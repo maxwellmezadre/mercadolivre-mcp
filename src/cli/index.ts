@@ -168,6 +168,54 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       ),
     );
 
+  command("spending")
+    .description("Spending summary from the cache, grouped by month, year, seller, category or none")
+    .option("--group-by <key>", "month (default), year, seller, category or none")
+    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
+    .option("--from <date>", "purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .option("--include-cancelled", "include cancelled purchases")
+    .action((options) =>
+      invoke(
+        "spending_summary",
+        {
+          groupBy: options.groupBy,
+          dateFilter: options.date,
+          from: options.from,
+          to: options.to,
+          includeCancelled: options.includeCancelled,
+        },
+        options.json ?? false,
+      ),
+    );
+
+  command("installments")
+    .description("Purchases paid in installments, with an estimate of what is still open")
+    .option("--all", "every paid purchase, not only 2+ installments")
+    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
+    .option("--from <date>", "purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .action((options) =>
+      invoke(
+        "list_installments",
+        { onlyMultiple: options.all ? false : undefined, dateFilter: options.date, from: options.from, to: options.to },
+        options.json ?? false,
+      ),
+    );
+
+  command("payment-methods")
+    .description("Payment methods used and how much went through each")
+    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
+    .option("--from <date>", "purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .action((options) =>
+      invoke(
+        "list_payment_methods",
+        { dateFilter: options.date, from: options.from, to: options.to },
+        options.json ?? false,
+      ),
+    );
+
   command("invoice <orderId>")
     .description("NF-e metadata and download links of one order")
     .action((orderId: string, options) =>
