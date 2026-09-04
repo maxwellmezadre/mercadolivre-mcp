@@ -123,3 +123,81 @@ export type PurchaseGroup = {
   detailRef: { packId: string; orderId: string };
   products: PurchaseListItem[];
 };
+
+// ------------------------------------------------------------ detail page
+
+/** Financial breakdown of the WHOLE purchase (spec §6.4 `ticket_row`). */
+export type MoneyBreakdown = {
+  /** Sum of the items at list price. */
+  productsCents?: number;
+  /** Negative. */
+  discountCents?: number;
+  /** Negative. */
+  couponsCents?: number;
+  /** 0 when free. */
+  shippingCents?: number;
+  totalCents?: number;
+  /** Installment interest: total minus the rest, only when paying in N > 1. */
+  interestCents?: number;
+  /** Units in the purchase, from the "Produtos (N)" label. */
+  itemCount?: number;
+  /** Labels the parser does not know, normalized, with their cents. */
+  extras: Record<string, number>;
+  currency: "BRL";
+};
+
+export type Payment = {
+  /** 1 = paid in full. */
+  installments: number;
+  installmentCents: number;
+  /** installments * installmentCents. */
+  totalCents: number;
+  /** "Mastercard", "Pix", "Boleto", "Saldo em conta", ... */
+  method?: string;
+  cardLast4?: string;
+  paymentDate?: string;
+  /** Mercado Pago payment id: the bridge to a card statement. */
+  paymentId?: string;
+  /** Original prose, for auditing. */
+  raw: string;
+};
+
+export type ShippingAddress = { addressLine?: string; addressCity?: string };
+
+export type Seller = {
+  id?: string;
+  name?: string;
+  isOfficialStore: boolean;
+  messagesUrl?: string;
+};
+
+/** One `row_with_ellipsis`: prices are LINE TOTALS, already times quantity. */
+export type DetailProduct = {
+  title: string;
+  quantity: number;
+  listCents?: number;
+  paidCents?: number;
+  variations: Record<string, string>;
+  itemId?: string;
+  imageUrl?: string;
+  itemUrl?: string;
+};
+
+/** Facts of the detail page; the product inventory comes from the list (spec §6.5). */
+export type DetailPage = {
+  purchaseId?: string;
+  purchaseDateLabel?: string;
+  purchaseDate?: string;
+  money: MoneyBreakdown;
+  payment?: Payment;
+  shipping: ShippingAddress;
+  seller?: Seller;
+  /** Subset of the purchase's products (complete only for small purchases). */
+  products: DetailProduct[];
+  /** Title of the order the page was queried with (`context_with_ellipsis`). */
+  queriedProductTitle?: string;
+  invoiceOrderIds: string[];
+  hasInvoice: boolean;
+  /** Invariant violations, reported instead of hidden. */
+  warnings: string[];
+};
