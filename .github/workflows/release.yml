@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # create the Release and attach binaries
+  id-token: write # npm provenance
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bunx tsc --noEmit
+      - run: bun test
+
+  npm:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v6
+        with:
+          # Trusted publishing (OIDC) needs npm >= 11.5.1; Node 24 ships it.
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      - run: bun install --frozen-lockfile
+      - run: bun run build:dist
+      # No NODE_AUTH_TOKEN: the credential is a short-lived OIDC token minted at
+      # publish time; provenance is automatic.
+      - run: npm publish --access public
+
+  binaries:
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: bun-linux-x64
+            asset: mercadolivre-linux-x64
+          - os: macos-latest
+            target: bun-darwin-arm64
+            asset: mercadolivre-darwin-arm64
+          - os: windows-latest
+            target: bun-windows-x64
+            asset: mercadolivre-windows-x64.exe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      # playwright-core stays external: `login` needs it resolvable at runtime,
+      # every other command runs from the binary alone.
+      - run: bun build --compile --target=${{ matrix.target }} src/bin.ts --outfile ${{ matrix.asset }} --external playwright-core
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset }}
