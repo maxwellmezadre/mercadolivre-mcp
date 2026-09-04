@@ -1,6 +1,5 @@
 import type {
   Brick,
-  DateFilter,
   ListPage,
   PurchaseGroup,
   PurchaseListItem,
@@ -134,7 +133,7 @@ export function parseListPage(root: Brick, now: Date): ListPage {
       .map((option) => option.value)
       .filter((value): value is string => typeof value === "string"),
     dateFilters: dropdownOptions(root, "dropdown", "filterDate")
-      .filter((option): option is DateFilter => typeof option.value === "string")
+      .filter((option): option is { value: string; text?: string } => typeof option.value === "string")
       .map((option) => ({ value: option.value, label: option.text ?? option.value })),
     items,
   };
