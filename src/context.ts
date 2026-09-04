@@ -2,6 +2,8 @@ import { createSessionStore, type SessionStore } from "./auth/session.js";
 import type { Config } from "./config.js";
 import { createMeliHttp, type HttpDeps, type MeliHttp } from "./core/http.js";
 import { createLogger, type Logger } from "./core/logger.js";
+import { createInvoicesApi, type InvoicesApi } from "./meli/api/invoices.js";
+import { createPurchasesApi, type PurchasesApi } from "./meli/api/purchases.js";
 
 // Injection context (AR-4): collaborators are passed explicitly, no globals.
 // Everything that touches time or the network is replaceable in tests.
@@ -11,6 +13,7 @@ export type Ctx = {
   now: () => Date;
   session: SessionStore;
   http: MeliHttp;
+  meli: { purchases: PurchasesApi; invoices: InvoicesApi };
 };
 
 export type ContextDeps = {
@@ -21,6 +24,7 @@ export type ContextDeps = {
 
 export function createContext(config: Config, deps: ContextDeps = {}): Ctx {
   const now = deps.now ?? (() => Date.now());
+  const clock = () => new Date(now());
   // Shared by reference: the session store appends cookie values (NFR-4).
   const secrets: string[] = [];
   const log = createLogger({ logFile: config.logFile, secrets, sink: deps.logSink });
@@ -40,5 +44,15 @@ export function createContext(config: Config, deps: ContextDeps = {}): Ctx {
     },
     { now, ...deps.http },
   );
-  return { config, log, now: () => new Date(now()), session, http };
+  return {
+    config,
+    log,
+    now: clock,
+    session,
+    http,
+    meli: {
+      purchases: createPurchasesApi({ http, now: clock }),
+      invoices: createInvoicesApi({ http }),
+    },
+  };
 }

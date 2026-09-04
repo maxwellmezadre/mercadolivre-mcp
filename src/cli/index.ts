@@ -60,6 +60,55 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       invoke("auth_status", { verify: options.verify ?? false }, options.json ?? false),
     );
 
+  command("purchases")
+    .description("List purchases (grouped by purchase) with optional filters")
+    .option("--page <n>", "first page (default 1)")
+    .option("--max-pages <n>", "consecutive pages to read (default 1)")
+    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
+    .option("--category <name>", "exact category name (see categories)")
+    .option("--search <text>", "free text search")
+    .action((options) =>
+      invoke(
+        "list_purchases",
+        {
+          page: toNumber(options.page),
+          maxPages: toNumber(options.maxPages),
+          dateFilter: options.date,
+          category: options.category,
+          search: options.search,
+        },
+        options.json ?? false,
+      ),
+    );
+
+  command("purchase <purchaseId>")
+    .description("Full detail of one purchase (money, installments, products, seller, invoice)")
+    .option("--pack <packId>", "pack id paired with --order")
+    .option("--order <orderId>", "order id paired with --pack")
+    .option("--no-invoice", "skip the NF-e metadata")
+    .option("--max-lookup-pages <n>", "pages to scan when --pack/--order are missing")
+    .action((purchaseId: string, options) =>
+      invoke(
+        "get_purchase",
+        {
+          purchaseId,
+          packId: options.pack,
+          orderId: options.order,
+          includeInvoice: options.invoice,
+          maxLookupPages: toNumber(options.maxLookupPages),
+        },
+        options.json ?? false,
+      ),
+    );
+
+  command("categories")
+    .description("Category names and time windows accepted by the purchase filters")
+    .action((options) => invoke("list_categories", {}, options.json ?? false));
+
+  command("invoice <orderId>")
+    .description("NF-e metadata and download links of one order")
+    .action((orderId: string, options) => invoke("get_invoice", { orderId }, options.json ?? false));
+
   command("raw <url>")
     .description("Authenticated GET on an allowed Mercado Livre host (rediscovery)")
     .option("--as <mode>", "html | json | nordic", "html")

@@ -2,6 +2,7 @@ import { afterAll, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { allTools } from "../src/tools/registry.js";
 
 // End-to-end over stdio: the real binary entry, a real JSON-RPC handshake,
 // and the guarantee that stdout carries nothing but JSON-RPC (NFR-3).
@@ -40,7 +41,7 @@ test("mcp handshake lists the tools and calls auth_status without a session", as
   ]);
 
   const list = replies.find((reply) => reply.id === 2)?.result as { tools: Array<{ name: string; annotations: { readOnlyHint: boolean } }> };
-  expect(list.tools.map((tool) => tool.name)).toEqual(["auth_status", "raw_get"]);
+  expect(list.tools.map((tool) => tool.name)).toEqual(allTools.map((tool) => tool.name));
   expect(list.tools[0]?.annotations.readOnlyHint).toBe(true);
 
   const status = replies.find((reply) => reply.id === 3)?.result as { isError?: boolean; content: Array<{ text: string }> };
