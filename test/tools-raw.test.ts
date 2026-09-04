@@ -17,7 +17,7 @@ const CTX_PAGE =
               bricks: [
                 { id: "list_item_a", ui_type: "list_item" },
                 { id: "list_item_b", ui_type: "list_item" },
-                { id: "paginator_1", ui_type: "paginator", data: { total_pages: 7 } },
+                { id: "paginator_1", ui_type: "paginator", data: { total_pages: 7, filler: "x".repeat(2000) } },
               ],
             },
           },

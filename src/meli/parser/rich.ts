@@ -55,7 +55,7 @@ const QUANTITY_WORDS: Record<string, number> = {
 const QUANTITY = /(\d+|[a-z]+)\s+(?:unidades?|un\b\.?)/gi;
 
 export function stripAccents(value: string): string {
-  return value.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 /** "| 3 unidades", "Uma unidade.", "1 un." -> number; undefined when absent. */
