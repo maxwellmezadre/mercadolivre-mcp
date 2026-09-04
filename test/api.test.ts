@@ -134,7 +134,7 @@ describe("invoices api", () => {
     expect(calls).toHaveLength(3);
     expect(calls[0]?.url).toBe(`${WWW}/emissor/omni/api/invoices-overview?identifiers=${ids.slice(0, OVERVIEW_BATCH).join("%2C")}`);
     expect(calls[0]?.options.kind).toBe("json");
-    expect(invoices.map((invoice) => invoice.orderId)).toEqual([ids[0], ids[10], ids[20]]);
+    expect(invoices.map((invoice) => invoice.orderId)).toEqual(ids.filter((_, index) => index % OVERVIEW_BATCH === 0));
     expect(await api.overview([])).toEqual([]);
     expect(calls).toHaveLength(3);
   });
