@@ -1,6 +1,10 @@
-// Raw shapes of the Flox/Nordic payload (spec §5). Everything is optional on
-// purpose: bricks are server-driven UI and any field may be absent. Parsers
-// (AR-5) turn these into the canonical model declared further down.
+// Raw shapes of the Flox/Nordic payload (spec §5) and the canonical model the
+// parsers produce (spec §7). Raw fields are optional on purpose: bricks are
+// server-driven UI and any field may be absent. Money is integer cents (AR-7)
+// and every Mercado Livre id is a numeric string that must never become a
+// JavaScript number.
+
+// ---------------------------------------------------------------- raw shapes
 
 export type RichNode = {
   type: string;
@@ -48,3 +52,74 @@ export type PageProps = {
 };
 
 export type NordicCtx = { appProps?: { pageProps?: PageProps } };
+
+// ---------------------------------------------------------- canonical model
+
+/**
+ * Identity hierarchy (spec §6.5): purchase (checkout) > pack (parcel) >
+ * order (ONE product) > shipment. `packId` and `orderId` always come from
+ * the same list item (AR-10).
+ */
+export type PurchaseIds = {
+  /** The checkout; "Compra número N" in the UI. Aggregation key (AR-8). */
+  purchaseId: string;
+  /** Logistic parcel inside the purchase. */
+  packId: string;
+  /** One product. Used by the detail page and the invoice endpoints. */
+  orderId: string;
+  /** Shared by the orders of the same pack. */
+  shipmentId?: string;
+  /** "SHIPPING", "SERVICES", ... */
+  verticalId?: string;
+};
+
+/** One row of the purchases list = one order = one product (spec §6.2). */
+export type PurchaseListItem = PurchaseIds & {
+  /** ISO date derived from the enclosing group label. */
+  purchaseDate?: string;
+  /** "27 de agosto" / "3 de julho de 2024", as rendered. */
+  purchaseDateLabel: string;
+  /** "Entregue", "A caminho", "Cancelado", ... */
+  status?: string;
+  /** "Chegou no dia 29 de agosto. Enviado por FULL" */
+  deliveryHeadline?: string;
+  /** ISO date when the headline says the parcel arrived. */
+  deliveredAt?: string;
+  isFull: boolean;
+  /** Raw product label from the list (title + quantity + attributes prose). */
+  productTitle: string;
+  quantity: number;
+  /** "MLB2086446083" */
+  itemId?: string;
+  itemUrl?: string;
+  imageUrl?: string;
+  detailUrl?: string;
+};
+
+export type DateFilter = { value: string; label: string };
+
+export type ListPage = {
+  page: number;
+  totalPages: number;
+  /** "68 compras" / '3 compras contêm "cafe"' */
+  totalLabel?: string;
+  /** Values accepted by the category filter. */
+  categories: string[];
+  dateFilters: DateFilter[];
+  items: PurchaseListItem[];
+};
+
+/** Orders of the list grouped by purchase (AR-8). */
+export type PurchaseGroup = {
+  purchaseId: string;
+  purchaseDate?: string;
+  purchaseDateLabel: string;
+  /** Most frequent status among the orders. */
+  status?: string;
+  orderCount: number;
+  totalUnits: number;
+  packIds: string[];
+  /** A valid pair for the detail page: the first order's own pack and order. */
+  detailRef: { packId: string; orderId: string };
+  products: PurchaseListItem[];
+};
