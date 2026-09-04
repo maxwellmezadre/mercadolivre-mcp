@@ -1,7 +1,7 @@
 import type { Database } from "bun:sqlite";
 import type { DateFilterValue } from "../meli/api/purchases.js";
 import { normalizeTitle } from "../meli/merge.js";
-import type { ProductRow, PurchaseRow } from "./repo.js";
+import type { InvoiceRow, ProductRow, PurchaseRow } from "./repo.js";
 
 // Read side of the cache (AR-6): the filters every query tool needs, in SQL.
 // Dates are `YYYY-MM-DD` strings, so ranges compare lexicographically. The
@@ -136,6 +136,8 @@ export type Queries = {
   productsByPurchase(purchaseIds: string[]): Map<string, ProductRow[]>;
   categoriesByPurchase(purchaseIds: string[]): Map<string, string[]>;
   products(query: ProductQuery): ProductWithPurchase[];
+  /** Cached invoices of the purchases in a period, newest purchase first. */
+  invoices(query: Pick<PurchaseQuery, "from" | "to" | "includeCancelled">): Array<InvoiceRow & { purchase_date: string | null }>;
 };
 
 export function createQueries(db: Database): Queries {
@@ -178,6 +180,15 @@ export function createQueries(db: Database): Queries {
       );
       for (const row of rows) map.set(row.purchase_id, [...(map.get(row.purchase_id) ?? []), row.category]);
       return map;
+    },
+
+    invoices(query) {
+      const where = purchaseWhere(query);
+      return all<InvoiceRow & { purchase_date: string | null }>(
+        `SELECT i.*, u.purchase_date FROM invoices i JOIN purchases u ON u.purchase_id = i.purchase_id
+         ${where.sql()} ORDER BY u.purchase_date DESC, i.order_id`,
+        ...where.values,
+      );
     },
 
     products(query) {

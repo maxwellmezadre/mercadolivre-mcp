@@ -222,6 +222,41 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       invoke("get_invoice", { orderId }, options.json ?? false),
     );
 
+  command("download-invoice <orderId>")
+    .description("Download the NF-e of one order (pdf or xml) into the download directory")
+    .requiredOption("--format <format>", "pdf or xml")
+    .option("--name <fileName>", "file name inside the download directory")
+    .action((orderId: string, options) =>
+      invoke(
+        "download_invoice",
+        { orderId, format: options.format, fileName: options.name },
+        options.json ?? false,
+      ),
+    );
+
+  command("export-invoices")
+    .description("Download every cached NF-e of a period (pdf, xml or both)")
+    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
+    .option("--from <date>", "purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .option("--format <format>", "pdf, xml or both (default both)")
+    .option("--overwrite", "download again over existing files")
+    .option("--include-cancelled", "include cancelled purchases")
+    .action((options) =>
+      invoke(
+        "export_invoices",
+        {
+          dateFilter: options.date,
+          from: options.from,
+          to: options.to,
+          format: options.format,
+          overwrite: options.overwrite,
+          includeCancelled: options.includeCancelled,
+        },
+        options.json ?? false,
+      ),
+    );
+
   command("sync")
     .description("Synchronize the local cache (incremental by default; --full once, --reparse offline)")
     .option("--full", "walk every page and category")

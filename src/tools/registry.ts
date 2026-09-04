@@ -1,6 +1,7 @@
 import { listInstallments, listPaymentMethods, spendingSummary } from "./analytics.js";
 import { authStatus } from "./auth.js";
 import type { ToolDef } from "./define.js";
+import { downloadInvoice, exportInvoices } from "./invoices.js";
 import { listProducts, productHistory } from "./products.js";
 import { getInvoice, getPurchase, listCategories, listPurchases, searchPurchases } from "./purchases.js";
 import { rawGet } from "./raw.js";
@@ -20,6 +21,8 @@ export const allTools: ToolDef[] = [
   listInstallments,
   listPaymentMethods,
   getInvoice,
+  downloadInvoice,
+  exportInvoices,
   sync,
   rawGet,
 ];
