@@ -45,3 +45,11 @@ export class RateLimitError extends UpstreamError {
     this.name = "RateLimitError";
   }
 }
+
+/** The page or payload does not have the shape we know (layout changed?). */
+export class ParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ParseError";
+  }
+}
