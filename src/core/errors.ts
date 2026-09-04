@@ -22,3 +22,26 @@ export class SessionError extends Error {
     this.name = "SessionError";
   }
 }
+
+/** Mercado Livre answered with an error status or an error page. */
+export class UpstreamError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "UpstreamError";
+  }
+}
+
+/** 403/429 that survived every retry: back off before trying again (NFR-2). */
+export class RateLimitError extends UpstreamError {
+  constructor(status: number, attempts: number) {
+    super(
+      status,
+      `Mercado Livre refused the request with HTTP ${status} after ${attempts} ` +
+        "attempts (rate limited or blocked). Wait a few minutes before retrying.",
+    );
+    this.name = "RateLimitError";
+  }
+}
