@@ -45,6 +45,7 @@ export type SessionStore = {
   /** `Cookie` header for `host`. Throws NO_SESSION when nothing is configured. */
   cookieHeader(host: string): string;
   userAgent(): string | undefined;
+  meta(): SessionMeta;
   /** Merges `Set-Cookie` lines received from `host`; persists file-backed sessions. */
   applySetCookies(host: string, setCookies: readonly string[]): void;
   /** Replaces the session with a fresh login result. */
@@ -180,6 +181,11 @@ export function createSessionStore(opts: {
     userAgent() {
       load();
       return meta.userAgent;
+    },
+
+    meta() {
+      load();
+      return meta;
     },
 
     applySetCookies(host, setCookies) {

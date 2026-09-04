@@ -11,7 +11,8 @@
   "homepage": "https://github.com/maxwellmezadre/mercadolivre-mcp#readme",
   "keywords": ["mercadolivre", "mercadolibre", "mcp", "cli", "purchases", "nfe", "claude"],
   "bin": {
-    "mercadolivre": "./dist/bin.js"
+    "mercadolivre": "./dist/bin.js",
+    "mercadolivre-mcp": "./dist/mcp-bin.js"
   },
   "files": ["dist", "SKILL.md", "README.md", "LICENSE"],
   "exports": "./dist/bin.js",
@@ -25,7 +26,7 @@
     "start": "bun run src/bin.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "build:dist": "bun build src/bin.ts --target=bun --outdir dist",
+    "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --outdir dist",
     "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre",
     "prepublishOnly": "bun run build:dist"
   },
