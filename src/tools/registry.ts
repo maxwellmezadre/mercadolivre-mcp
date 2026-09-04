@@ -1,6 +1,7 @@
 import { listInstallments, listPaymentMethods, spendingSummary } from "./analytics.js";
 import { authStatus } from "./auth.js";
 import type { ToolDef } from "./define.js";
+import { doctor } from "./doctor.js";
 import { downloadInvoice, exportInvoices } from "./invoices.js";
 import { listProducts, productHistory } from "./products.js";
 import { getInvoice, getPurchase, listCategories, listPurchases, searchPurchases } from "./purchases.js";
@@ -11,6 +12,7 @@ import { sync } from "./sync.js";
 // is the order clients see.
 export const allTools: ToolDef[] = [
   authStatus,
+  doctor,
   listPurchases,
   getPurchase,
   searchPurchases,

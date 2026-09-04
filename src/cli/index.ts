@@ -60,6 +60,10 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       invoke("auth_status", { verify: options.verify ?? false }, options.json ?? false),
     );
 
+  command("doctor")
+    .description("Check the session and every Mercado Livre endpoint this tool depends on")
+    .action((options) => invoke("doctor", {}, options.json ?? false));
+
   command("purchases")
     .description("List purchases (grouped by purchase) with optional filters")
     .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
