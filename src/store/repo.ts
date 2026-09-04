@@ -129,6 +129,9 @@ export type Store = {
   purchasesNeedingDetail(opts: { refreshNonFinalBefore?: string }): PurchaseRow[];
   productsWithoutPrice(): ProductRow[];
   searchProducts(query: string, limit: number): ProductRow[];
+  getInvoice(orderId: string): InvoiceRow | undefined;
+  /** Purchases whose detail page is cached, for reparsing without network. */
+  purchasesWithRawDetail(): Array<Pick<PurchaseRow, "purchase_id" | "order_id" | "detail_fetched_at"> & { raw_detail: string }>;
 };
 
 const flag = (value: boolean | undefined): number | null =>
@@ -353,6 +356,13 @@ export function createStore(db: Database): Store {
 
     productsWithoutPrice: () =>
       all<ProductRow>("SELECT * FROM products WHERE price_source = 'none' ORDER BY rowid"),
+
+    getInvoice: (orderId) => one<InvoiceRow>("SELECT * FROM invoices WHERE order_id = ?", orderId),
+
+    purchasesWithRawDetail: () =>
+      all<Pick<PurchaseRow, "purchase_id" | "order_id" | "detail_fetched_at"> & { raw_detail: string }>(
+        "SELECT purchase_id, order_id, detail_fetched_at, raw_detail FROM purchases WHERE raw_detail IS NOT NULL ORDER BY rowid",
+      ),
 
     searchProducts(query, limit) {
       const match = ftsQuery(query);

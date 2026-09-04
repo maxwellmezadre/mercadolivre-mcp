@@ -2,6 +2,7 @@ import { authStatus } from "./auth.js";
 import type { ToolDef } from "./define.js";
 import { getInvoice, getPurchase, listCategories, listPurchases } from "./purchases.js";
 import { rawGet } from "./raw.js";
+import { sync } from "./sync.js";
 
 // Flat registry shared by the MCP server and the CLI (AR-1). The order here
 // is the order clients see.
@@ -11,6 +12,7 @@ export const allTools: ToolDef[] = [
   getPurchase,
   listCategories,
   getInvoice,
+  sync,
   rawGet,
 ];
 

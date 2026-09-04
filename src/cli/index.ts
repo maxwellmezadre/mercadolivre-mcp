@@ -109,6 +109,28 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     .description("NF-e metadata and download links of one order")
     .action((orderId: string, options) => invoke("get_invoice", { orderId }, options.json ?? false));
 
+  command("sync")
+    .description("Synchronize the local cache (incremental by default; --full once, --reparse offline)")
+    .option("--full", "walk every page and category")
+    .option("--reparse", "re-run the parsers on cached pages, no network")
+    .option("--max-pages <n>", "safety cap on list pages (default 10)")
+    .option("--no-details", "skip purchase details")
+    .option("--no-invoices", "skip NF-e overviews and xml")
+    .option("--no-categories", "skip the category pass")
+    .action((options) =>
+      invoke(
+        "sync",
+        {
+          mode: options.reparse ? "reparse" : options.full ? "full" : "incremental",
+          maxPages: toNumber(options.maxPages),
+          withDetails: options.details,
+          withInvoices: options.invoices,
+          withCategories: options.categories,
+        },
+        options.json ?? false,
+      ),
+    );
+
   command("raw <url>")
     .description("Authenticated GET on an allowed Mercado Livre host (rediscovery)")
     .option("--as <mode>", "html | json | nordic", "html")
