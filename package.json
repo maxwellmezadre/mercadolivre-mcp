@@ -26,8 +26,8 @@
     "start": "bun run src/bin.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --outdir dist",
-    "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre",
+    "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --outdir dist --external playwright-core",
+    "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre --external playwright-core",
     "prepublishOnly": "bun run build:dist"
   },
   "devDependencies": {
@@ -38,5 +38,8 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@sinclair/typebox": "^0.34.52",
     "commander": "^15.0.0"
+  },
+  "optionalDependencies": {
+    "playwright-core": "^1.62.1"
   }
 }

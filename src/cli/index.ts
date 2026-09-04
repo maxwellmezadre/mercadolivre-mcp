@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { loadConfig } from "../config.js";
+import { interactiveLogin } from "../auth/login.js";
 import { createContext } from "../context.js";
 import { compactObject, runTool } from "../tools/define.js";
 import { toolByName } from "../tools/registry.js";
@@ -70,6 +71,21 @@ export async function runCli(argv: string[], version: string): Promise<void> {
         options.json ?? false,
       ),
     );
+
+  program
+    .command("login")
+    .description(
+      "Open a browser window to log in; the session is saved locally (this tool never sees the password)",
+    )
+    .action(async () => {
+      try {
+        const result = await interactiveLogin(createContext(loadConfig()));
+        console.error(`Session saved to ${result.sessionFile} (${result.cookieCount} cookies).`);
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+      }
+    });
 
   program
     .command("mcp")
