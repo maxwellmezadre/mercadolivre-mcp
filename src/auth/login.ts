@@ -2,14 +2,16 @@ import { mkdirSync } from "node:fs";
 import type { Config } from "../config.js";
 import { LIST_PAGE_URL } from "../core/http.js";
 import type { Logger } from "../core/logger.js";
+import { INSTALL_HINT, resolveLoginBrowser, type Browser } from "./browser.js";
 import type { SessionCookie, SessionStore } from "./session.js";
 
-// Interactive login (F-2, spec §3.3): a headed browser with a persistent
-// profile is opened on the purchases page; the user authenticates by hand
-// (password, 2FA, captcha — nothing is automated and the tool never sees the
-// credentials). Once the purchases list renders, the browser's storage state
-// becomes our session. Playwright is loaded lazily so the MCP server and the
-// rest of the CLI never depend on it.
+// Interactive login (F-2, spec §3.3): the user's default browser (Chromium
+// based — see browser.ts) is opened headed, with its own persistent profile,
+// on the purchases page; the user authenticates by hand (password, 2FA,
+// captcha — nothing is automated and the tool never sees the credentials).
+// Once the purchases list renders, the browser's storage state becomes our
+// session. Playwright is loaded lazily so the MCP server and the rest of the
+// CLI never depend on it.
 
 export type PageLike = {
   goto(url: string, options?: { waitUntil?: string; timeout?: number }): Promise<unknown>;
@@ -35,9 +37,16 @@ export type PlaywrightLike = {
 export type LoginDeps = {
   /** Replaced in tests; defaults to `import("playwright-core")`. */
   importPlaywright?: () => Promise<PlaywrightLike>;
+  /** Replaced in tests; defaults to the system default browser resolution. */
+  resolveBrowser?: (override: string | undefined) => { browser: Browser; warnings: string[] };
 };
 
-export type LoginResult = { cookieCount: number; userAgent?: string; sessionFile: string };
+export type LoginResult = {
+  browser: string;
+  cookieCount: number;
+  userAgent?: string;
+  sessionFile: string;
+};
 
 const LIST_ITEM_SELECTOR = "[id^=list_item_]";
 const LOGIN_TIMEOUT_MS = 5 * 60_000;
@@ -52,31 +61,13 @@ async function defaultImport(): Promise<PlaywrightLike> {
   return (await import("playwright-core")) as unknown as PlaywrightLike;
 }
 
-const BASE_OPTIONS = {
+const LAUNCH_OPTIONS = {
   headless: false,
   viewport: { width: 1280, height: 900 },
-  // A plain Chrome window is less likely to be challenged than an automation one.
+  // A plain browser window is less likely to be challenged than an automation one.
   ignoreDefaultArgs: ["--enable-automation"],
   args: ["--disable-blink-features=AutomationControlled"],
 };
-
-async function launch(
-  playwright: PlaywrightLike,
-  profileDir: string,
-  channel: string,
-  log: Logger,
-): Promise<BrowserContextLike> {
-  try {
-    return await playwright.chromium.launchPersistentContext(profileDir, {
-      ...BASE_OPTIONS,
-      channel,
-    });
-  } catch (error) {
-    if (!/not found|not installed|doesn't exist/i.test(String(error))) throw error;
-    log.warn(`Browser channel "${channel}" not found; falling back to the bundled Chromium.`);
-    return playwright.chromium.launchPersistentContext(profileDir, BASE_OPTIONS);
-  }
-}
 
 export async function interactiveLogin(
   ctx: { config: Config; session: SessionStore; log: Logger },
@@ -90,8 +81,23 @@ export async function interactiveLogin(
     throw new Error(`Could not load playwright-core (${reason}). ${PLAYWRIGHT_HINT}`);
   }
 
+  const resolve = deps.resolveBrowser ?? ((override) => resolveLoginBrowser({ override }));
+  const { browser, warnings } = resolve(ctx.config.loginBrowser);
+  for (const warning of warnings) ctx.log.warn(warning);
+
   mkdirSync(ctx.config.profileDir, { recursive: true, mode: 0o700 });
-  const context = await launch(playwright, ctx.config.profileDir, ctx.config.loginChannel, ctx.log);
+  ctx.log.info(`Opening ${browser.name} for the Mercado Livre login...`);
+  let context: BrowserContextLike;
+  try {
+    context = await playwright.chromium.launchPersistentContext(ctx.config.profileDir, {
+      ...LAUNCH_OPTIONS,
+      executablePath: browser.executablePath,
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(`Could not start ${browser.name} (${browser.executablePath}): ${reason}. ${INSTALL_HINT}`);
+  }
+
   try {
     const page = await context.newPage();
     await page.goto(LIST_PAGE_URL, { waitUntil: "domcontentloaded" });
@@ -103,6 +109,7 @@ export async function interactiveLogin(
     const state = await context.storageState();
     ctx.session.save({ cookies: state.cookies, userAgent });
     return {
+      browser: browser.name,
       cookieCount: ctx.session.cookies().length,
       userAgent,
       sessionFile: ctx.session.path,

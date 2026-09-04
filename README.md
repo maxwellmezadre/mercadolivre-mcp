@@ -62,7 +62,10 @@ pacote npm (`bunx @maxwellmezadre/mercadolivre-mcp login`), ou use
 mercadolivre login
 ```
 
-Abre o seu Chrome na página de compras; você entra normalmente (senha, 2FA, captcha).
+Abre o **navegador padrão do sistema** na página de compras; você entra normalmente (senha,
+2FA, captcha). O navegador precisa ser o Google Chrome ou um baseado em Chromium (Arc,
+Brave, Edge, Vivaldi): com Safari ou Firefox como padrão, a ferramenta avisa, usa outro
+compatível que já esteja instalado ou pede para instalar um.
 Quando a lista de compras carrega, a sessão do navegador é salva em
 `~/.config/mercadolivre-mcp/session.json` com permissão `0600`. Não há OAuth nem
 refresh token nesta superfície: a sessão dura enquanto o Mercado Livre a mantiver
@@ -136,7 +139,7 @@ Nenhuma é obrigatória.
 | `MERCADOLIVRE_REQUEST_INTERVAL_MS` | `1000` | Intervalo mínimo entre requisições (mais jitter de 200–600 ms) |
 | `MERCADOLIVRE_HTTP_TIMEOUT_MS` | `30000` | Timeout por requisição |
 | `MERCADOLIVRE_USER_AGENT` | o do login | User-Agent enviado ao site |
-| `MERCADOLIVRE_LOGIN_CHANNEL` | `chrome` | Navegador usado pelo `login` (`chrome`, `msedge`, `chromium`) |
+| `MERCADOLIVRE_LOGIN_BROWSER` | navegador padrão | Navegador do `login`: caminho do `.app`, executável ou bundle id (só Chromium-based) |
 | `MERCADOLIVRE_LOG_FILE` | — | Arquivo de log (os logs vão sempre para stderr) |
 
 Referência completa: [docs/CONFIGURATION.md](docs/CONFIGURATION.md).

@@ -4,7 +4,7 @@
 
 ```sh
 bun install
-bun run src/bin.ts login          # entra no Chrome; a sessão vai para ~/.config/mercadolivre-mcp
+bun run src/bin.ts login          # abre o navegador padrão (Chromium-based); sessão em ~/.config/mercadolivre-mcp
 bun run src/bin.ts status --verify
 bun run src/bin.ts sync --full    # carga inicial: ~3 min para ~70 compras
 ```

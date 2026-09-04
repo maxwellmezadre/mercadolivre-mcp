@@ -24,7 +24,7 @@ describe("loadConfig defaults", () => {
 
     expect(config.requestIntervalMs).toBe(1000);
     expect(config.httpTimeoutMs).toBe(30_000);
-    expect(config.loginChannel).toBe("chrome");
+    expect(config.loginBrowser).toBeUndefined();
     expect(config.cookie).toBeUndefined();
     expect(config.userAgent).toBeUndefined();
     expect(config.logFile).toBeUndefined();
@@ -48,7 +48,7 @@ describe("loadConfig overrides", () => {
       MERCADOLIVRE_LOG_FILE: "/tmp/ml.log",
       MERCADOLIVRE_DOWNLOAD_DIR: "/tmp/nfe",
       MERCADOLIVRE_USER_AGENT: "UA/1.0",
-      MERCADOLIVRE_LOGIN_CHANNEL: "chromium",
+      MERCADOLIVRE_LOGIN_BROWSER: "/Applications/Arc.app",
     });
 
     expect(config.cookie).toBe("a=1; b=2");
@@ -57,7 +57,7 @@ describe("loadConfig overrides", () => {
     expect(config.logFile).toBe("/tmp/ml.log");
     expect(config.downloadDir).toBe("/tmp/nfe");
     expect(config.userAgent).toBe("UA/1.0");
-    expect(config.loginChannel).toBe("chromium");
+    expect(config.loginBrowser).toBe("/Applications/Arc.app");
   });
 
   test("blank values count as unset", () => {

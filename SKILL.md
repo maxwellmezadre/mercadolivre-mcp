@@ -20,7 +20,8 @@ pela tool `sync`; a rede só entra quando pedido.
 ## Antes de tudo
 
 1. `auth_status` — há sessão? Se não: peça ao usuário para rodar `mercadolivre login`
-   no terminal (ele digita a senha no navegador; a ferramenta nunca a vê) ou
+   no terminal (abre o navegador padrão, que precisa ser Chrome ou Chromium-based; ele
+   digita a senha lá e a ferramenta nunca a vê) ou
    configurar `MERCADOLIVRE_COOKIE`.
 2. `sync` — se o cache estiver vazio (`list_purchases` avisa com `note`), rode
    `sync` com `mode: "full"` uma vez (≈3 min; para ~70 compras). Nas sessões

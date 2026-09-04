@@ -9,7 +9,8 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); versioname
 
 ### Added
 
-- Login interativo (`mercadolivre login`) via Playwright headed e `MERCADOLIVRE_COOKIE`
+- Login interativo (`mercadolivre login`) no navegador padrão do sistema (Chromium-based;
+  aviso e instrução de instalação para Safari/Firefox) e `MERCADOLIVRE_COOKIE`
   como alternativa; sessão em `session.json` (0600) com cookies renovados a cada resposta.
 - Cliente HTTP serial (1 req/s + jitter, backoff em 403/429, redirect manual com
   detecção de login).

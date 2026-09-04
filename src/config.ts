@@ -20,8 +20,8 @@ export const ConfigSchema = Type.Object({
   cookie: Type.Optional(Type.String({ minLength: 1 })),
   /** Overrides the User-Agent captured at login. */
   userAgent: Type.Optional(Type.String({ minLength: 1 })),
-  /** Playwright browser channel used by `login` (chrome, msedge, chromium). */
-  loginChannel: Type.String({ minLength: 1 }),
+  /** Browser for `login`: an .app, an executable or a bundle id (default: the system default browser). */
+  loginBrowser: Type.Optional(Type.String({ minLength: 1 })),
   /** Minimum gap between two requests to Mercado Livre (NFR-2). */
   requestIntervalMs: Type.Integer({ minimum: 0 }),
   httpTimeoutMs: Type.Integer({ minimum: 1000 }),
@@ -98,7 +98,7 @@ export function loadConfig(env: Env = process.env): Config {
     ),
     cookie: readOptional(env, "MERCADOLIVRE_COOKIE"),
     userAgent: readOptional(env, "MERCADOLIVRE_USER_AGENT"),
-    loginChannel: readOptional(env, "MERCADOLIVRE_LOGIN_CHANNEL") ?? "chrome",
+    loginBrowser: readOptional(env, "MERCADOLIVRE_LOGIN_BROWSER"),
     requestIntervalMs: readInt(
       problems,
       env,
