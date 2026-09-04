@@ -4,12 +4,14 @@ import { homedir } from "node:os";
 import { basename, join } from "node:path";
 
 // Which browser the login drives (F-2). The user's DEFAULT browser is used
-// when it is Chromium based — Google Chrome, Arc, Brave, Microsoft Edge,
-// Vivaldi, Chromium... — because Playwright can drive any of them through
-// `executablePath`. Safari and Firefox cannot be driven this way, so the user
-// is told to install a compatible browser (or to point
-// MERCADOLIVRE_LOGIN_BROWSER at one). Everything that touches the OS goes
-// through a `Probe`, replaceable in tests.
+// when Playwright can drive it through `executablePath`: Google Chrome,
+// Brave, Microsoft Edge, Vivaldi, Chromium, Opera. Safari and Firefox are
+// different engines; Arc and Dia are Chromium based but do not expose a
+// DevTools connection (measured: neither --remote-debugging-pipe nor
+// --remote-debugging-port answers), so they cannot be driven either. In those
+// cases another installed compatible browser is used with a warning, or the
+// user is told what to install (or to set MERCADOLIVRE_LOGIN_BROWSER).
+// Everything that touches the OS goes through a `Probe`, replaceable in tests.
 
 export type Probe = {
   platform: string;
@@ -52,36 +54,43 @@ export type DefaultBrowser = {
   id?: string;
   appPath?: string;
   executablePath?: string;
-  /** Chromium based and resolvable. */
+  /** Drivable by Playwright and resolvable on disk. */
   compatible: boolean;
-  /** Whether the browser is in our lists at all (unknown ones are not trusted). */
-  known: boolean;
+  /** Why not, when not compatible. */
+  reason?: string;
 };
 
-/** Chromium-based browsers, in fallback preference order. Ids lowercase (LaunchServices stores them so). */
-const CHROMIUM_MAC: Array<{ id: string; name: string }> = [
+/** Drivable browsers, in fallback preference order. Ids lowercase (LaunchServices stores them so). */
+const DRIVABLE_MAC: Array<{ id: string; name: string }> = [
   { id: "com.google.chrome", name: "Google Chrome" },
-  { id: "company.thebrowser.browser", name: "Arc" },
   { id: "com.brave.browser", name: "Brave Browser" },
   { id: "com.microsoft.edgemac", name: "Microsoft Edge" },
   { id: "org.chromium.chromium", name: "Chromium" },
   { id: "com.vivaldi.vivaldi", name: "Vivaldi" },
   { id: "com.operasoftware.opera", name: "Opera" },
-  { id: "company.thebrowser.dia", name: "Dia" },
   { id: "com.google.chrome.canary", name: "Google Chrome Canary" },
   { id: "com.google.chrome.beta", name: "Google Chrome Beta" },
   { id: "com.google.chrome.dev", name: "Google Chrome Dev" },
 ];
 
-const OTHER_MAC: Record<string, string> = {
-  "com.apple.safari": "Safari",
-  "org.mozilla.firefox": "Firefox",
-  "org.mozilla.firefoxdeveloperedition": "Firefox Developer Edition",
-  "com.duckduckgo.macos.browser": "DuckDuckGo",
-  "com.kagi.kagimacos": "Orion",
+/** Known browsers that cannot be driven, with the reason shown to the user. */
+const NOT_DRIVABLE_MAC: Record<string, { name: string; reason: string }> = {
+  "company.thebrowser.browser": {
+    name: "Arc",
+    reason: "Arc is Chromium based but does not expose a DevTools connection, so it cannot be automated",
+  },
+  "company.thebrowser.dia": {
+    name: "Dia",
+    reason: "Dia is Chromium based but does not expose a DevTools connection, so it cannot be automated",
+  },
+  "com.apple.safari": { name: "Safari", reason: "Safari is not Chromium based" },
+  "org.mozilla.firefox": { name: "Firefox", reason: "Firefox is not Chromium based" },
+  "org.mozilla.firefoxdeveloperedition": { name: "Firefox Developer Edition", reason: "Firefox is not Chromium based" },
+  "com.duckduckgo.macos.browser": { name: "DuckDuckGo", reason: "DuckDuckGo is not Chromium based" },
+  "com.kagi.kagimacos": { name: "Orion", reason: "Orion is not Chromium based" },
 };
 
-const CHROMIUM_LINUX: Array<{ desktop: RegExp; bins: string[]; name: string }> = [
+const DRIVABLE_LINUX: Array<{ desktop: RegExp; bins: string[]; name: string }> = [
   { desktop: /^google-chrome/, bins: ["google-chrome", "google-chrome-stable"], name: "Google Chrome" },
   { desktop: /^chromium/, bins: ["chromium", "chromium-browser"], name: "Chromium" },
   { desktop: /^brave/, bins: ["brave-browser", "brave"], name: "Brave Browser" },
@@ -90,7 +99,7 @@ const CHROMIUM_LINUX: Array<{ desktop: RegExp; bins: string[]; name: string }> =
   { desktop: /^opera/, bins: ["opera"], name: "Opera" },
 ];
 
-const CHROMIUM_WINDOWS: Array<{ name: string; paths: string[] }> = [
+const DRIVABLE_WINDOWS: Array<{ name: string; paths: string[] }> = [
   {
     name: "Google Chrome",
     paths: [
@@ -102,10 +111,10 @@ const CHROMIUM_WINDOWS: Array<{ name: string; paths: string[] }> = [
 ];
 
 export const INSTALL_HINT =
-  "The login drives your default browser, which must be Google Chrome or a Chromium-based browser " +
-  "(Arc, Brave, Microsoft Edge, Vivaldi, Chromium). Install one — https://www.google.com/chrome or " +
-  "https://arc.net — and make it the default, or point MERCADOLIVRE_LOGIN_BROWSER at its .app or " +
-  "executable. Without any browser, set MERCADOLIVRE_COOKIE instead.";
+  "The login drives your default browser, which must be Google Chrome or another Chromium-based browser " +
+  "that exposes DevTools (Brave, Microsoft Edge, Vivaldi, Chromium). Install one — https://www.google.com/chrome " +
+  "— and make it the default, or point MERCADOLIVRE_LOGIN_BROWSER at its .app or executable. " +
+  "Without any browser, set MERCADOLIVRE_COOKIE instead.";
 
 // ------------------------------------------------------------------- macOS
 
@@ -170,22 +179,24 @@ function macBrowser(appPath: string, probe: Probe, fallback: { id?: string; name
 
 function macDefault(probe: Probe): DefaultBrowser {
   const id = macHandlerId(probe);
-  const chromium = CHROMIUM_MAC.find((entry) => entry.id === id);
-  if (chromium) {
+  const drivable = DRIVABLE_MAC.find((entry) => entry.id === id);
+  if (drivable) {
     const appPath = macFindApp(id, probe);
-    const browser = appPath ? macBrowser(appPath, probe, chromium) : undefined;
+    const browser = appPath ? macBrowser(appPath, probe, drivable) : undefined;
     return browser
-      ? { ...browser, compatible: true, known: true }
-      : { name: chromium.name, id, compatible: false, known: true };
+      ? { ...browser, compatible: true }
+      : { name: drivable.name, id, compatible: false, reason: `${drivable.name} is the default browser but its application could not be found` };
   }
-  if (OTHER_MAC[id]) return { name: OTHER_MAC[id] as string, id, compatible: false, known: true };
+  const known = NOT_DRIVABLE_MAC[id];
+  if (known) return { name: known.name, id, compatible: false, reason: known.reason };
   const appPath = macFindApp(id, probe);
   const info = appPath ? macAppInfo(appPath, probe) : {};
-  return { name: info.name ?? id, id, appPath, compatible: false, known: false };
+  const name = info.name ?? id;
+  return { name, id, appPath, compatible: false, reason: `${name} is not known to be a Chromium-based browser that exposes DevTools` };
 }
 
 function macFallback(probe: Probe): Browser | undefined {
-  for (const entry of CHROMIUM_MAC) {
+  for (const entry of DRIVABLE_MAC) {
     const appPath = macFindApp(entry.id, probe);
     const browser = appPath ? macBrowser(appPath, probe, entry) : undefined;
     if (browser) return browser;
@@ -207,16 +218,18 @@ function linuxDefault(probe: Probe): DefaultBrowser | undefined {
   const desktop = probe.exec("xdg-settings", ["get", "default-web-browser"])?.trim();
   if (!desktop) return undefined;
   const name = desktop.replace(/\.desktop$/, "");
-  const entry = CHROMIUM_LINUX.find((candidate) => candidate.desktop.test(desktop));
-  if (!entry) return { name, compatible: false, known: /firefox|epiphany|konqueror|midori/i.test(name) };
+  const entry = DRIVABLE_LINUX.find((candidate) => candidate.desktop.test(desktop));
+  if (!entry) {
+    return { name, compatible: false, reason: `${name} is not a Chromium-based browser that exposes DevTools` };
+  }
   const executablePath = linuxBin(entry.bins, probe);
   return executablePath
-    ? { name: entry.name, executablePath, compatible: true, known: true }
-    : { name: entry.name, compatible: false, known: true };
+    ? { name: entry.name, executablePath, compatible: true }
+    : { name: entry.name, compatible: false, reason: `${entry.name} is the default browser but its executable is not on PATH` };
 }
 
 function linuxFallback(probe: Probe): Browser | undefined {
-  for (const entry of CHROMIUM_LINUX) {
+  for (const entry of DRIVABLE_LINUX) {
     const executablePath = linuxBin(entry.bins, probe);
     if (executablePath) return { name: entry.name, executablePath };
   }
@@ -226,7 +239,7 @@ function linuxFallback(probe: Probe): Browser | undefined {
 // ----------------------------------------------------------------- Windows
 
 function windowsFallback(probe: Probe): Browser | undefined {
-  for (const entry of CHROMIUM_WINDOWS) {
+  for (const entry of DRIVABLE_WINDOWS) {
     const executablePath = entry.paths.find((path) => probe.exists(path));
     if (executablePath) return { name: entry.name, executablePath };
   }
@@ -272,8 +285,8 @@ function resolveOverride(value: string, probe: Probe): Browser {
 
 /**
  * The browser the login will open: the override when set, else the default
- * browser when Chromium based, else an installed Chromium-based browser (with
- * a warning), else an error telling the user what to install.
+ * browser when it can be driven, else an installed drivable browser (with a
+ * warning), else an error telling the user what to install.
  */
 export function resolveLoginBrowser(
   opts: { override?: string },
@@ -290,9 +303,7 @@ export function resolveLoginBrowser(
   const reason =
     found === undefined
       ? `Could not detect the default browser on ${probe.platform}.`
-      : found.known
-        ? `Your default browser (${found.name}) is not compatible with the login.`
-        : `Your default browser (${found.name}) is not known to be Chromium based, so the login will not use it.`;
+      : `Your default browser (${found.name}) is not compatible with the login: ${found.reason}.`;
 
   const fallback = installedFallback(probe);
   if (fallback) {

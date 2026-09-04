@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { detectDefaultBrowser, resolveLoginBrowser, type Probe } from "../src/auth/browser.js";
 
-// The login opens the user's DEFAULT browser when it is Chromium based
-// (Chrome, Arc, Brave, Edge, Chromium, Vivaldi...). Safari and Firefox cannot
-// be driven, so the user is told to install a compatible one. Everything that
-// touches the OS goes through an injected probe.
+// The login opens the user's DEFAULT browser when Playwright can drive it
+// (Chrome, Brave, Edge, Vivaldi, Chromium...). Safari and Firefox are other
+// engines; Arc and Dia are Chromium based but expose no DevTools connection.
+// Those cases fall back to an installed drivable browser with a warning, or
+// tell the user what to install. Everything OS-bound goes through a probe.
 
 type App = { id: string; exe: string; name: string };
 
@@ -60,12 +61,12 @@ const SAFARI: App = { id: "com.apple.Safari", exe: "Safari", name: "Safari" };
 const BRAVE: App = { id: "com.brave.Browser", exe: "Brave Browser", name: "Brave Browser" };
 
 describe("macOS default browser", () => {
-  test("uses the default browser when it is chromium based (Arc, lowercase id in the plist)", () => {
-    const probe = probeFor({ https: "company.thebrowser.browser", apps: { "/Applications/Arc.app": ARC, "/Applications/Google Chrome.app": CHROME }, spotlight: false });
+  test("uses the default browser when Playwright can drive it (lowercase id in the plist)", () => {
+    const probe = probeFor({ https: "com.brave.browser", apps: { "/Applications/Brave Browser.app": BRAVE, "/Applications/Google Chrome.app": CHROME }, spotlight: false });
 
     const { browser, warnings } = resolveLoginBrowser({}, probe);
 
-    expect(browser).toEqual({ name: "Arc", id: "company.thebrowser.Browser", appPath: "/Applications/Arc.app", executablePath: "/Applications/Arc.app/Contents/MacOS/Arc" });
+    expect(browser).toEqual({ name: "Brave Browser", id: "com.brave.Browser", appPath: "/Applications/Brave Browser.app", executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser" });
     expect(warnings).toEqual([]);
   });
 
@@ -78,22 +79,33 @@ describe("macOS default browser", () => {
     expect(scan.browser.executablePath).toBe(spotlight.browser.executablePath);
   });
 
-  test("no https handler means Safari: warns and falls back to an installed compatible browser", () => {
+  test("Arc as default: cannot be automated, so an installed Chrome is used with a warning", () => {
+    const probe = probeFor({ https: "company.thebrowser.browser", apps: { "/Applications/Arc.app": ARC, "/Applications/Google Chrome.app": CHROME }, spotlight: false });
+
+    expect(detectDefaultBrowser(probe)).toMatchObject({ name: "Arc", compatible: false, reason: expect.stringMatching(/DevTools/) });
+    const { browser, warnings } = resolveLoginBrowser({}, probe);
+    expect(browser.name).toBe("Google Chrome");
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toMatch(/Arc/);
+    expect(warnings[0]).toMatch(/not compatible/i);
+    expect(warnings[0]).toMatch(/DevTools/);
+    expect(warnings[0]).toMatch(/Google Chrome/);
+  });
+
+  test("no https handler means Safari: warns and falls back to an installed drivable browser", () => {
     const probe = probeFor({ https: null, apps: { "/Applications/Safari.app": SAFARI, "/Applications/Brave Browser.app": BRAVE } });
 
     expect(detectDefaultBrowser(probe)).toMatchObject({ name: "Safari", compatible: false });
     const { browser, warnings } = resolveLoginBrowser({}, probe);
     expect(browser.name).toBe("Brave Browser");
-    expect(warnings).toHaveLength(1);
-    expect(warnings[0]).toMatch(/Safari/);
-    expect(warnings[0]).toMatch(/not compatible/i);
+    expect(warnings[0]).toMatch(/Safari.*not compatible/i);
     expect(warnings[0]).toMatch(/Brave Browser/);
   });
 
-  test("tells the user to install Chrome or a chromium based browser when none is available", () => {
+  test("tells the user to install Chrome or another drivable browser when none is available", () => {
     const probe = probeFor({ https: "org.mozilla.firefox", apps: { "/Applications/Firefox.app": { id: "org.mozilla.firefox", exe: "firefox", name: "Firefox" }, "/Applications/Safari.app": SAFARI } });
 
-    expect(() => resolveLoginBrowser({}, probe)).toThrow(/Firefox.*not compatible[\s\S]*Google Chrome[\s\S]*Arc/);
+    expect(() => resolveLoginBrowser({}, probe)).toThrow(/Firefox.*not compatible[\s\S]*Google Chrome[\s\S]*Brave/);
   });
 
   test("an unknown browser is not trusted; the message points at the override", () => {
@@ -121,7 +133,7 @@ describe("override", () => {
 });
 
 describe("linux", () => {
-  test("uses the xdg default when it is chromium based, otherwise the first compatible one on PATH", () => {
+  test("uses the xdg default when drivable, otherwise the first drivable browser on PATH", () => {
     const chrome = resolveLoginBrowser({}, probeFor({ platform: "linux", xdg: "google-chrome.desktop\n", which: { "google-chrome": "/usr/bin/google-chrome" }, files: ["/usr/bin/google-chrome"] }));
     const firefox = resolveLoginBrowser({}, probeFor({ platform: "linux", xdg: "firefox.desktop\n", which: { chromium: "/usr/bin/chromium" }, files: ["/usr/bin/chromium"] }));
 

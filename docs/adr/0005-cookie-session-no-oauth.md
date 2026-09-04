@@ -8,8 +8,9 @@
 ## Decisão
 
 Autenticar com os cookies da própria sessão do usuário: `login` abre o navegador padrão
-do sistema (Chromium-based — Chrome, Arc, Brave, Edge, Vivaldi; Safari e Firefox
-recebem aviso e instrução de instalação) headed, com perfil persistente próprio (o usuário digita senha/2FA; a ferramenta só persiste o
+do sistema (Chromium com DevTools — Chrome, Brave, Edge, Vivaldi; Safari, Firefox e Arc,
+que não expõe DevTools, recebem aviso, fallback para outro instalado ou instrução de
+instalação) headed, com perfil persistente próprio (o usuário digita senha/2FA; a ferramenta só persiste o
 `storageState` filtrado para `*.mercadolivre.com.br`, com permissão 0600 e o
 User-Agent do navegador) ou `MERCADOLIVRE_COOKIE` com o header copiado do DevTools.
 Cada `Set-Cookie` recebido é absorvido e persistido; a expiração é detectada pelo

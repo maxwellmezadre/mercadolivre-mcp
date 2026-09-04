@@ -13,7 +13,7 @@ malformados falham na hora, listando todos os problemas de uma vez.
 | `MERCADOLIVRE_REQUEST_INTERVAL_MS` | `1000` | Intervalo mínimo entre requisições; jitter de 200–600 ms é somado |
 | `MERCADOLIVRE_HTTP_TIMEOUT_MS` | `30000` | Timeout por requisição (mínimo 1000) |
 | `MERCADOLIVRE_USER_AGENT` | o salvo no login | User-Agent enviado ao site (por padrão, o do navegador que fez o login) |
-| `MERCADOLIVRE_LOGIN_BROWSER` | navegador padrão | Navegador do `login`: caminho do `.app` (macOS), executável ou bundle id. Precisa ser Chromium-based (Chrome, Arc, Brave, Edge, Vivaldi) |
+| `MERCADOLIVRE_LOGIN_BROWSER` | navegador padrão | Navegador do `login`: caminho do `.app` (macOS), executável ou bundle id. Precisa expor DevTools (Chrome, Brave, Edge, Vivaldi, Chromium) |
 | `MERCADOLIVRE_LOG_FILE` | — | Copia dos logs (que vão sempre para stderr) |
 
 ## Arquivos em `MERCADOLIVRE_HOME`
@@ -31,10 +31,12 @@ Apague `session.json` para "deslogar"; apague `cache.sqlite` para recomeçar do 
 
 O `login` abre o **navegador padrão do sistema** com um perfil próprio (não o seu perfil
 do dia a dia). No macOS o padrão vem do handler de `https` do LaunchServices; no Linux,
-de `xdg-settings`. Só navegadores baseados em Chromium podem ser controlados: Google
-Chrome, Arc, Brave, Microsoft Edge, Vivaldi, Chromium, Opera. Se o padrão for Safari ou
-Firefox (ou um navegador desconhecido), a ferramenta avisa e usa outro compatível que já
-esteja instalado; sem nenhum, ela pede para instalar o Chrome ou um Chromium-based e
+de `xdg-settings`. Só navegadores Chromium que expõem o DevTools podem ser controlados:
+Google Chrome, Brave, Microsoft Edge, Vivaldi, Chromium, Opera. Safari e Firefox são
+outros motores; o **Arc** (e o Dia) é Chromium mas não responde nem a
+`--remote-debugging-pipe` nem a `--remote-debugging-port`, então também não serve. Nesses
+casos (ou com um navegador desconhecido) a ferramenta avisa e usa outro compatível que já
+esteja instalado; sem nenhum, ela pede para instalar o Chrome (ou Brave/Edge/Vivaldi) e
 defini-lo como padrão. `MERCADOLIVRE_LOGIN_BROWSER` força um navegador específico
 (`/Applications/Google Chrome.app`, `/usr/bin/chromium` ou `com.google.Chrome`).
 

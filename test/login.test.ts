@@ -19,7 +19,7 @@ const ML_COOKIE: SessionCookie = {
   expires: -1, httpOnly: true, secure: true, sameSite: "Lax",
 };
 const GOOGLE_COOKIE: SessionCookie = { ...ML_COOKIE, name: "g", domain: ".google.com" };
-const ARC: Browser = { name: "Arc", id: "company.thebrowser.Browser", appPath: "/Applications/Arc.app", executablePath: "/Applications/Arc.app/Contents/MacOS/Arc" };
+const CHROME: Browser = { name: "Google Chrome", id: "com.google.Chrome", appPath: "/Applications/Google Chrome.app", executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" };
 
 function fakePlaywright(opts: { failLaunch?: boolean } = {}) {
   const calls = {
@@ -71,11 +71,11 @@ describe("interactiveLogin", () => {
 
     const result = await interactiveLogin(ctx, {
       importPlaywright: async () => playwright,
-      resolveBrowser: () => ({ browser: ARC, warnings: [] }),
+      resolveBrowser: () => ({ browser: CHROME, warnings: [] }),
     });
 
     expect(calls.launch[0]?.dir).toBe(ctx.config.profileDir);
-    expect(calls.launch[0]?.options).toMatchObject({ headless: false, executablePath: ARC.executablePath });
+    expect(calls.launch[0]?.options).toMatchObject({ headless: false, executablePath: CHROME.executablePath });
     expect(calls.launch[0]?.options.channel).toBeUndefined();
     expect(calls.goto).toEqual([LIST_PAGE_URL]);
     expect(calls.waited).toEqual(["[id^=list_item_]"]);
@@ -84,8 +84,8 @@ describe("interactiveLogin", () => {
     const saved = JSON.parse(readFileSync(ctx.config.sessionFile, "utf8")) as { cookies: SessionCookie[]; meta: { userAgent: string } };
     expect(saved.cookies.map((cookie) => cookie.name)).toEqual(["ssid"]);
     expect(saved.meta.userAgent).toBe("UA/fake");
-    expect(result).toEqual({ browser: "Arc", cookieCount: 1, userAgent: "UA/fake", sessionFile: ctx.config.sessionFile });
-    expect(ctx.lines.join("")).toContain("Opening Arc");
+    expect(result).toEqual({ browser: "Google Chrome", cookieCount: 1, userAgent: "UA/fake", sessionFile: ctx.config.sessionFile });
+    expect(ctx.lines.join("")).toContain("Opening Google Chrome");
   });
 
   test("passes the MERCADOLIVRE_LOGIN_BROWSER override to the resolver and logs its warnings", async () => {
@@ -97,7 +97,7 @@ describe("interactiveLogin", () => {
       importPlaywright: async () => playwright,
       resolveBrowser: (override) => {
         overrides.push(override);
-        return { browser: ARC, warnings: ["Your default browser (Safari) is not compatible with the login. Using Arc instead."] };
+        return { browser: CHROME, warnings: ["Your default browser (Safari) is not compatible with the login. Using Google Chrome instead."] };
       },
     });
 
@@ -110,8 +110,8 @@ describe("interactiveLogin", () => {
     const { playwright } = fakePlaywright({ failLaunch: true });
 
     await expect(
-      interactiveLogin(ctx, { importPlaywright: async () => playwright, resolveBrowser: () => ({ browser: ARC, warnings: [] }) }),
-    ).rejects.toThrow(/Could not start Arc[\s\S]*Google Chrome/);
+      interactiveLogin(ctx, { importPlaywright: async () => playwright, resolveBrowser: () => ({ browser: CHROME, warnings: [] }) }),
+    ).rejects.toThrow(/Could not start Google Chrome[\s\S]*Google Chrome/);
   });
 
   test("surfaces the browser resolution error untouched", async () => {
