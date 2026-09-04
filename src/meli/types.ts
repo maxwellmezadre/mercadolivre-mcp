@@ -201,3 +201,40 @@ export type DetailPage = {
   /** Invariant violations, reported instead of hidden. */
   warnings: string[];
 };
+
+// ---------------------------------------------------------------- invoices
+
+/** One entry of `/emissor/omni/api/invoices-overview` (spec §4.4). */
+export type InvoiceOverview = {
+  /** Derived from the download url; the payload carries no order id field. */
+  orderId: string;
+  invoiceDate?: string;
+  source?: string;
+  transactionType?: string;
+  items: Array<{ id: string; name: string }>;
+  pdfUrl?: string;
+  xmlUrl?: string;
+};
+
+/** One `<det>` of an NF-e 4.00 XML. Values are GROSS (before purchase-level discounts). */
+export type InvoiceXmlItem = {
+  code?: string;
+  description: string;
+  quantity: number;
+  unitCents: number;
+  totalCents: number;
+  discountCents: number;
+  ncm?: string;
+  cfop?: string;
+};
+
+export type InvoiceXml = {
+  /** 44-digit access key. */
+  accessKey?: string;
+  number?: string;
+  issuedAt?: string;
+  issuerCnpj?: string;
+  issuerName?: string;
+  totalCents?: number;
+  items: InvoiceXmlItem[];
+};
