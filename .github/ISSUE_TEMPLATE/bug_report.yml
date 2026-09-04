@@ -1,0 +1,28 @@
+name: Bug report
+description: Reporte um problema no mercadolivre-mcp
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: O que aconteceu?
+      description: Comportamento observado e esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Passos para reproduzir
+      description: Comando(s) ou tool(s) e sequência que levam ao problema.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Saída de `mercadolivre doctor --json`
+      description: "⚠️ Nunca cole cookies, o header Cookie, `session.json` nem ids reais de compra."
+  - type: input
+    id: version
+    attributes:
+      label: Versão e runtime
+      placeholder: "mercadolivre 0.1.0 · Bun 1.3 · macOS"
