@@ -7,6 +7,7 @@ import type {
   InvoiceXml,
   PurchaseListItem,
 } from "../meli/types.js";
+import { createQueries, ftsQuery, type Queries } from "./queries.js";
 
 // Repository over the cache (AR-6, AR-8). Purchases are keyed by purchase id
 // and hold the purchase-level facts exactly once; products are keyed by
@@ -101,6 +102,8 @@ export type InvoiceRow = {
 
 export type Store = {
   readonly db: Database;
+  /** Read-side queries with filters (list, search, products). */
+  readonly query: Queries;
   close(): void;
   transaction<T>(fn: () => T): T;
 
@@ -139,16 +142,6 @@ const flag = (value: boolean | undefined): number | null =>
 const json = (value: unknown): string | null => (value === undefined ? null : JSON.stringify(value));
 const orNull = <T>(value: T | undefined): T | null => (value === undefined ? null : value);
 
-/** FTS5 query: every whitespace-separated term quoted, so user text never breaks the syntax. */
-export function ftsQuery(query: string): string {
-  return query
-    .split(/\s+/)
-    .map((term) => term.replace(/"/g, ""))
-    .filter((term) => term.length > 0)
-    .map((term) => `"${term}"`)
-    .join(" ");
-}
-
 export function createStore(db: Database): Store {
   const run = (sql: string, ...params: unknown[]) => db.query(sql).run(...(params as never[]));
   const all = <T>(sql: string, ...params: unknown[]) => db.query(sql).all(...(params as never[])) as T[];
@@ -178,6 +171,7 @@ export function createStore(db: Database): Store {
 
   return {
     db,
+    query: createQueries(db),
     close: () => db.close(),
     transaction,
 

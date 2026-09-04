@@ -1,6 +1,6 @@
 import { Command } from "commander";
-import { loadConfig } from "../config.js";
 import { interactiveLogin } from "../auth/login.js";
+import { loadConfig } from "../config.js";
 import { createContext } from "../context.js";
 import { compactObject, runTool } from "../tools/define.js";
 import { toolByName } from "../tools/registry.js";
@@ -62,20 +62,30 @@ export async function runCli(argv: string[], version: string): Promise<void> {
 
   command("purchases")
     .description("List purchases (grouped by purchase) with optional filters")
-    .option("--page <n>", "first page (default 1)")
-    .option("--max-pages <n>", "consecutive pages to read (default 1)")
     .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
     .option("--category <name>", "exact category name (see categories)")
     .option("--search <text>", "free text search")
+    .option("--from <date>", "cache: purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "cache: purchase date <= YYYY-MM-DD")
+    .option("--limit <n>", "cache: maximum purchases (default 50)")
+    .option("--offset <n>", "cache: purchases to skip")
+    .option("--live", "read the site instead of the cache")
+    .option("--page <n>", "site: first page (default 1)")
+    .option("--max-pages <n>", "site: consecutive pages to read (default 1)")
     .action((options) =>
       invoke(
         "list_purchases",
         {
-          page: toNumber(options.page),
-          maxPages: toNumber(options.maxPages),
+          fromCache: options.live ? false : undefined,
           dateFilter: options.date,
           category: options.category,
           search: options.search,
+          from: options.from,
+          to: options.to,
+          limit: toNumber(options.limit),
+          offset: toNumber(options.offset),
+          page: toNumber(options.page),
+          maxPages: toNumber(options.maxPages),
         },
         options.json ?? false,
       ),
@@ -101,13 +111,68 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       ),
     );
 
+  command("search <query>")
+    .description("Search the purchase history by product title, brand or variation")
+    .option("--live", "ask the site instead of the cache")
+    .option("--limit <n>", "cache: maximum products")
+    .action((query: string, options) =>
+      invoke(
+        "search_purchases",
+        { query, scope: options.live ? "live" : undefined, limit: toNumber(options.limit) },
+        options.json ?? false,
+      ),
+    );
+
   command("categories")
     .description("Category names and time windows accepted by the purchase filters")
     .action((options) => invoke("list_categories", {}, options.json ?? false));
 
+  command("products")
+    .description("Purchased products from the cache, with prices paid")
+    .option("--from <date>", "purchase date >= YYYY-MM-DD")
+    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .option("--seller <name>", "seller name (partial) or id")
+    .option("--min-paid <brl>", "minimum amount paid for the line")
+    .option("--max-paid <brl>", "maximum amount paid for the line")
+    .option("--title <text>", "text contained in the title")
+    .option("--sort <order>", "date_desc, date_asc, paid_desc or paid_asc")
+    .option("--limit <n>", "maximum rows (default 100)")
+    .option("--include-cancelled", "include cancelled purchases")
+    .action((options) =>
+      invoke(
+        "list_products",
+        {
+          from: options.from,
+          to: options.to,
+          seller: options.seller,
+          minPaid: toNumber(options.minPaid),
+          maxPaid: toNumber(options.maxPaid),
+          titleContains: options.title,
+          sort: options.sort,
+          limit: toNumber(options.limit),
+          includeCancelled: options.includeCancelled,
+        },
+        options.json ?? false,
+      ),
+    );
+
+  command("product-history")
+    .description("Every purchase of one product and its unit price trend")
+    .option("--item <itemId>", "item id, e.g. MLB2086446083")
+    .option("--title <text>", "text contained in the title")
+    .action((options) =>
+      invoke(
+        "product_history",
+        { itemId: options.item, titleContains: options.title },
+        options.json ?? false,
+      ),
+    );
+
   command("invoice <orderId>")
     .description("NF-e metadata and download links of one order")
-    .action((orderId: string, options) => invoke("get_invoice", { orderId }, options.json ?? false));
+    .action((orderId: string, options) =>
+      invoke("get_invoice", { orderId }, options.json ?? false),
+    );
 
   command("sync")
     .description("Synchronize the local cache (incremental by default; --full once, --reparse offline)")
@@ -133,7 +198,7 @@ export async function runCli(argv: string[], version: string): Promise<void> {
 
   command("raw <url>")
     .description("Authenticated GET on an allowed Mercado Livre host (rediscovery)")
-    .option("--as <mode>", "html | json | nordic", "html")
+    .option("--as <mode>", "html, json or nordic", "html")
     .option("--max-bytes <n>", "cap the returned body")
     .action((url: string, options) =>
       invoke(

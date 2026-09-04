@@ -3,6 +3,8 @@ import type { Ctx } from "../src/context.js";
 import type { InvoicesApi } from "../src/meli/api/invoices.js";
 import type { PurchasesApi } from "../src/meli/api/purchases.js";
 import type { DetailPage, InvoiceOverview, ListPage, PurchaseListItem } from "../src/meli/types.js";
+import { openDatabase } from "../src/store/db.js";
+import { createStore } from "../src/store/repo.js";
 import { runTool } from "../src/tools/define.js";
 import { getInvoice, getPurchase, listCategories, listPurchases } from "../src/tools/purchases.js";
 
@@ -57,7 +59,8 @@ function fakeCtx(opts: { pages?: ListPage[]; filtered?: ListPage; detail?: Detai
     download: async () => { throw new Error("not used"); },
     downloadXml: async () => { throw new Error("not used"); },
   };
-  const ctx = { meli: { purchases, invoices }, now: () => new Date("2026-09-04T12:00:00Z") } as unknown as Ctx;
+  const store = createStore(openDatabase(":memory:"));
+  const ctx = { meli: { purchases, invoices }, store: () => store, now: () => new Date("2026-09-04T12:00:00Z") } as unknown as Ctx;
   return { ctx, calls };
 }
 
@@ -110,11 +113,11 @@ describe("get_purchase (live)", () => {
     const { ctx, calls } = fakeCtx({ pages: [page([item("900", "9")], 1, 2), page([item("100", "1"), item("100", "2")], 2, 2)] });
 
     const result = (await runTool(getPurchase, { purchaseId: "100", includeInvoice: false }, ctx)) as {
-      lookup: { pagesScanned: number }; products: Array<{ orderId?: string; priceSource: string }>;
+      lookup: { source: string; pagesScanned: number }; products: Array<{ orderId?: string; priceSource: string }>;
     };
 
     expect(calls).toEqual(['listPage 1 {"dateFilter":"ALL"}', 'listPage 2 {"dateFilter":"ALL"}', "getDetail 100/100k/1"]);
-    expect(result.lookup).toEqual({ pagesScanned: 2 });
+    expect(result.lookup).toEqual({ source: "list", pagesScanned: 2 });
     expect(result.products.map((product) => [product.orderId, product.priceSource])).toEqual([["1", "detail"], ["2", "none"]]);
   });
 
@@ -130,6 +133,7 @@ describe("list_categories and get_invoice", () => {
     const { ctx } = fakeCtx({ pages: [page([], 1, 1)] });
 
     expect(await runTool(listCategories, {}, ctx)).toEqual({
+      source: "live",
       categories: ["Pet Shop", "Saúde"],
       dateFilters: [{ value: "30D", label: "Últimos 30 dias" }],
     });
