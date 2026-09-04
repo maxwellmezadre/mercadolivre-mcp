@@ -1,0 +1,41 @@
+{
+  "name": "@maxwellmezadre/mercadolivre-mcp",
+  "version": "0.1.0",
+  "description": "CLI + MCP server for your Mercado Livre purchase history (buyer side): purchases, products, payments, installments, sellers and NF-e invoices",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxwellmezadre/mercadolivre-mcp.git"
+  },
+  "homepage": "https://github.com/maxwellmezadre/mercadolivre-mcp#readme",
+  "keywords": ["mercadolivre", "mercadolibre", "mcp", "cli", "purchases", "nfe", "claude"],
+  "bin": {
+    "mercadolivre": "./dist/bin.js"
+  },
+  "files": ["dist", "SKILL.md", "README.md", "LICENSE"],
+  "exports": "./dist/bin.js",
+  "engines": {
+    "bun": ">=1.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "start": "bun run src/bin.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "build:dist": "bun build src/bin.ts --target=bun --outdir dist",
+    "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre",
+    "prepublishOnly": "bun run build:dist"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@sinclair/typebox": "^0.34.52",
+    "commander": "^15.0.0"
+  }
+}

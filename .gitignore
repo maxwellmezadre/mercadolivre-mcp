@@ -1,0 +1,25 @@
+node_modules/
+dist/
+*.log
+
+# Build artifacts (single binary)
+/mercadolivre
+/mercadolivre-*
+
+# Runtime data never belongs in the repo
+*.sqlite
+*.sqlite-*
+session.json
+
+# Env
+.env
+.env.*
+
+# OS/editor
+.DS_Store
+
+# Planning artifacts, raw captures and the original spec (private)
+task/
+
+# Playwright CLI automation artifacts
+.playwright-cli/
