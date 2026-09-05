@@ -1,0 +1,43 @@
+{
+  "invoices": [
+    {
+      "invoice_date": "2026-08-28T01:19:41Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB2086605722",
+          "name": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000102438224154/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000102438224154/xml"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "platform": {
+    "siteId": "MLB",
+    "countryId": "BR",
+    "id": "ML",
+    "domain": "mercadolivre.com.br"
+  },
+  "locale": "pt-BR"
+}

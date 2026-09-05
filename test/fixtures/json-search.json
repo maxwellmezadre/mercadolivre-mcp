@@ -1,0 +1,3047 @@
+{
+  "type": "register_and_render",
+  "data": {
+    "brick": {
+      "id": "main_0637bf6c4506",
+      "ui_type": "main",
+      "data": {
+        "type": "flat"
+      },
+      "bricks": [
+        {
+          "id": "list_header_v2_f769306ce5f7",
+          "ui_type": "list_header_v2",
+          "data": {
+            "title": {
+              "rich": [
+                {
+                  "type": "text",
+                  "value": {
+                    "text": "Compras",
+                    "modifier": "bold"
+                  },
+                  "text": "Compras"
+                }
+              ],
+              "accessibility": "Compras"
+            }
+          },
+          "bricks": [
+            {
+              "id": "list_header_info_container_619af658f7f5",
+              "ui_type": "list_header_info_container",
+              "bricks": [
+                {
+                  "id": "list_header_coachmark_filter",
+                  "ui_type": "list_header_filter_container",
+                  "data": {
+                    "event": {
+                      "data": {
+                        "method": "GET",
+                        "path": "/my_purchases/api/web/list_items"
+                      },
+                      "type": "request"
+                    },
+                    "content": [
+                      {
+                        "type": "input",
+                        "data": {
+                          "value": "Mubidi",
+                          "placeholder": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Busque por compra, marca e mais..."
+                                },
+                                "text": "Busque por compra, marca e mais..."
+                              }
+                            ],
+                            "accessibility": "Busque por compra, marca e mais..."
+                          },
+                          "icon": {
+                            "accessibility": "Busque por compra, marca e mais...",
+                            "data": {
+                              "id": "search"
+                            }
+                          },
+                          "cancel": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Cancelar"
+                                },
+                                "text": "Cancelar"
+                              }
+                            ],
+                            "accessibility": "Cancelar"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "bricks": [
+                    {
+                      "id": "coach_mark_cafaff465e8f",
+                      "ui_type": "coach_mark",
+                      "data": {
+                        "steps": [
+                          {
+                            "target": "[data-id=\"list_header_coachmark_filter\"]",
+                            "title": "Encontre suas compras facilmente!",
+                            "content": "Agora, busque por bivo ou categoria e filtre suas compras por status.",
+                            "placement": "right"
+                          }
+                        ],
+                        "locale": {
+                          "next": "",
+                          "back": "",
+                          "last": "OK, entendi"
+                        },
+                        "scroll_offset": 200,
+                        "coachmark_key": "list_header_coachmark_filter"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "list_header_subtitle_fd093ed6a809",
+                  "ui_type": "list_header_subtitle",
+                  "data": {
+                    "subtitle": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "3 compras contêm <b>\"Mubidi\"</b>"
+                          },
+                          "text": "3 compras contêm <b>\"Mubidi\"</b>"
+                        }
+                      ],
+                      "accessibility": "3 compras contêm <b>\"Mubidi\"</b>"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "list_item_container",
+          "ui_type": "list_item_container",
+          "bricks": [
+            {
+              "id": "list_item_grouper_3cf70539a5b0",
+              "ui_type": "list_item_grouper",
+              "data": {
+                "text": {
+                  "rich": [
+                    {
+                      "type": "text",
+                      "value": {
+                        "text": "27 de agosto",
+                        "modifier": "bold"
+                      },
+                      "text": "27 de agosto"
+                    }
+                  ],
+                  "accessibility": "27 de agosto"
+                }
+              },
+              "bricks": [
+                {
+                  "id": "list_item_fd7408179f08",
+                  "ui_type": "list_item",
+                  "data": {
+                    "intro": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Entregue",
+                            "modifier": "success"
+                          },
+                          "text": "Entregue"
+                        }
+                      ],
+                      "accessibility": "Entregue"
+                    },
+                    "title": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Chegou no dia 29 de agosto   "
+                          },
+                          "text": "Chegou no dia 29 de agosto   "
+                        },
+                        {
+                          "type": "icon",
+                          "value": {
+                            "id": "full",
+                            "accessibility": ". Enviado por FULL"
+                          }
+                        }
+                      ],
+                      "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                    },
+                    "info": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "1 un. | Tipo de embalagem: Hetij"
+                          },
+                          "text": "1 un. | Tipo de embalagem: Hetij"
+                        }
+                      ],
+                      "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                    },
+                    "link": {
+                      "text": {
+                        "rich": [
+                          {
+                            "type": "text",
+                            "value": {
+                              "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                            },
+                            "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                          }
+                        ],
+                        "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                      },
+                      "event": {
+                        "type": "go_to",
+                        "data": {
+                          "url": "https://produto.mercadolivre.com.br/MLB-2086605722-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                          "deeplink": "meli://item?id=MLB2086605722&vertical=cpg#sid=purchases"
+                        }
+                      }
+                    },
+                    "asset": {
+                      "data": {
+                        "url": "https://http2.mlstatic.com/D_798796-MLA114662527023_082026-N.jpg",
+                        "alt": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                      },
+                      "accessibility": "",
+                      "type": "image"
+                    },
+                    "context": {
+                      "purchase_id": "2000252563335855",
+                      "order_id": "2000102438224154",
+                      "pack_id": "2000217202137124",
+                      "vertical_id": "SHIPPING",
+                      "shipment_id": "47877815605"
+                    },
+                    "visible": true
+                  },
+                  "bricks": [
+                    {
+                      "id": "button_container_6909c8852d77",
+                      "ui_type": "button_container",
+                      "bricks": [
+                        {
+                          "id": "button_a3e8f5566kev",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Ver compra",
+                            "style": "loud",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000102438224154",
+                                "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000102438224154"
+                              }
+                            },
+                            "accessibility": "Ver compra"
+                          }
+                        },
+                        {
+                          "id": "button_d5353ca01674",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Comprar novamente",
+                            "style": "quiet",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://produto.mercadolivre.com.br/MLB-2086605722-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                                "deeplink": "https://produto.mercadolivre.com.br/MLB-2086605722-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM"
+                              }
+                            },
+                            "accessibility": "Comprar novamente"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "expandable_content_0b328d424661",
+                  "ui_type": "expandable_content",
+                  "data": {
+                    "collapsed_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver toda a compra",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver toda a compra"
+                        }
+                      ],
+                      "accessibility": "Ver toda a compra"
+                    },
+                    "expanded_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver apenas os resultados",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver apenas os resultados"
+                        }
+                      ],
+                      "accessibility": "Ver apenas os resultados"
+                    },
+                    "button_position": "bottom",
+                    "expanded": false
+                  },
+                  "bricks": [
+                    {
+                      "id": "list_item_f955f77df9b4",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "2 un. | Fragrância: Cavuduj, Tipo de embalagem: Mosoju"
+                              },
+                              "text": "2 un. | Fragrância: Cavuduj, Tipo de embalagem: Mosoju"
+                            }
+                          ],
+                          "accessibility": "Holudecedumi Mep Har Cavuduj 5l 2 unidades. Fragrância Cavuduj. Tipo de embalagem Mosoju"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Holudecedumi Mep Har Cavuduj 5l"
+                                },
+                                "text": "Holudecedumi Mep Har Cavuduj 5l"
+                              }
+                            ],
+                            "accessibility": "Holudecedumi Mep Har Cavuduj 5l 2 unidades. Fragrância Cavuduj. Tipo de embalagem Mosoju"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-3795663081-yp-holudecedumi-cavuduj-har-yp-5l-cavuduj-_JM",
+                              "deeplink": "meli://item?id=MLB3795663081&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_699794-MLA99938100316_112025-N.jpg",
+                            "alt": "Mep Holudecedumi Cavuduj Har Mep 5l Cavuduj"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000042272375895",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_f14906091c02",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_d74141c2c27c",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000042272375895",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000042272375895"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_5fa63bb1b7aa",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-3795663081-yp-holudecedumi-cavuduj-har-yp-5l-cavuduj-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-3795663081-yp-holudecedumi-cavuduj-har-yp-5l-cavuduj-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_e414976fe993",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "2 un. | Dukofef do dare: Tocem, Tipo de dare: Mipirez, Tipo de embalagem: Fupih"
+                              },
+                              "text": "2 un. | Dukofef do dare: Tocem, Tipo de dare: Mipirez, Tipo de embalagem: Fupih"
+                            }
+                          ],
+                          "accessibility": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g 2 unidades. Dukofef do dare Tocem. Tipo de dare Mipirez. Tipo de embalagem Fupih"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g"
+                                },
+                                "text": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g"
+                              }
+                            ],
+                            "accessibility": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g 2 unidades. Dukofef do dare Tocem. Tipo de dare Mipirez. Tipo de embalagem Fupih"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-4475593544-dare-mipirez-e-tocem-dekedoci-secevu-pacote-250g-_JM",
+                              "deeplink": "meli://item?id=MLB4475593544&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_775585-MLA99456123842_112025-N.jpg",
+                            "alt": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000311002394253",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_5c5a11f16dbf",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_3487da3e7247",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000311002394253",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000311002394253"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_2af69ecffa72",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-4475593544-dare-mipirez-e-tocem-dekedoci-secevu-pacote-250g-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-4475593544-dare-mipirez-e-tocem-dekedoci-secevu-pacote-250g-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_a50db3d05883",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Fragrância: Sikocaj"
+                              },
+                              "text": "1 un. | Fragrância: Sikocaj"
+                            }
+                          ],
+                          "accessibility": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml Uma unidade. Fragrância Sikocaj"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml"
+                                },
+                                "text": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml"
+                              }
+                            ],
+                            "accessibility": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml Uma unidade. Fragrância Sikocaj"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-4271890562-duvab-mobizim-suzonuruhivu-bovujigofud-sikocaj-10ml-_JM",
+                              "deeplink": "meli://item?id=MLB4271890562&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_760956-MLA99812224422_112025-N.jpg",
+                            "alt": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000353533273414",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_54e7c64afaae",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_2b4c50df817a",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000353533273414",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000353533273414"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_2de8a58c2665",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-4271890562-duvab-mobizim-suzonuruhivu-bovujigofud-sikocaj-10ml-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-4271890562-duvab-mobizim-suzonuruhivu-bovujigofud-sikocaj-10ml-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_6370bfec81dd",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Fragrância: Fesozi e bohin"
+                              },
+                              "text": "1 un. | Fragrância: Fesozi e bohin"
+                            }
+                          ],
+                          "accessibility": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml Uma unidade. Fragrância Fesozi e bohin"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml"
+                                },
+                                "text": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml"
+                              }
+                            ],
+                            "accessibility": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml Uma unidade. Fragrância Fesozi e bohin"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-3902412694-disivolu-bovujigofud-hozasicer-duvab-fesozi-e-mahi-120ml-_JM",
+                              "deeplink": "meli://item?id=MLB3902412694&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_962295-MLB80537707453_112024-N.jpg",
+                            "alt": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000461083083227",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_d11ca053826d",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_decc3a851882",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000461083083227",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000461083083227"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_0a34975d9850",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-3902412694-disivolu-bovujigofud-hozasicer-duvab-fesozi-e-mahi-120ml-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-3902412694-disivolu-bovujigofud-hozasicer-duvab-fesozi-e-mahi-120ml-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_81b122f4046e",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Fragrância: Nodof"
+                              },
+                              "text": "1 un. | Fragrância: Nodof"
+                            }
+                          ],
+                          "accessibility": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml Uma unidade. Fragrância Nodof"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml"
+                                },
+                                "text": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml"
+                              }
+                            ],
+                            "accessibility": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml Uma unidade. Fragrância Nodof"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-4271263543-duvab-mobizim-suzonuruhivu-bovujigofud-nodof-10ml-_JM",
+                              "deeplink": "meli://item?id=MLB4271263543&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_905337-MLA99342122073_112025-N.jpg",
+                            "alt": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000167336228411",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_73cc98340289",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_8ec6d5aa5e0a",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000167336228411",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000167336228411"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_4b514f377899",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-4271263543-duvab-mobizim-suzonuruhivu-bovujigofud-nodof-10ml-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-4271263543-duvab-mobizim-suzonuruhivu-bovujigofud-nodof-10ml-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_87ce08323e51",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Fragrância: Tak legive"
+                              },
+                              "text": "1 un. | Fragrância: Tak legive"
+                            }
+                          ],
+                          "accessibility": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml Uma unidade. Fragrância Tak legive"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml"
+                                },
+                                "text": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml"
+                              }
+                            ],
+                            "accessibility": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml Uma unidade. Fragrância Tak legive"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-4271281892-duvab-mobizim-suzonuruhivu-budaseh-10ml-_JM",
+                              "deeplink": "meli://item?id=MLB4271281892&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_947899-MLA99342545024_112025-N.jpg",
+                            "alt": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000345212302861",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_2055a60590c0",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_56aa410b9e22",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000345212302861",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000345212302861"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_df8cf98ce758",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-4271281892-duvab-mobizim-suzonuruhivu-budaseh-10ml-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-4271281892-duvab-mobizim-suzonuruhivu-budaseh-10ml-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_05a3c7bab0f5",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 29 de agosto   "
+                              },
+                              "text": "Chegou no dia 29 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 29 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "3 unidades"
+                              },
+                              "text": "3 unidades"
+                            }
+                          ],
+                          "accessibility": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades 3 unidades."
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                                },
+                                "text": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                              }
+                            ],
+                            "accessibility": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades 3 unidades."
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-3765459560-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM",
+                              "deeplink": "meli://item?id=MLB3765459560&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_742366-MLA99922658261_112025-N.jpg",
+                            "alt": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000093541688523",
+                          "pack_id": "2000217202137124",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877815605"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_de021332b1a5",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_3de71c9a086b",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000093541688523",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000217202137124&orderId=2000093541688523"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_56f6c400cf57",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-3765459560-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-3765459560-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_400bc909198a",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 31 de agosto "
+                              },
+                              "text": "Chegou no dia 31 de agosto "
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 31 de agosto "
+                        },
+                        "description": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Você pode devolvê-lo até quarta-feira, 30 de setembro."
+                              },
+                              "text": "Você pode devolvê-lo até quarta-feira, 30 de setembro."
+                            }
+                          ],
+                          "accessibility": "Você pode devolvê-lo até quarta-feira, 30 de setembro."
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Cor: Pagosubuv"
+                              },
+                              "text": "1 un. | Cor: Pagosubuv"
+                            }
+                          ],
+                          "accessibility": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor Uma unidade. Cor Pagosubuv"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor"
+                                },
+                                "text": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor"
+                              }
+                            ],
+                            "accessibility": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor Uma unidade. Cor Pagosubuv"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-2625901540-tukinu-diruhele-36l-pepo-gilapek-sua-cor-_JM",
+                              "deeplink": "meli://item?id=MLB2625901540#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_945889-MLB89231355853_082025-N.jpg",
+                            "alt": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000303015159153",
+                          "pack_id": "2000235095565312",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47873079291"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_e185190a25a7",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_c25902b493c3",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000235095565312&orderId=2000303015159153",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000235095565312&orderId=2000303015159153"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_4cfbbfa7c5b0",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-2625901540-tukinu-diruhele-36l-pepo-gilapek-sua-cor-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-2625901540-tukinu-diruhele-36l-pepo-gilapek-sua-cor-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_6b6925699264",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 28 de agosto   "
+                              },
+                              "text": "Chegou no dia 28 de agosto   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 28 de agosto   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 unidade"
+                              },
+                              "text": "1 unidade"
+                            }
+                          ],
+                          "accessibility": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades Uma unidade."
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades"
+                                },
+                                "text": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades"
+                              }
+                            ],
+                            "accessibility": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades Uma unidade."
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-6365802542-minal-tifih-fifosiji-boban-panaf-30m-ponihekef-16-unidades-_JM",
+                              "deeplink": "meli://item?id=MLB6365802542&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_837563-MLA99441282294_112025-N.jpg",
+                            "alt": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000252563335855",
+                          "order_id": "2000234497749204",
+                          "pack_id": "2000060780013512",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47877103482"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_ac973764d2fb",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_82e949933522",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000060780013512&orderId=2000234497749204",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000060780013512&orderId=2000234497749204"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_f371bfd8ce4c",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-6365802542-minal-tifih-fifosiji-boban-panaf-30m-ponihekef-16-unidades-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-6365802542-minal-tifih-fifosiji-boban-panaf-30m-ponihekef-16-unidades-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "list_item_grouper_aab519609056",
+              "ui_type": "list_item_grouper",
+              "data": {
+                "text": {
+                  "rich": [
+                    {
+                      "type": "text",
+                      "value": {
+                        "text": "9 de junho",
+                        "modifier": "bold"
+                      },
+                      "text": "9 de junho"
+                    }
+                  ],
+                  "accessibility": "9 de junho"
+                },
+                "link": {
+                  "text": {
+                    "rich": [
+                      {
+                        "type": "text",
+                        "value": {
+                          "text": "Adicionar tudo ao carrinho"
+                        },
+                        "text": "Adicionar tudo ao carrinho"
+                      }
+                    ],
+                    "accessibility": "Adicionar tudo ao carrinho"
+                  },
+                  "event": {
+                    "data": {
+                      "method": "POST",
+                      "path": "/my_purchases/api/web/2000155855374115/repurchase",
+                      "params": [
+                        {
+                          "key": "device.type",
+                          "value": "desktop"
+                        }
+                      ]
+                    },
+                    "type": "request"
+                  },
+                  "visible": false
+                }
+              },
+              "bricks": [
+                {
+                  "id": "list_item_284a15514e59",
+                  "ui_type": "list_item",
+                  "data": {
+                    "intro": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Entregue",
+                            "modifier": "success"
+                          },
+                          "text": "Entregue"
+                        }
+                      ],
+                      "accessibility": "Entregue"
+                    },
+                    "title": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Chegou no dia 10 de junho   "
+                          },
+                          "text": "Chegou no dia 10 de junho   "
+                        },
+                        {
+                          "type": "icon",
+                          "value": {
+                            "id": "full",
+                            "accessibility": ". Enviado por FULL"
+                          }
+                        }
+                      ],
+                      "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                    },
+                    "info": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "1 un. | Tipo de embalagem: Hetij"
+                          },
+                          "text": "1 un. | Tipo de embalagem: Hetij"
+                        }
+                      ],
+                      "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                    },
+                    "link": {
+                      "text": {
+                        "rich": [
+                          {
+                            "type": "text",
+                            "value": {
+                              "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                            },
+                            "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                          }
+                        ],
+                        "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                      },
+                      "event": {
+                        "type": "go_to",
+                        "data": {
+                          "url": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                          "deeplink": "meli://item?id=MLB4359540921&vertical=cpg#sid=purchases"
+                        }
+                      }
+                    },
+                    "asset": {
+                      "data": {
+                        "url": "https://http2.mlstatic.com/D_798796-MLA114662527023_082026-N.jpg",
+                        "alt": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                      },
+                      "accessibility": "",
+                      "type": "image"
+                    },
+                    "context": {
+                      "purchase_id": "2000155855374115",
+                      "order_id": "2000120511220818",
+                      "pack_id": "2000473164356301",
+                      "vertical_id": "SHIPPING",
+                      "shipment_id": "47268061091"
+                    },
+                    "visible": true
+                  },
+                  "bricks": [
+                    {
+                      "id": "button_container_6d70552b9555",
+                      "ui_type": "button_container",
+                      "bricks": [
+                        {
+                          "id": "button_dd9135570d89",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Ver compra",
+                            "style": "loud",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000120511220818",
+                                "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000120511220818"
+                              }
+                            },
+                            "accessibility": "Ver compra"
+                          }
+                        },
+                        {
+                          "id": "button_3d924a6a9d48",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Comprar novamente",
+                            "style": "quiet",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                                "deeplink": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM"
+                              }
+                            },
+                            "accessibility": "Comprar novamente"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "list_item_67f01e37fe56",
+                  "ui_type": "list_item",
+                  "data": {
+                    "intro": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Entregue",
+                            "modifier": "success"
+                          },
+                          "text": "Entregue"
+                        }
+                      ],
+                      "accessibility": "Entregue"
+                    },
+                    "title": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Chegou no dia 10 de junho   "
+                          },
+                          "text": "Chegou no dia 10 de junho   "
+                        },
+                        {
+                          "type": "icon",
+                          "value": {
+                            "id": "full",
+                            "accessibility": ". Enviado por FULL"
+                          }
+                        }
+                      ],
+                      "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                    },
+                    "info": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "1 un. | Tipo de embalagem: Hetij"
+                          },
+                          "text": "1 un. | Tipo de embalagem: Hetij"
+                        }
+                      ],
+                      "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                    },
+                    "link": {
+                      "text": {
+                        "rich": [
+                          {
+                            "type": "text",
+                            "value": {
+                              "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                            },
+                            "text": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                          }
+                        ],
+                        "accessibility": "Mubidi De Gikal Socub Finoho Culad 500 Ml Uma unidade. Tipo de embalagem Hetij"
+                      },
+                      "event": {
+                        "type": "go_to",
+                        "data": {
+                          "url": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                          "deeplink": "meli://item?id=MLB4359540921&vertical=cpg#sid=purchases"
+                        }
+                      }
+                    },
+                    "asset": {
+                      "data": {
+                        "url": "https://http2.mlstatic.com/D_798796-MLA114662527023_082026-N.jpg",
+                        "alt": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+                      },
+                      "accessibility": "",
+                      "type": "image"
+                    },
+                    "context": {
+                      "purchase_id": "2000155855374115",
+                      "order_id": "2000260031513556",
+                      "pack_id": "2000357820908545",
+                      "vertical_id": "SHIPPING",
+                      "shipment_id": "47263049542"
+                    },
+                    "visible": true
+                  },
+                  "bricks": [
+                    {
+                      "id": "button_container_3af9472a99d2",
+                      "ui_type": "button_container",
+                      "bricks": [
+                        {
+                          "id": "button_72fbbd4e26c2",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Ver compra",
+                            "style": "loud",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000357820908545&orderId=2000260031513556",
+                                "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000357820908545&orderId=2000260031513556"
+                              }
+                            },
+                            "accessibility": "Ver compra"
+                          }
+                        },
+                        {
+                          "id": "button_6a090fcc481e",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Comprar novamente",
+                            "style": "quiet",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM",
+                                "deeplink": "https://produto.mercadolivre.com.br/MLB-4359540921-mubidi-de-gikal-socub-finoho-culad-500-ml-_JM"
+                              }
+                            },
+                            "accessibility": "Comprar novamente"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "expandable_content_8f59649c5a41",
+                  "ui_type": "expandable_content",
+                  "data": {
+                    "event": {
+                      "data": {
+                        "target_id": "expandable_content_8f59649c5a41"
+                      },
+                      "type": "toggle_link_visibility"
+                    },
+                    "collapsed_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver toda a compra",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver toda a compra"
+                        }
+                      ],
+                      "accessibility": "Ver toda a compra"
+                    },
+                    "expanded_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver apenas os resultados",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver apenas os resultados"
+                        }
+                      ],
+                      "accessibility": "Ver apenas os resultados"
+                    },
+                    "button_position": "bottom",
+                    "expanded": false
+                  },
+                  "bricks": [
+                    {
+                      "id": "list_item_9c6d7ff2a3f6",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 10 de junho   "
+                              },
+                              "text": "Chegou no dia 10 de junho   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "2 un. | Tipo de embalagem: Mopak"
+                              },
+                              "text": "2 un. | Tipo de embalagem: Mopak"
+                            }
+                          ],
+                          "accessibility": "Gijuvabemu Mep Vorul 5 Litros 2 unidades. Tipo de embalagem Mopak"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Gijuvabemu Mep Vorul 5 Litros"
+                                },
+                                "text": "Gijuvabemu Mep Vorul 5 Litros"
+                              }
+                            ],
+                            "accessibility": "Gijuvabemu Mep Vorul 5 Litros 2 unidades. Tipo de embalagem Mopak"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-5170476072-gijuvabemu-yp-vorul-5-litros-_JM",
+                              "deeplink": "meli://item?id=MLB5170476072&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_644298-MLA99440016453_112025-N.jpg",
+                            "alt": "Gijuvabemu Mep Vorul 5 Litros"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000155855374115",
+                          "order_id": "2000404618433039",
+                          "pack_id": "2000473164356301",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47268061091"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_75d19fcf3db1",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_c2f0d9b0e0f4",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000404618433039",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000404618433039"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_d04374424a05",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-5170476072-gijuvabemu-yp-vorul-5-litros-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-5170476072-gijuvabemu-yp-vorul-5-litros-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_bfb587ef07a0",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 10 de junho   "
+                              },
+                              "text": "Chegou no dia 10 de junho   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "3 unidades"
+                              },
+                              "text": "3 unidades"
+                            }
+                          ],
+                          "accessibility": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades 3 unidades."
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                                },
+                                "text": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                              }
+                            ],
+                            "accessibility": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades 3 unidades."
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-1903017612-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM",
+                              "deeplink": "meli://item?id=MLB1903017612&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_742366-MLA99922658261_112025-N.jpg",
+                            "alt": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000155855374115",
+                          "order_id": "2000235066257003",
+                          "pack_id": "2000473164356301",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47268061091"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_d79a0489d03f",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_9d81e9527545",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000235066257003",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000235066257003"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_fb3024f9fdec",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-1903017612-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-1903017612-tijarukopaka-limukumit-kazatugujaj-falil-kojavafi-tarajuba-8-unidades-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_263bb12e9047",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 10 de junho   "
+                              },
+                              "text": "Chegou no dia 10 de junho   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Fragrância: Pij do Tulope"
+                              },
+                              "text": "1 un. | Fragrância: Pij do Tulope"
+                            }
+                          ],
+                          "accessibility": "Kit 3 Duvab Pij Do Tulope - Disivolu, Lanirag, Pofi Liziv Uma unidade. Fragrância Pij do Tulope"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Kit 3 Duvab Pij Do Tulope - Disivolu, Lanirag, Pofi Liziv"
+                                },
+                                "text": "Kit 3 Duvab Pij Do Tulope - Disivolu, Lanirag, Pofi Liziv"
+                              }
+                            ],
+                            "accessibility": "Kit 3 Duvab Pij Do Tulope - Disivolu, Lanirag, Pofi Liziv Uma unidade. Fragrância Pij do Tulope"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-6255293372-kit-3-duvab-pij-do-tulope-disivolu-lanirag-pofi-liziv-_JM",
+                              "deeplink": "meli://item?id=MLB6255293372&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_876632-MLB107345662213_022026-N.jpg",
+                            "alt": "Kit 3 Duvab Pij Do Tulope - Disivolu, Lanirag, Pofi Liziv"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000155855374115",
+                          "order_id": "2000641435970914",
+                          "pack_id": "2000473164356301",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47268061091"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_9d3ccd90b8cd",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_b86fbab75a4b",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000641435970914",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000641435970914"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_b25d44504861",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-6255293372-kit-3-duvab-pij-do-tulope-disivolu-lanirag-pofi-liziv-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-6255293372-kit-3-duvab-pij-do-tulope-disivolu-lanirag-pofi-liziv-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list_item_342e5edc8775",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 10 de junho   "
+                              },
+                              "text": "Chegou no dia 10 de junho   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 10 de junho   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Cor: Peto"
+                              },
+                              "text": "1 un. | Cor: Peto"
+                            }
+                          ],
+                          "accessibility": "Kabidic Peto Não Vivun Gevivuz Bifubade Lumumo-putug 3 Unidades Uma unidade. Cor Peto"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Kabidic Peto Não Vivun Gevivuz Bifubade Lumumo-putug 3 Unidades"
+                                },
+                                "text": "Kabidic Peto Não Vivun Gevivuz Bifubade Lumumo-putug 3 Unidades"
+                              }
+                            ],
+                            "accessibility": "Kabidic Peto Não Vivun Gevivuz Bifubade Lumumo-putug 3 Unidades Uma unidade. Cor Peto"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-2030025096-kabidic-peto-no-vivun-gevivuz-bifubade-lumumo-putug-3-unidades-_JM",
+                              "deeplink": "meli://item?id=MLB2030025096&vertical=cpg#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_960257-MLA99930236752_112025-N.jpg",
+                            "alt": "Kabidic Peto Não Vivun Gevivuz Bifubade Lumumo-putug 3 Unidades"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000155855374115",
+                          "order_id": "2000047128034066",
+                          "pack_id": "2000473164356301",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "47268061091"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "button_container_5e6b7dde7770",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_2fee11339b8e",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000047128034066",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000155855374115/status?packId=2000473164356301&orderId=2000047128034066"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_c57f3b84600e",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-2030025096-kabidic-peto-no-vivun-gevivuz-bifubade-lumumo-putug-3-unidades-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-2030025096-kabidic-peto-no-vivun-gevivuz-bifubade-lumumo-putug-3-unidades-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "advertising_9db75285b383",
+              "ui_type": "advertising",
+              "data": {
+                "content": {
+                  "fast_loading": {
+                    "experiments": {},
+                    "items": [
+                      {
+                        "type": "adn",
+                        "is_off_meli": false,
+                        "start_date": "2026-04-22T03:00:00Z",
+                        "end_date": "2026-10-01T02:59:59Z",
+                        "event_tracking": {
+                          "print": [
+                            {
+                              "url": "https://print1.mercadoclics.com/hekobub/prints/MLB/count?d=TWakPmTXuL0YL7lXZpOQ3XV5YBDOy_V3z8QfvQvum3skWMVEkFcn-kLXNugWfsp8kwVbAmahWOWBTyfShExi84X1OucUmpyZxrbFG_uW1XD-YTVjG2ClL3yG4iZowPGq_ymIxLsJh4zkKwAUC4cMDHKTlUnp1OuZmiYLtcMbkCFGUXvHEXUD65e2OYWzOhMFiZYBApnNE75zAHSX_VMydkWhTiFOQ0LkMnVg176-Lrt9IsDet5q3Eh-Rtg5vkp4m_ulBjLaVTmTbgByC1D9G-h9pHkHyXFXE8M7SNLiXCfms9tPA4ybSe2RdixkY-0SiILSVKXqPZtBxDTljvEMrNjprZz4SGidHg90r2cKtUrCAhuqd-asB7UQ9hWVztGfHvJ8n53KOF9wK8rGmODCdC68HRF9maPvQ6spvTpu-A1Vlz0e_NNvzQUxrUsB-ywtalfce6ihUhw_K0ktImPe1PIdtAbfAm_6zWRcoa3Gor25nBqprgqJed0gRx4DryoYQ62yqN4L5XspwvS-zqXj-7x_JMxW7hGoE-TaUPaYNSn2Nl_PYDryT6efHJilGbPXQgHAkC56t0zC_3Jdgejkw7AxpghpTEyeLwqLcCVju-upkIZP4RRH9ZX4Atc5RD7UxHBgL9X_tpbkKiBcDJiSusGe_TXalMW7ryCoA4Zh6LeDV920acUAGlti1VKgMqKlOGYuVmS4I_CeeCHR00zKdoBp20_F0TtPvcSmv9ljyULoX3nCPo2BwZtvCjuuda6uWpUlLz_2ADxkztuxXqHnY381zZtuwr5uRGpbOrPjyFdWysh3ATTQAPBPHEQH9pKvtXidHzh0EvkdJYWSGZ1SmbmKuwYykO4gQlFrz2mVQglFHEXxybR52tyR9x52ydZh7nlhgorWsAmzair5x1yLMgQSEzYCt0mXPr_H-k3JJDvcnlGIarkBWWdqwo31Bacsa54Wz_2VlhvZKgxb6xR6_YW7yGhrSSE157Z8CunMEBpZYDFid_TKLmMaQCdTPgiNIo5rLSiYRcXr5a4q6rfnXkXnrrP47YIll-SUyMtbgw_SjjMsGDa2ywKGwrkndCRpldbLuP_Ysu7OgvN2qX7jhqxPqfpRuFIOyFdI_tulf3iTYzIfRX2g14ey60HU3a1p79ZZF54B-C-sDBNGWxx8_CjCpvU5upSyVTUaLvu7xXhFHwG7ACs8uuOxlVBmqwWvHNS55rwbLbO-O9hTOSFiWHq45G0pX_l6NiLIibRNVxIWjBzr3feSL65ujvFa3bQuUSaMjh-gn3_eHvFdCtNlq6E6cKQUk_c2m1tn_bzdPV_pZPV4NFfG46-cq-Q-hkN2Ud_BEBlE_EZ1pRfTTJjbfWb7YeJWH5nS0kX_M7vy6VwKeRmK4zpebwSmy1F2TIeS4nUNvlc8pF3RnozKJUamPE1ukjieEOvNFSR22wftv-bWxjnncqW_K85R3jaAq2zdUL1mSPQzXbxz1CeQ2iE9-dIBg4IAoT5Ufrb8L_qfzooSkbnDwfQ0unDAKtSFma42j9TEPcRT0ffjR5ZcoJDuKjyvym2bNUPLaSoUUL9Yvv5BYa6NnXKIYp4RR6oBxXoebi2z80hZm8Bdh-sti1T0p-nFqGvQpcbqEy2q-JX--qmL73ZvEcfMuSt1f5w4-pDMPDgpnBLGKwH4qRkmbnxnPa2yXAZpeuNTFdQ4VNY4mmCcc-6NdWgE5tb4hQXfvjKv1x43kwLRASVw9AkAFQg7Lgl3Sxt-HHBMNTGyBTqdfCOKK1FnJ4zYdkUSilK8YU5SG2OxyjEmAqmB-4DT2LzmGDzGBPccMh_alQDU9Pgx_NOJGq8UTfgPaH1_j5JYANSeHvclyeFgAeapseHvAGNfNyH5FYgBfT3J-Rg5ABFwcCW6xs1_xYteKseMfwYxmYWbvQWMonlLtVLbujSN8Tf10ExXaLiU2wIhG5ehn95tuCtNT_gOBHx2jfYTPARYuw7ChtwPoby199UFfof-dJVdVF6B9yZzDdgNL5GL0WILRhanBYaI9H48WTqB6xnSlo-4Agb8BhEAinU7s3fNZ3RuAoP_nHE-meSR1SVw3FZ8cGmxMbdPze34ay4LUB4WsGworjG7nr0HNQSNuQTnP6Su_1M6V3YtiAWRKBqZFRbtknFIvkT4t1k8eQAFtVEQKs06H9Qft8VCkX-Q_V7ykJpJ64E4InJcPgfO7zlKhHK1qsND8vbnO7uryImy_PWV_ys8Ji0xlkwxQMB_7lUbpgdGP-bpa29lrc-kGn7CY2Atm3sTqBI7pa1Jj9-cPpiD0QIfA4k8DsQnJ7E9642jKyywMnlfpkmVawlgWCeQi_9OQy6hPqyfSfjavNpLEWt8DzEXccs0ZQQZ8iosxUGil6z2PgVQ071bN7g9APmsohAMIroiD0Pyb1SWRAgnvosW-E-aUuqpDQlKKLQN96q1Dl8IxY6nyXSuhSrE2ZHYIGpG_8K2yAXViAGdyCY8B6z7peKtvI30agSEfo-X9uAiGqFtbYsT2mede3ybAo7dMFNF903Us2sdKjfmP5CLXyOEgG8saBNna02gINBeG07Ss9ZYqU8Uyy81UJ1HrwLa3IZZS3EkZhPGTBfH5ogUfFQbOtQ8JwRXwqeYMI2p2WHjtYZGARlHiFQliRaKAAT7oejuTJJQ8ZG0jkGeYT5zuidlBNNLz9Qy_uy6Pqku9iNZyFM9kXSuXAdM6gIoqyH8S4JDq_Me92NdfSJ_sdqL7G09_jDaDjFtJXfHW8eX9pHQ6YBkZNIxrLceEJXBYZf4okj1KoyTEGBLkLdg3FKUYcBt7v7fbzl5Hws5ZlW2R-gDII4mmyOWqBD-AQ8BMIY-bKl93RXy82GYqmPYOPS9PRjiqlmCeRB-jHrGb2vPynsyyXMQejFeMIBYzJsbuQ4Pkjg8xYUBDvfy4y17rNVGEzRU-EPoHsoLBScb6QKEE-vwmUufdeS0VcvTx8MbqRRcAAWJPgZ5p_lh9nbqLofNqcKpDo3A5&cipher=v2"
+                            }
+                          ],
+                          "view": [
+                            {
+                              "url": "https://print1.mercadoclics.com/hekobub/views/MLB/count?d=TWakPmTXuL0YL7lXZpOQ3XV5YBDOy_V3z8QfvQvum3skWMVEkFcn-kLXNugWfsp8kwVbAmahWOWBTyfShExi84X1OucUmpyZxrbFG_uW1XD-YTVjG2ClL3yG4iZowPGq_ymIxLsJh4zkKwAUC4cMDHKTlUnp1OuZmiYLtcMbkCFGUXvHEXUD65e2OYWzOhMFiZYBApnNE75zAHSX_VMydkWhTiFOQ0LkMnVg176-LrtEHwgBTKZbNs9IjFQT219O3whxhFIE3TVjPf9CRyJal89LAeXb69Qy84msJ9QsojZPY8YbUKPh0pP7gcbufy-EZpkgoo_ZzD9y-wIaxj703DMtAqpbW7KMz2GgdauQfgQhoGbRcEurICAbl0QSmkzT8Wv-qklEBBLbOlXeCCBVdd947x5e5x6x4VCRDMj_q99l-InopGD1iVXOSegkgWWj6mHB1nYuRDsHLAEmeJogWtCnUz8ibed1ct-_EqCYusIUMUEB3m5gpZM5gs1o2uZNBbKOBBGcTJtDdN7Qn6EyUT9iDDWGRd3FsAlmJBxBENphyhOEHMMFEbOEe5VL7-0UKUZj8vu9DcrclMY2fLTnH9W8XnbDM9BHy9N7LW8hE9QBBT0lGbZY7fTKiDN15JHFhnzZ6nUSWqQpV58vpWVKwQyUyw45h4jOc-YnWhdwDmIbsg-Iv60C0fjq3pj94S4_8htoy1G16V8zSLyaZRBk5-VV7q850JTnX7hxkIsv7XIu9FP5qs8XfoFuhr8TI1eipHQnzxCez2JLsTA3-9ggr3oQQ4LxXBO6Y8OdPE-B9qCE6FRSHlhtWF6bfwWqKoes6_nqfo4NNrOCZr1djqY5ZxEvOL1A74jR2QkcYCeR52KL8PwQCJSwAq_4j5bM5cKRyGB2RyixhDiYO99tHY3SDJJXoGyRL5g45w4VACPr7YyEZG6AjEb7b0Fr_WI3zTyjxyGaCUgPuYo3GXWwcNmrCmj1kYV8qV2RmvCB8lfNGsknyNanbb5i2weNp2OsRFbwgEHU-Zzmt4F98NTl7QwEiOszBpmDWa276CYMqJbse91PL_kXgud-sBmx-RAxl03IxjH0CBDg0Joe3eDMUUzoiNaQCvXwDcVrLKWWJmMRKuk7NBel9mv0q5L208JscMm7PweuerGrK7uKoQo_T5ZoJg&cipher=v2"
+                            }
+                          ],
+                          "click": [
+                            {
+                              "url": "https://click1.mercadolivre.com.br/hekobub/clicks/MLB/count?a=TWakPmTXuL0YL7lXZpOQ3fDwkdjGsSzuH9ZevoWcP4ahhlAj2V5sDOyXtNx_G0mYu__q4dvvAzk9aDwyX5jbvyp-OMUzI6asdTMRFQfQ1-mYEabre--qxODFOwKHbBIHeGAk61NaCvlZy6ak_710cU-Cipqup-X_LG4ma7Utuh7ri6NuKJtnxrEBYsvr9kV5rmAwbCS-zmm8wyo3Q8swrig3mC2EUpbXCtehlcCsixkYuU9eWIf46vo0AHtuqrfDpXUcjnrAj4hxAP_29fHgeBJGDPMjU-hycHPwvgOGqzS4Fw3JXZQX0f5C8ARa5oEgryVb4NZObeGjL343gE2TfFp50txRe_HQDa7opDg3zs7RHtlu98fwrjmbNerMc_RXnBQs5Y1AOydt4elGTeMPiNBwpEpw9k9o98DhNjXIqWGTVNZXDYnY8-lth4xPYDH9o7csJyoyqEA_Fl_EQaX-x-r09qv1WAMa21xddjyU4e1QrMHHEqO7vKndOgo__luX-6lJ0XTr_cKAYJKD8ISlz5hVF3z6YU_bP8Gu2e-XgW66gUbg5PNg7NqMjzuedwftElywxEMz_BklUV2-dYa_fu7do4CcTcpatHIR9iX1PcOqklUXQtFx_8fc-x0eLWXAN40t7_T2NBGtLzoSEQdehtRj6iRiBPd63yaJshv_vRBJyZCtXFudEg7JQzGRuEvs1nIc-01Ope1vrsFNBGQzXzVFh4B-0WSuFOYXpKazqTFq6DPB2ih61xVn1KtR_6N-Bi61FMTxvBs70hLsl69ZQ8twijWtvqUFdSKpdtgDgaUuRz3kSDlOw6ioM4EZ-DcZrXXlM8wJC7583YJSjf46P3GDUk94ax2TvvFkoaDK6fPH3lXEn5iDuoRIZEDyM8077HkqVszT0-mWfuUffYaxqQk2LAObjnDO6xcd5M-ctVOhsOc5C1FXXVOrnXyrmlIrQvVZeUtpjwwde6X6FccVLOPIO6WyDnZYtpCrshG5MjFOoDwqfvTN79o9gKwlPOhiJvaFhOwunC7vzkRr8VIcbDxPenBi0AmTDKz9h02zbmpFb48UX0GE_VNHuPpbI0wn&cipher=v2"
+                            }
+                          ]
+                        },
+                        "event_data": {},
+                        "view": {},
+                        "verification_resources": [],
+                        "content": {
+                          "images": {
+                            "primary_logo": "https://http2.mlstatic.com/D_NQ_817054-MLA109873116315_042026-OO.jpg"
+                          },
+                          "colors": {},
+                          "texts": {
+                            "promoted_tag": "Ad",
+                            "promoted": "Patrocinado"
+                          },
+                          "actions": {
+                            "content_link": {
+                              "action_id": "advertising",
+                              "link": "https://www.mercadolivre.com.br/loja/id/58c7a7425931231db3920ffcc51ccf41354450422?item_id=MLB7511320609&category_id=MLB1652",
+                              "event_data": {},
+                              "target": "external_link"
+                            }
+                          },
+                          "a11y": {
+                            "context_promoted": "Ad",
+                            "context_logo": "logotipo"
+                          },
+                          "marketplace_items": [
+                            {
+                              "reviews": {
+                                "rating_average": 5,
+                                "total": 5
+                              },
+                              "type": "dca_child",
+                              "price": {
+                                "decimal_separator": ",",
+                                "symbol": "R$",
+                                "amount": 2899,
+                                "currency_id": "BRL"
+                              },
+                              "texts": {
+                                "title": "Notebook Asus Vivobook Go 15, Amd Athlon Silver 10 2,4 Ghz, 4gb Ram, 128gb Ssd, Sobu Nível Ips 15.6  Full Hd, Windows 11 Pofi, Mixed Black - E1504fa-bq5312ws"
+                              },
+                              "images": {
+                                "picture": "https://http2.mlstatic.com/D_NQ_625597-MLA112359570852_052026-OO.jpg"
+                              },
+                              "actions": {
+                                "content_link": {
+                                  "action_id": "advertising",
+                                  "link": "https://www.mercadolivre.com.br/loja/id/58c7a7425931231db3920ffcc51ccf41354450422?item_id=MLB7511320609&category_id=MLB1652",
+                                  "event_data": {},
+                                  "target": "external_link"
+                                }
+                              },
+                              "a11y": {
+                                "context_reviews": "5.0",
+                                "context_price": "2899.0",
+                                "context_title": "Notebook Asus Vivobook Go 15, Amd Athlon Silver 10 2,4 Ghz, 4gb Ram, 128gb Ssd, Sobu Nível Ips 15.6  Full Hd, Windows 11 Pofi, Mixed Black - E1504fa-bq5312ws"
+                              },
+                              "seller": {
+                                "text": "Por Asus",
+                                "official_store": true
+                              },
+                              "event_tracking": {
+                                "click": [
+                                  {
+                                    "url": "https://click1.mercadolivre.com.br/hekobub/clicks/MLB/count?a=TWakPmTXuL0YL7lXZpOQ3fDwkdjGsSzuH9ZevoWcP4ahhlAj2V5sDOyXtNx_G0mYu__q4dvvAzk9aDwyX5jbvyp-OMUzI6asdTMRFQfQ1-mYEabre--qxODFOwKHbBIHeGAk61NaCvlZy6ak_710cU-Cipqup-X_LG4ma7Utuh7ri6NuKJtnxrEBYsvr9kV5rmAwbCS-zmm8wyo3Q8swrig3mC2EUpbXCtehlcCsixkYuU9eWIf46vo0AHtuqrfDpXUcjnrAj4hxAP_29fHgeBJGDPMjU-hycHPwvgOGqzS4Fw3JXZQX0f5C8ARa5oEgryVb4NZObeGjL343gE2TfFp50txRe_HQDa7opDg3zs7RHtlu98fwrjmbNerMc_RXnBQs5Y1AOydt4elGTeMPiNBwpEpw9k9o98DhNjXIqWGTVNZXDYnY8-lth4xPYDH9o7csJyoyqEA_Fl_EQaX-x-r09qv1WAMa21xddjyU4e1QrMHHEqO7vKndOgo__luX-6lJ0XTr_cKAYJKD8ISlz5hVF3z6YU_bP8Gu2e-XgW66gUbg5PNg7NqMjzuedwftElywxEMz_BklUV2-dYa_ftpwMiupZpECOQLJLv3Pkx2gNKxahFCeTh8XZQr8DoIT3j1BuYzcROVKae3rxp-YVyZvAdXfe2o-1qfDjYT6gLJWQ_LqeOdBrq0EGaWsPTbFpeEzK_JIvtgOwgCrFEMPPKZdVp9TNVb3FjW5-a5EbBq-6l6GLP09Qcc52lWGS19GhsOYmU-4Y3zBlOf0RtzkdLv5HRyQYmg6i83d60H5rSO79HPQmCXpsXaBw_7dVqUkEx-1HDg4Pq42YmreaGOynhTm22uBGJRUEtCsEbQCmGWXyddwDbi-1BAUaRtivyFh6Mw6BylN3eqPQhE64NMOv4GKB4kFyrmchC0GHdW13ihetkVEgSw8lLP7qsPzA1GbBlW6ofe3NtTY7FbxSFYxlNB4HQZlB8YLj1HSUCPqaa0CHkF1LVIwA9NySF9SHXUZsU06JkVCsn11f0__OrxaUXAEMeqM3Yu5k5eJrK1wt_cPwr4zaTH4Cb-315HzogINrEAhLdLs3qSHqVap8FRsyvWWejj52UnpNKeu94Pvgxh1JRbyGq1L1fhkBhmI7874&cipher=v2"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "type": "dca"
+                        },
+                        "template": {
+                          "url": "https://http2.mlstatic.com/frontend-assets/adn-frontend-library/dca-banner-horizontal-medium-fako-double.2.9.50.js",
+                          "tag": "dca-banner-horizontal-medium-fako-double",
+                          "skin": "default"
+                        },
+                        "lazy_loading_print_percentage": 0,
+                        "slot_id": "purchases_list",
+                        "show_feedback_ad": false,
+                        "creative_id": "4852925",
+                        "placement_id": "PURCHASES_LIST_DESKTOP_1",
+                        "print_id": "58eb0e24-68a3-4822-b2cd-d3c3ceb2ba69"
+                      },
+                      {
+                        "type": "adn",
+                        "is_off_meli": false,
+                        "start_date": "2026-03-02T20:00:00Z",
+                        "end_date": "2026-11-01T02:59:59Z",
+                        "event_tracking": {
+                          "print": [
+                            {
+                              "url": "https://print1.mercadoclics.com/hekobub/prints/MLB/count?d=cDauG8nD9VrGQiYFju0ZLr_TX95kmosjSiclLjLC497t7ptC-R_T2892sjybZFpzqbOt65fwyuRtbGcL3fN5zBUjEJvppzU4YOORUNo9XPTQOBJk2EpOwc9J_i1y3aqJ1KVrrVuFmrwEfL4UgDtSZ-IJ_RLdd-iwljWI9zcQ7r7MbqIsXYRgHy_N45KlZDzqgohFUdM4-wKx2WOHRS724CRYsHc7zLJGlH6pYwH42S_N8Sjm6Vxk8HEUM8XGyGXcDFpvMXGDAmTV0ZETSnyCGKcdCbt11c_aourabF6y4XaJs67V2A4J9Nwh2oP7FtmcX-mz8lH2xZ439HRpa0_2BE9Zp5_iFCEybUnNsbDwpiwyr9iXE1dvUdOQimKCIVRb1oExmf8ZrebzW5N1SEyTqzgd7SFIiMcvSYcJNuhYYYJL_rlms2_WvqZRIyJ-_L2mns4_JB3TR7XmpxWBLBwfqc04dQGN0ZMZCuELujFu883qo_9EGYCP-ekPEZi4ae28gIMxz_ep-n4xQkqXLrS40et2HSF0nyeUFQWoF2tVnJH2m-GfDZ9KpuI7KJn9qLAlCp8Ng3c1P3iImEAtlImt-lPGtYZKwlXdOPk9cJgbNWBfrI9GT-PRmwRAm0870fhHKjJTnH1mSaa9P2izroLhp1aQzkUechuwIjTmWcYIJbtZM7E5kBGLzrCBJMNsZ-0CVMIdrZo8OXViwJ8aGl_oBDBRdRrn0t8KdlV4cB8OwiXRVIgA21DhBTCGruAvrN0PJE-uSkgRaNxIfzmgGhi8oQpM3RXeKFI-Dcci4CM_8iryorpyNDENSbi_4_2_0oKG_hysESJYJrFV_--fXyNPTVeIuDAL_nFo3nP5v6Lh4XSgDxdM0km4ECjY5_0VyyyK_OncUfwxBZD61sDbMLaqYj4D4hY9902J63ybHyyZAb6YgGO10jHM4cVM77GyXaEidwkm0iWJowfHVPjY_VAsZIqOm77ddf9bpcGqLEVKiXJbTWe5dCVivB0cSB-m_kQA_XZ5tWkrb-hH2g0ywE4K4tesri3oClix324m4Nh04uwkaPgoBoNO9KngBEC1RApWgbO-u4jJdjSTAJxDvIx2bN1GnUfdkDLnJu0cS6NELHTwfDdJsZTSrvvnnzdXjpaaFaWB7grNe8W_LYffdeonEoB2OdF63-4htTZaye-GTHymKRbSAU8MGVGo0OlmzwDuRGeUK4X07OIkix9Yf1Y2ZhJ6Tn4CjJ39-NQLC7KrjrTXpG7Z3TAYVv9hGffASIbYN_qW6p8aHI0fSN1BQwEd5iNxJTvIFqgiK2edvNdP-R_-QzNjdkleOIKSlOY7hH9O3r_SNA0rda3q0jDsWoQOtwGts-2IxTvhtkZYnw8y1fTqb33c8AV_IR9QNTxUOAaMCt9jJyBx1WCa11aWjJ-OeLR6Z0lltoyJ-OSV0P4FWmiGvaIBPC01L8JlOWJBnaM4xccSDAlG0kG0VUAVPXlzoKf7W-zbOZXXT5ho8A9B2F-enwYBtwaYNKMv0IuozY7_84rbRRuqrP1cg_LIiYKKoTJ0BGD34Y6Hv64PT8K5Hf8Yj14RwP1IjIkTjmOV9dpABteVZrfDA3jWJzlM7j_qgeNjH8gIlSOzuxPFqxK-1O8arb8N86iaDeoRyWBwwyNEwPsO4TGb7COGCaiAii4A7750flqUYzvET6HVMxJiY0RaZQ8RWyowLk0YlnW6fWkLbM25ZeeBETVbeqIrMmQL5nTPFq9k14jUxVo79onZbtpTH9H4yoTtrT0lbKQ7P5c2sTJtPGD3KcXFjvMrQAyXfdsAH4jpyayhUmEAzJqrrBoWoELBDiyhCC2QF-5HjY4OfAx_3SgJY3U4Z2f91hixxBzBuethAzrwQCqom3zXJ4ACNAZREEcU-J7qf1QDku1azovuUWENPnhcgvPQgMWkLCDCO5F6ldpJbBABt6XDxJWwRuFFOpmgzf9wLnn4KKttksehfrLJxpenZ8ag6XrcAQvikav9_Ea8Maz6Q37PNrPXr9TfOcetuO2vi7xFXEz2N_LGmJHr18PqLdOPn7dM9p2AnF71ZbxZeSqshFcgoiYRIciXl3WEKP3fplKjSqwj1nGQhtomwwRISZTI3JWBq64QdD4mN2qoRoRi5i2I6ME4PiRfcz604NJzVsVCR1rKijy24mjPJ6R28B0kV3_UUNNzP6EPAXadGpsPynV3Ad5V_6MR2-xRCCi7x7YqUFw0esSouEvY4C50A5Z-MfKd9D-uNlgkmgp-Sn_YXX1YlfdZhfXHfsoAC3ImRVQ_a8UxpDVoNU7m5QAA6ukAEY5PtxuaFL_fD1EwxORXGhUNT-ZmLThOb8CQWBjZs32S3sGKinDnsb66CYrk7gpGD392aWowYKHO7L0KDHzSBVDlvjUCSEx7trNaqw61uOPq7Elx9hl-4QWSLJaKxadW_TjWNXy5AV4w0YT42fw9XYv3rBbEjQJ2RU_28tL52qX4oq0rWCQs4D2WdYVKb0LppLCPHOT1yWvtY6BTpOuEd1oFFtS30_eRkzmTCSutPxmBwVbnGfV-EUoUwmNVwSpvMzFgdqt9uneV7e1vmVimueJZhnsm03iLtxSOOCi8_WAnZQbJyt6oIKWt7y4gI8Q13UDksJIfEeV1Cwd1LpZ8KlDNncbI-bYnB8ZjahvSHL8aT2FvvBwpR9VFI-1ZJiYUK06e_fp6Ijtk5X3yzmmk20kKkRD6n5Fydr3ev4Q5a3f1GH0OnuHqBTWqRCqODJZqU6WUybaACXNwNsLVNAmtz0VaNLIf6SNkgy3kJBuxfoYevz2zRl-SfYNbjoHnyeL95dTV3j5aulldGfdrRPKD-WCq7qTOHmgOAmqehL3xqO7lKoY2E8di82SpZ7hyLVkIomg6SmtGKjyTyc73dDe3jOHq1cIE-vvzH1MS_nSzK_TGkvJdG_xDC-b2Tur4MTxlyJ98QXiHlBNCNAw-RpOY6fby-sU1amNQIJzHVxnTzmAQAuhb9O10R69pfbvnIrwHr7nov2FWyUlQHxeXMr7IYFikRhwY_NOm59F_rFRr0gEdUeLj&cipher=v2"
+                            }
+                          ],
+                          "view": [
+                            {
+                              "url": "https://print1.mercadoclics.com/hekobub/views/MLB/count?d=cDauG8nD9VrGQiYFju0ZLr_TX95kmosjSiclLjLC497t7ptC-R_T2892sjybZFpzqbOt65fwyuRtbGcL3fN5zBUjEJvppzU4YOORUNo9XPTQOBJk2EpOwc9J_i1y3aqJ1KVrrVuFmrwEfL4UgDtSZ-IJ_RLdd-iwljWI9zcQ7r7MbqIsXYRgHy_N45KlZDzqgohFUdM4-wKx2WOHRS724CRYsHc7zLJGlH6pYwH42S94T-mtepY8iAwRMtCMfwumF0c0cIPMHQckWaojj72typXpXpZJMK9r4YMtxyUsiwKtxpp_v_BrUxRdpjmAsDtrdjnAl1IDBq0qdJiH639WjwE3BzKkCyadyFdcs6VbHpqNjMcE8QAt53KcpJiG-7qoHsBcRAwFLCJ7zc0rfz85iF5Qrkh0FYV7ZChy_1y7LQxAK-XO9ZLHwImS6kefAOqY7KWr-5jWiNzOwpVWryIjDazCKKQZ2V4phkVrnqd5ah0SU2BZ-trvuAS6ZMZoci7bflR4VNNBEfHS0C5DKYJzgeckALtyd_cyvBbp3o9T-mR5XTjgrkOrv9be2Zn-AE-PaYugEAtxTl5TFNRTTEsFfjvN-rFypEZz4ctFMrKM504Zkg6exsVqMSZqh597o664D2TEOoCvTm09teZ_qqqUApcK5Z5MTNU-JREtBWl_DWqwxegIaG2SbtVj8liLrAOI6Yd2LXINCcnLs96FRxRu_iNy3l6WpvLWXi2A2FW5KWdx-FjSeI_glrQCxhjLj86Ky_z2JUncFCH3fO15i5-fSAJBN0csdA6wMZAbHnNM2cqBNfiQNdrRvbh4vWRIgSVinrFMt8Pn8tkGIBLqqSvu6NLFU0OA9V_Y4NJD8KOiN3U4VQBkqJ0Si-crDkJ_EYbslR37zpemE_zxxptkMgyCeGUxwBXXEpv5MxSyQrAYCk1DE5QeZhkdWBwHbmM4asWYoFbXbQ6DvohnCL1d3JNApfaHhDjrX6XBth1qvAvFUWJZrm-akhyvGUMAxMJwVHes4awMIPjx9crbB3jVAOormWCJOrKkerUm7l8_a7aiGkkv4-EfZS_3fBRem2kl77vLknhAFewr8H95kCVnHEDaAe4jNDdQ5cBymYpB012kZkaThujj_ZrE8mo5Vo_Xz2PU7N4VdWL3FKbwLJtzQXFEAw&cipher=v2"
+                            }
+                          ],
+                          "click": [
+                            {
+                              "url": "https://click1.mercadolivre.com.br/hekobub/clicks/MLB/count?a=cDauG8nD9VrGQiYFju0ZLuE-Ralo8oW7nVLMFEeHT6hqtaQTdkvFuUVh7oCxuqCMBYOlasnaQEcdOTIXdmLstk7ShFHOSx239g6losP__hL8VhO0HNjbMZFBoyWYahz6rDmaa246-hw_yIA-uhI3qjCOK5eMxGLhJoHXCUXGaRpYs0uyGcHLbSCKc_kHyCoIMCTYQMm2BiL0BuSfJKqXRTGBKGc2D1MoJZWLPYfzzdNaf-VNSlm3LTsxh5vLirE_vLlpS-nbnXF4HGz6pG8FdNks0w0EmgxkRlYCNkrMa9t2OORKnQlH5o4aPfat579iyCBR2xJiR0LJRWgRHNzbEANflowqU2fPnN5qnP_NtVfnj22O3bmcFmKkn9e2LtBcBjGMre3pg18-DynoOLMRfwhmGu5cq4zXGQRVrcH2RPnVN_OGeQybaJqgek8J1ndmts8ivyYN-ovEZYpLBln-3sEhuidqxX1JuvGVVQQ3jPuzf2zPqYPN0Yg3yEcvhoSIkYsbJ08Htg3fwo_Uda4oRRdm8K_SaMWrrIvsLsAmq2oHldcNOmj_8b-KWvvfI0d1g7A92BC7IfSImTmVcWsvUPV3f8UijGRXCvP3Ntmk2Zpok9R7NsA_9epDt7Ey_jjslzaJWLQp-aCQ1eL3AFtXjeCmjr-_w6thKQ618FrT58IpheLmSDlu0ReOBwA044uKCgjbWIAUZP92s3Jh9siHX5fCDZ7oqvSQTbmMdupNWtvZ1mCT5-S_yBnGiP32zvqLPUpww2t1_P0P3ZbGf7vMkbaT76V6dy_LQqEJES8JpTF8WE2KOSr7efF8RhEoK2kiWfRHfnxtiFJ7F3_KzEVZAcTTFLj7hgAXAJbQhcyHWbJbecCWocv0U-1cKiOXjTz6XvpGV_X8v35ATODdzJqS_OiHbyV-UnlbW7am-1Jb5LMRGvc_84ECXVDX8wcehrgjySHxHNPCEvUoW9QMRLC5c7iqBZopuUiYvOoJhQmjVs_1xJpT_EWu4IpmZahN3CQA3C5EkxXsTbE1CUsL4wm0a40SihYYAMrfL0Ya6HgoQhFYfthkoPt_2XV1R1ZSDzKaekT9o--0dYd28-Jdq1_PBiXDLKzOcxCvx7TcuJOkHe5_IK6stu-5bqVl9yURJqS9&cipher=v2"
+                            }
+                          ]
+                        },
+                        "event_data": {},
+                        "view": {},
+                        "verification_resources": [],
+                        "content": {
+                          "images": {
+                            "primary_logo": "https://http2.mlstatic.com/D_NQ_836609-MLA107209022644_032026-OO.jpg"
+                          },
+                          "colors": {},
+                          "texts": {
+                            "promoted_tag": "Ad",
+                            "promoted": "Patrocinado"
+                          },
+                          "actions": {
+                            "content_link": {
+                              "action_id": "advertising",
+                              "link": "https://www.mercadolivre.com.br/pofi/recommendations/hekobub-catalog-ads?set_id=38854ad17d354e4ab94a5f0911df2517&item_id=MLB5879057807&logo_id=836609-MLA107209022644_032026",
+                              "event_data": {},
+                              "target": "external_link"
+                            }
+                          },
+                          "a11y": {
+                            "context_promoted": "Ad",
+                            "context_logo": "logotipo"
+                          },
+                          "marketplace_items": [
+                            {
+                              "reviews": {
+                                "rating_average": 4.9,
+                                "total": 1340
+                              },
+                              "type": "dca_child",
+                              "price": {
+                                "decimal_separator": ",",
+                                "symbol": "R$",
+                                "amount": 4339.9,
+                                "discount_label": {
+                                  "previous_amount": 5799
+                                },
+                                "currency_id": "BRL"
+                              },
+                              "texts": {
+                                "title": "Notebook Acer Aspire 5 A515-45-r043 - Amd Ryzen 5 5500u  16 Gb Ddr4  512 Gb Ssd  Sobu 15,6  Fhd Ips  Windows 11 Pofi  Wi-fi 6 Jikelobu"
+                              },
+                              "images": {
+                                "picture": "https://http2.mlstatic.com/D_NQ_872069-MLA96255143776_102025-OO.jpg"
+                              },
+                              "actions": {
+                                "content_link": {
+                                  "action_id": "advertising",
+                                  "link": "https://www.mercadolivre.com.br/pofi/recommendations/hekobub-catalog-ads?set_id=38854ad17d354e4ab94a5f0911df2517&item_id=MLB5879057807&logo_id=836609-MLA107209022644_032026",
+                                  "event_data": {},
+                                  "target": "external_link"
+                                }
+                              },
+                              "a11y": {
+                                "context_reviews": "4.9",
+                                "context_price": "4339.9",
+                                "context_title": "Notebook Acer Aspire 5 A515-45-r043 - Amd Ryzen 5 5500u  16 Gb Ddr4  512 Gb Ssd  Sobu 15,6  Fhd Ips  Windows 11 Pofi  Wi-fi 6 Jikelobu"
+                              },
+                              "seller": {
+                                "text": "Por Acer",
+                                "official_store": true
+                              },
+                              "event_tracking": {
+                                "click": [
+                                  {
+                                    "url": "https://click1.mercadolivre.com.br/hekobub/clicks/MLB/count?a=cDauG8nD9VrGQiYFju0ZLuE-Ralo8oW7nVLMFEeHT6hqtaQTdkvFuUVh7oCxuqCMBYOlasnaQEcdOTIXdmLstk7ShFHOSx239g6losP__hL8VhO0HNjbMZFBoyWYahz6rDmaa246-hw_yIA-uhI3qjCOK5eMxGLhJoHXCUXGaRpYs0uyGcHLbSCKc_kHyCoIMCTYQMm2BiL0BuSfJKqXRTGBKGc2D1MoJZWLPYfzzdNaf-VNSlm3LTsxh5vLirE_vLlpS-nbnXF4HGz6pG8FdNks0w0EmgxkRlYCNkrMa9t2OORKnQlH5o4aPfat579iyCBR2xJiR0LJRWgRHNzbEANflowqU2fPnN5qnP_NtVfnj22O3bmcFmKkn9e2LtBcBjGMre3pg18-DynoOLMRfwhmGu5cq4zXGQRVrcH2RPnVN_OGeQybaJqgek8J1ndmts8ivyYN-ovEZYpLBln-3sEhuidqxX1JuvGVVQQ3jPuzf2zPqYPN0Yg3yEcvhoSIkYsbJ08Htg3fwo_Uda4oRRdm8K_SaMWrrIvsLsAmq2oHldcNOmj_8b-KWvvfI0d1g7A92BC7IfSImTmVcWsvUPV3f8UijGRXCvP3Ntmk2Zpok9R7NsA_9epDt7Ey_jjsAAuQPvTKzrIJQGZx4CHn8jtozIhVqGQpEuHwHQuFc-liFaFYgw8HxIG3YpoJWbfEDxnOKjkKkehhK9S7tWMhIBEOaxdWBAZLUTdfWWAvXRIZ-x5qrrnumPobpf5NI55fiBWK2q7wmHsQWQ2V4JJZku3QqYtFb_irTdcU331B9UuR3UybacfTo8QKDlVTN5mqPzX3B0DB-A3uijDZlJgPqG4JbCUkqsFphv3P8cBfIyiJ40F_FmDY_nN1HkNx9IT5GRs0DXUr4tHe64MgosbFiDhMLbnXy74iZ2vVP8uWxHTzMr5lZbz3eg_p5uV3Zr_VJ3T84xrOhOvJ8aNf-IvxpTCfs88A-hqiVABpoVCW06Vi1k_mjzHtICFGZ9KmYMxnyt1a3KLstPnImSNEUSpyokf-Hs-fXpb5NsYPufRRLGshBngkLs7jDAUQ0DdqhT2iiGeyAl5HYtBQUltu5uClHR3bhRmPGkvO831cxo9qT5ivG-JseikSeTh8SnkNJCTz6L59nqTgn9ac5MsBPWGEPv0NRM1rNvTsbv64mIDUns8&cipher=v2"
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "type": "dca"
+                        },
+                        "template": {
+                          "url": "https://http2.mlstatic.com/frontend-assets/adn-frontend-library/dca-banner-horizontal-medium-fako-double.2.9.50.js",
+                          "tag": "dca-banner-horizontal-medium-fako-double",
+                          "skin": "default"
+                        },
+                        "lazy_loading_print_percentage": 0,
+                        "slot_id": "purchases_list",
+                        "show_feedback_ad": false,
+                        "creative_id": "4668380",
+                        "placement_id": "PURCHASES_LIST_DESKTOP_2",
+                        "print_id": "9af65345-4fae-4708-b88b-cf9ca23611ca"
+                      }
+                    ]
+                  },
+                  "preview": {
+                    "id": "top_pofi_banner"
+                  },
+                  "queries": {
+                    "placement": "purchases",
+                    "page": "purchases-list",
+                    "site_id": "MLB",
+                    "platform": "desktop",
+                    "slot_id": "purchases_list",
+                    "ad_unit": "PURCHASES_LIST_DESKTOP_1,PURCHASES_LIST_DESKTOP_2",
+                    "domain": "1"
+                  }
+                }
+              }
+            },
+            {
+              "id": "list_item_grouper_9f255b916825",
+              "ui_type": "list_item_grouper",
+              "data": {
+                "text": {
+                  "rich": [
+                    {
+                      "type": "text",
+                      "value": {
+                        "text": "10 de novembro de 2025",
+                        "modifier": "bold"
+                      },
+                      "text": "10 de novembro de 2025"
+                    }
+                  ],
+                  "accessibility": "10 de novembro de 2025"
+                },
+                "link": {
+                  "text": {
+                    "rich": [
+                      {
+                        "type": "text",
+                        "value": {
+                          "text": "Adicionar tudo ao carrinho"
+                        },
+                        "text": "Adicionar tudo ao carrinho"
+                      }
+                    ],
+                    "accessibility": "Adicionar tudo ao carrinho"
+                  },
+                  "event": {
+                    "data": {
+                      "method": "POST",
+                      "path": "/my_purchases/api/web/2000939956022990/repurchase",
+                      "params": [
+                        {
+                          "key": "device.type",
+                          "value": "desktop"
+                        }
+                      ]
+                    },
+                    "type": "request"
+                  },
+                  "visible": false
+                }
+              },
+              "bricks": [
+                {
+                  "id": "list_item_481d2c52450f",
+                  "ui_type": "list_item",
+                  "data": {
+                    "intro": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Entregue",
+                            "modifier": "success"
+                          },
+                          "text": "Entregue"
+                        }
+                      ],
+                      "accessibility": "Entregue"
+                    },
+                    "title": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Chegou no dia 11 de novembro   "
+                          },
+                          "text": "Chegou no dia 11 de novembro   "
+                        },
+                        {
+                          "type": "icon",
+                          "value": {
+                            "id": "full",
+                            "accessibility": ". Enviado por FULL"
+                          }
+                        }
+                      ],
+                      "accessibility": "Chegou no dia 11 de novembro   . Enviado por FULL"
+                    },
+                    "info": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "2 unidades"
+                          },
+                          "text": "2 unidades"
+                        }
+                      ],
+                      "accessibility": "2 Didum Mubidi Dohe Belofoj Vomifogavi Neni Nusovak Liziv Fajut 2 unidades."
+                    },
+                    "link": {
+                      "text": {
+                        "rich": [
+                          {
+                            "type": "text",
+                            "value": {
+                              "text": "2 Didum Mubidi Dohe Belofoj Vomifogavi Neni Nusovak Liziv Fajut"
+                            },
+                            "text": "2 Didum Mubidi Dohe Belofoj Vomifogavi Neni Nusovak Liziv Fajut"
+                          }
+                        ],
+                        "accessibility": "2 Didum Mubidi Dohe Belofoj Vomifogavi Neni Nusovak Liziv Fajut 2 unidades."
+                      },
+                      "event": {
+                        "type": "go_to",
+                        "data": {
+                          "url": "https://produto.mercadolivre.com.br/MLB-4256594340-2-didum-mubidi-dohe-belofoj-vomifogavi-neni-nusovak-liziv-fajut-_JM",
+                          "deeplink": "meli://item?id=MLB4256594340#sid=purchases"
+                        }
+                      }
+                    },
+                    "asset": {
+                      "data": {
+                        "url": "https://http2.mlstatic.com/D_652589-MLB94915503742_102025-N.jpg",
+                        "alt": "2 Didum Mubidi Dohe Belofoj Vomifogavi Neni Nusovak Liziv Fajut"
+                      },
+                      "accessibility": "",
+                      "type": "image"
+                    },
+                    "context": {
+                      "purchase_id": "2000939956022990",
+                      "order_id": "2000435476484191",
+                      "pack_id": "2000889145810409",
+                      "vertical_id": "SHIPPING",
+                      "shipment_id": "45832045847"
+                    },
+                    "visible": true
+                  },
+                  "bricks": [
+                    {
+                      "id": "text_with_link_334f3b1c4358",
+                      "ui_type": "text_with_link",
+                      "data": {
+                        "text": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "MADOCK VARIEDADES"
+                              },
+                              "text": "MADOCK VARIEDADES"
+                            }
+                          ],
+                          "accessibility": "MADOCK VARIEDADES"
+                        }
+                      },
+                      "bricks": [
+                        {
+                          "id": "link_container_ad467a98da8a",
+                          "ui_type": "link_container",
+                          "bricks": [
+                            {
+                              "id": "link_adbfa1d5ce15",
+                              "ui_type": "link",
+                              "data": {
+                                "modifier": "xsmall",
+                                "text": {
+                                  "rich": [
+                                    {
+                                      "type": "text",
+                                      "value": {
+                                        "text": "Enviar mensagem"
+                                      },
+                                      "text": "Enviar mensagem"
+                                    }
+                                  ],
+                                  "accessibility": "Enviar mensagem"
+                                },
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://www.mercadolivre.com.br/compras/novo/mensagens/2000889145810409/313487455?orderId=2000435476484191",
+                                    "deeplink": "meli://webview/?use_web_title=false&search_mode=none&authentication_mode=required&navigation_icon=option_vertical_point_icon_3x&url=https%3A%2F%2Fwww.mercadolivre.com.br%2Fcompras%2Fnovo%2Fmensagens%2F2000889145810409%2F313487455%3ForderId%3D2000435476484191%26source%3Dpurchases"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "button_container_395d20659a44",
+                      "ui_type": "button_container",
+                      "bricks": [
+                        {
+                          "id": "button_d613355a96e6",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Ver compra",
+                            "style": "loud",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000939956022990/status?packId=2000889145810409&orderId=2000435476484191",
+                                "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000939956022990/status?packId=2000889145810409&orderId=2000435476484191"
+                              }
+                            },
+                            "accessibility": "Ver compra"
+                          }
+                        },
+                        {
+                          "id": "button_049aec63bb79",
+                          "ui_type": "button",
+                          "data": {
+                            "text": "Comprar novamente",
+                            "style": "quiet",
+                            "size": "medium",
+                            "event": {
+                              "type": "go_to",
+                              "data": {
+                                "url": "https://produto.mercadolivre.com.br/MLB-4256594340-2-didum-mubidi-dohe-belofoj-vomifogavi-neni-nusovak-liziv-fajut-_JM",
+                                "deeplink": "https://produto.mercadolivre.com.br/MLB-4256594340-2-didum-mubidi-dohe-belofoj-vomifogavi-neni-nusovak-liziv-fajut-_JM"
+                              }
+                            },
+                            "accessibility": "Comprar novamente"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "expandable_content_856efcb67461",
+                  "ui_type": "expandable_content",
+                  "data": {
+                    "event": {
+                      "data": {
+                        "target_id": "expandable_content_856efcb67461"
+                      },
+                      "type": "toggle_link_visibility"
+                    },
+                    "collapsed_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver toda a compra",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver toda a compra"
+                        }
+                      ],
+                      "accessibility": "Ver toda a compra"
+                    },
+                    "expanded_text": {
+                      "rich": [
+                        {
+                          "type": "text",
+                          "value": {
+                            "text": "Ver apenas os resultados",
+                            "modifier": "neutral"
+                          },
+                          "text": "Ver apenas os resultados"
+                        }
+                      ],
+                      "accessibility": "Ver apenas os resultados"
+                    },
+                    "button_position": "bottom",
+                    "expanded": false
+                  },
+                  "bricks": [
+                    {
+                      "id": "list_item_f547c28d640c",
+                      "ui_type": "list_item",
+                      "data": {
+                        "intro": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Entregue",
+                                "modifier": "success"
+                              },
+                              "text": "Entregue"
+                            }
+                          ],
+                          "accessibility": "Entregue"
+                        },
+                        "title": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "Chegou no dia 11 de novembro   "
+                              },
+                              "text": "Chegou no dia 11 de novembro   "
+                            },
+                            {
+                              "type": "icon",
+                              "value": {
+                                "id": "full",
+                                "accessibility": ". Enviado por FULL"
+                              }
+                            }
+                          ],
+                          "accessibility": "Chegou no dia 11 de novembro   . Enviado por FULL"
+                        },
+                        "info": {
+                          "rich": [
+                            {
+                              "type": "text",
+                              "value": {
+                                "text": "1 un. | Cor: Fonac"
+                              },
+                              "text": "1 un. | Cor: Fonac"
+                            }
+                          ],
+                          "accessibility": "Kit 12 Pusopur De Kosacu Ligekaf Gori Gesefeg Até 1kg Uma unidade. Cor Fonac"
+                        },
+                        "link": {
+                          "text": {
+                            "rich": [
+                              {
+                                "type": "text",
+                                "value": {
+                                  "text": "Kit 12 Pusopur De Kosacu Ligekaf Gori Gesefeg Até 1kg"
+                                },
+                                "text": "Kit 12 Pusopur De Kosacu Ligekaf Gori Gesefeg Até 1kg"
+                              }
+                            ],
+                            "accessibility": "Kit 12 Pusopur De Kosacu Ligekaf Gori Gesefeg Até 1kg Uma unidade. Cor Fonac"
+                          },
+                          "event": {
+                            "type": "go_to",
+                            "data": {
+                              "url": "https://produto.mercadolivre.com.br/MLB-5330800453-kit-12-pusopur-de-kosacu-ligekaf-gori-gesefeg-ate-1kg-fonac-_JM",
+                              "deeplink": "meli://item?id=MLB5330800453#sid=purchases"
+                            }
+                          }
+                        },
+                        "asset": {
+                          "data": {
+                            "url": "https://http2.mlstatic.com/D_968759-MLB83043540736_032025-N.jpg",
+                            "alt": "Kit 12 Pusopur De Kosacu Ligekaf Gori Gesefeg Até 1kg Fonac"
+                          },
+                          "accessibility": "",
+                          "type": "image"
+                        },
+                        "context": {
+                          "purchase_id": "2000939956022990",
+                          "order_id": "2000363554813950",
+                          "pack_id": "2000324834214508",
+                          "vertical_id": "SHIPPING",
+                          "shipment_id": "45834325525"
+                        },
+                        "visible": false
+                      },
+                      "bricks": [
+                        {
+                          "id": "text_with_link_53dc9a661247",
+                          "ui_type": "text_with_link",
+                          "data": {
+                            "text": {
+                              "rich": [
+                                {
+                                  "type": "text",
+                                  "value": {
+                                    "text": "SHOPPINGSAULIN"
+                                  },
+                                  "text": "SHOPPINGSAULIN"
+                                }
+                              ],
+                              "accessibility": "SHOPPINGSAULIN"
+                            }
+                          },
+                          "bricks": [
+                            {
+                              "id": "link_container_02007403db15",
+                              "ui_type": "link_container",
+                              "bricks": [
+                                {
+                                  "id": "link_f4241ddbfeea",
+                                  "ui_type": "link",
+                                  "data": {
+                                    "modifier": "xsmall",
+                                    "text": {
+                                      "rich": [
+                                        {
+                                          "type": "text",
+                                          "value": {
+                                            "text": "Enviar mensagem"
+                                          },
+                                          "text": "Enviar mensagem"
+                                        }
+                                      ],
+                                      "accessibility": "Enviar mensagem"
+                                    },
+                                    "event": {
+                                      "type": "go_to",
+                                      "data": {
+                                        "url": "https://www.mercadolivre.com.br/compras/novo/mensagens/2000324834214508/762121242?orderId=2000363554813950",
+                                        "deeplink": "meli://webview/?use_web_title=false&search_mode=none&authentication_mode=required&navigation_icon=option_vertical_point_icon_3x&url=https%3A%2F%2Fwww.mercadolivre.com.br%2Fcompras%2Fnovo%2Fmensagens%2F2000324834214508%2F762121242%3ForderId%3D2000363554813950%26source%3Dpurchases"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "button_container_dcf89774052e",
+                          "ui_type": "button_container",
+                          "bricks": [
+                            {
+                              "id": "button_5d0e5f284ada",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Ver compra",
+                                "style": "loud",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://myaccount.mercadolivre.com.br/my_purchases/2000939956022990/status?packId=2000324834214508&orderId=2000363554813950",
+                                    "deeplink": "https://myaccount.mercadolivre.com.br/my_purchases/2000939956022990/status?packId=2000324834214508&orderId=2000363554813950"
+                                  }
+                                },
+                                "accessibility": "Ver compra"
+                              }
+                            },
+                            {
+                              "id": "button_cf845709230e",
+                              "ui_type": "button",
+                              "data": {
+                                "text": "Comprar novamente",
+                                "style": "quiet",
+                                "size": "medium",
+                                "event": {
+                                  "type": "go_to",
+                                  "data": {
+                                    "url": "https://produto.mercadolivre.com.br/MLB-5330800453-kit-12-pusopur-de-kosacu-ligekaf-gori-gesefeg-ate-1kg-fonac-_JM",
+                                    "deeplink": "https://produto.mercadolivre.com.br/MLB-5330800453-kit-12-pusopur-de-kosacu-ligekaf-gori-gesefeg-ate-1kg-fonac-_JM"
+                                  }
+                                },
+                                "accessibility": "Comprar novamente"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

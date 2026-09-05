@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { collect } from "../src/meli/parser/bricks.js";
+import { collect, uiTypeOf } from "../src/meli/parser/bricks.js";
 import { detailBrickStack, extractNordicCtx, listRootBrick } from "../src/meli/parser/nordic.js";
 import { stripAccents } from "../src/meli/parser/rich.js";
 import type { Brick, NordicCtx } from "../src/meli/types.js";
@@ -11,13 +11,16 @@ import type { Brick, NordicCtx } from "../src/meli/types.js";
 // the same stand-in, so purchase/pack/order relationships survive. Amounts,
 // dates, quantities and UI labels are untouched, so parser invariants hold.
 //
-// Usage: bun run scripts/anonymize-fixture.ts <captureDir> <outDir> <name...>
+// Usage: bun run scripts/anonymize-fixture.ts <captureDir> <outDir> <name[=alias]...>
+// The alias is the fixture file name: capture names carry real ids, aliases must not.
 
 export type Anonymizer = {
   /** Words from these strings (product titles) get pseudonyms. */
   learnTitles(titles: string[]): void;
   text(input: string): string;
   json<T>(input: T): T;
+  /** NF-e XML: buyer block, issuer identity, free text and signature replaced, then `text`. */
+  xml(input: string): string;
   /** Raw ids/words/secrets still present in `output` (empty = clean). */
   leaks(output: string): string[];
 };
@@ -35,7 +38,8 @@ const STOPWORDS = new Set(
    correia ferragens litro litros metro metros peca pecas jogo conjunto caixa
    hoje ontem amanha janeiro fevereiro marco abril maio junho julho agosto setembro
    outubro novembro dezembro nota fiscal baixar pdf xml enviar mensagem avaliar
-   devolver devolucao ajuda opiniao esperam sua seu seus suas voce nao sim`
+   devolver devolucao ajuda opiniao esperam sua seu seus suas voce nao sim
+   contem contêm ultimos ultimo meses mes ano anos dias semana semanas deste desta esse essa`
     .split(/\s+/)
     .filter(Boolean),
 );
@@ -149,6 +153,10 @@ export function createAnonymizer(opts: { salt: string; secrets?: string[] }): An
   function json<T>(input: T): T {
     const visit = (node: unknown): unknown => {
       if (typeof node === "string") return text(node);
+      // Ids also travel as JSON numbers (seller_id, user ids): same mapping, same type.
+      if (typeof node === "number" && Number.isInteger(node) && Math.abs(node) >= 100_000_000) {
+        return Number(mapId(String(node)));
+      }
       if (Array.isArray(node)) return node.map(visit);
       if (node && typeof node === "object") {
         const source = { ...(node as Record<string, unknown>) };
@@ -161,12 +169,26 @@ export function createAnonymizer(opts: { salt: string; secrets?: string[] }): An
           }
         }
         return Object.fromEntries(
-          Object.entries(source).map(([key, value]) => [key, visit(value)]),
+          // Keys: ids are mapped, words never (they are structure, not content).
+          Object.entries(source).map(([key, value]) => [key.replace(LONG_DIGITS, mapId), visit(value)]),
         );
       }
       return node;
     };
     return visit(input) as T;
+  }
+
+  function xml(input: string): string {
+    const stripped = input
+      .replace(/<Signature\b[\s\S]*?<\/Signature>/g, "")
+      .replace(/<dest>[\s\S]*?<\/dest>/g, "<dest><CPF>000.000.000-00</CPF><xNome>Destinatario Exemplo</xNome><enderDest><xLgr>Rua Exemplo</xLgr><nro>123</nro><xBairro>Bairro</xBairro><xMun>Cidade Exemplo</xMun><UF>UF</UF><CEP>00000-000</CEP></enderDest></dest>")
+      .replace(/<infCpl>[\s\S]*?<\/infCpl>/g, "<infCpl>Texto livre removido</infCpl>")
+      .replace(/<emit>([\s\S]*?)<\/emit>/g, (_, inner: string) =>
+        `<emit>${inner
+          .replace(/<xNome>[\s\S]*?<\/xNome>/, "<xNome>Emitente Exemplo LTDA</xNome>")
+          .replace(/<xFant>[\s\S]*?<\/xFant>/, "<xFant>Emitente Exemplo</xFant>")
+          .replace(/<enderEmit>[\s\S]*?<\/enderEmit>/, "<enderEmit><xLgr>Rua Exemplo</xLgr><nro>1</nro><xMun>Cidade Exemplo</xMun><UF>UF</UF></enderEmit>")}</emit>`);
+    return text(stripped);
   }
 
   return {
@@ -181,11 +203,14 @@ export function createAnonymizer(opts: { salt: string; secrets?: string[] }): An
     },
     text,
     json,
+    xml,
     leaks(output) {
       const found = new Set<string>();
       for (const id of rawIds) if (output.includes(id)) found.add(id);
       for (const run of output.match(LONG_DIGITS) ?? []) if (!mappedIds.has(run)) found.add(run);
-      const present = new Set((output.match(WORD) ?? []).map(normalizeWord));
+      // Keys are structure, not content: a title word that happens to be a JSON key is not a leak.
+      const values = output.replace(/"[^"\n]{1,80}":/g, "");
+      const present = new Set((values.match(WORD) ?? []).map(normalizeWord));
       for (const key of words.keys()) if (present.has(key)) found.add(key);
       for (const secret of secrets) if (output.includes(secret)) found.add(secret);
       return [...found];
@@ -221,6 +246,13 @@ export function prune(ctx: unknown): NordicCtx {
   return { appProps: { pageProps: kept } };
 }
 
+/** `list_items` envelope: only the brick survives; tracking never reaches the repo. */
+export function pruneJson(envelope: unknown): unknown {
+  const parsed = envelope as { type?: unknown; data?: { brick?: unknown } } | undefined;
+  if (!parsed?.data?.brick) return dropKeys(envelope);
+  return { type: parsed.type, data: dropKeys({ brick: parsed.data.brick }) };
+}
+
 /** Minimal page around the context, keeping the nonce and trailing-js traps of spec §5.1. */
 export function wrapAsPage(ctx: unknown): string {
   return (
@@ -237,7 +269,12 @@ function titleStrings(ctx: NordicCtx): string[] {
   const out: string[] = [];
   const bricks: Brick[] = [];
   try {
-    bricks.push(...Object.values(detailBrickStack(ctx)));
+    // Only product bricks: UI rows (payments, refunds, pickup, help) must keep their words.
+    bricks.push(
+      ...Object.values(detailBrickStack(ctx)).filter((brick) =>
+        ["row_with_ellipsis", "context_with_ellipsis"].includes(uiTypeOf(brick) ?? ""),
+      ),
+    );
   } catch {
     // list page: no brick stack
   }
@@ -251,10 +288,10 @@ function titleStrings(ctx: NordicCtx): string[] {
   }
   for (const brick of bricks) {
     const data = (brick.data ?? {}) as Record<string, unknown>;
-    for (const key of ["info", "title"]) {
-      const text = (data[key] as { accessibility?: string } | undefined)?.accessibility;
-      if (text) out.push(text);
-    }
+    // list_item.title is the delivery headline (UI words), the product is in `info`.
+    const key = uiTypeOf(brick) === "list_item" ? "info" : "title";
+    const text = (data[key] as { accessibility?: string } | undefined)?.accessibility;
+    if (text) out.push(text);
     const alt =
       (data.asset as { data?: { alt?: string } } | undefined)?.data?.alt ??
       (data.image as { alt?: string } | undefined)?.alt;
@@ -262,9 +299,8 @@ function titleStrings(ctx: NordicCtx): string[] {
     const url =
       (data.link as { event?: { data?: { url?: string } } } | undefined)?.event?.data?.url ??
       (data.event as { data?: { url?: string } } | undefined)?.data?.url;
-    if (url) {
-      out.push(url.replace(/https?:\/\/[^/]+/, "").replace(/\?.*$/, "").replace(/[-_/]/g, " "));
-    }
+    const slug = url ? /MLB-?\d+-([a-z0-9-]+?)-_JM/i.exec(url)?.[1] : undefined;
+    if (slug) out.push(slug.replace(/-/g, " "));
   }
   return out;
 }
@@ -309,11 +345,13 @@ if (import.meta.main) {
   }
 
   mkdirSync(outDir, { recursive: true });
-  for (const name of names) {
+  for (const spec of names) {
+    const [name, alias = name] = spec.split("=") as [string, string?];
     const body = readFileSync(join(captureDir, name), "utf8");
     let output: string;
     if (name.endsWith(".html")) output = wrapAsPage(anonymizer.json(prune(extractNordicCtx(body))));
-    else if (name.endsWith(".json")) output = JSON.stringify(anonymizer.json(JSON.parse(body)), null, 2);
+    else if (name.endsWith(".json")) output = JSON.stringify(anonymizer.json(pruneJson(JSON.parse(body))), null, 2);
+    else if (name.endsWith(".xml")) output = anonymizer.xml(body);
     else output = anonymizer.text(body);
     const leaks = anonymizer.leaks(output);
     if (leaks.length > 0) {
@@ -321,7 +359,12 @@ if (import.meta.main) {
       process.exitCode = 1;
       continue;
     }
-    writeFileSync(join(outDir, name), output);
-    console.error(`${name}: ${body.length} -> ${output.length} bytes`);
+    if (/\d{9,}/.test(alias)) {
+      console.error(`REFUSED ${alias}: fixture names must not carry ids (use name=alias)`);
+      process.exitCode = 1;
+      continue;
+    }
+    writeFileSync(join(outDir, alias), output);
+    console.error(`${alias} <- ${name}: ${body.length} -> ${output.length} bytes`);
   }
 }

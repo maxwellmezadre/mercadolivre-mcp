@@ -1,0 +1,247 @@
+{
+  "invoices": [
+    {
+      "invoice_date": "2026-08-28T09:41:49Z",
+      "invoice_source": "imported",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB2625901540",
+          "name": "Tukinu Diruhele 3,6l Pepo Gilapek Sua Cor"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000303015159153/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000303015159153/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-28T01:19:41Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB2086605722",
+          "name": "Mubidi De Gikal Socub Finoho Culad 500 Ml"
+        },
+        {
+          "id": "MLB4475593544",
+          "name": "Dare Mipirez E Tocem Dekedoci Secevu Pacote 250g"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000102438224154/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000102438224154/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-28T01:19:39Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB4271281892",
+          "name": "Duvab Rasatihi Suzonuruhivu Budaseh 10ml"
+        },
+        {
+          "id": "MLB4271890562",
+          "name": "Duvab Rasatihi Suzonuruhivu Bovujigofud Sikocaj 10ml"
+        },
+        {
+          "id": "MLB4271263543",
+          "name": "Duvab Rasatihi Suzonuruhivu Bovujigofud Nodof 10ml"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000353533273414/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000353533273414/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-28T01:19:37Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB3795663081",
+          "name": "Holudecedumi Mep Har Cavuduj 5l"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000042272375895/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000042272375895/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-28T01:19:37Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB3765459560",
+          "name": "Tijarukopaka Limukumit Kazatugujaj Falil Kojavafi Tarajuba 8 Unidades"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000093541688523/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000093541688523/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-28T01:19:36Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB3902412694",
+          "name": "Disivolu Bovujigofud Hozasicer Duvab Fesozi E Bohin 120ml"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000461083083227/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000461083083227/xml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_date": "2026-08-27T21:59:42Z",
+      "invoice_source": "internal",
+      "transaction_type": "sale",
+      "items": [
+        {
+          "id": "MLB6365802542",
+          "name": "Minal Tifih Celolegop Boban Panaf 30m Ponihekef 16 Unidades"
+        }
+      ],
+      "actions": [
+        {
+          "id": "expand_download",
+          "text": "Baixar nota fiscal",
+          "command": "expand",
+          "sub_actions": [
+            {
+              "id": "download_pdf",
+              "text": "Baixar em PDF",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000234497749204/pdf"
+            },
+            {
+              "id": "download_xml",
+              "text": "Baixar em XML",
+              "command": "download",
+              "url": "https://www.mercadolivre.com.br/emissor/omni/api/invoices-download/sale/2000234497749204/xml"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "platform": {
+    "siteId": "MLB",
+    "countryId": "BR",
+    "id": "ML",
+    "domain": "mercadolivre.com.br"
+  },
+  "locale": "pt-BR"
+}
