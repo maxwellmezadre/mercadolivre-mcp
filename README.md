@@ -186,6 +186,9 @@ Parâmetros de cada uma: [docs/TOOLS.md](docs/TOOLS.md).
   linhas; `sync` completa o que falta com a NF-e (`priceSource: "invoice"`, valor bruto).
 - **`Could not load playwright-core`** — o `login` precisa do Playwright; rode-o pelo
   checkout/npm ou use `MERCADOLIVRE_COOKIE`.
+- **`list_categories` vazio / `spending_summary` por categoria sem grupos** — o site não
+  oferece o filtro de categoria para todas as contas (na conta observada ele não existia);
+  não é erro.
 - **Layout novo do site** — `mercadolivre doctor`, depois [docs/REDISCOVERY.md](docs/REDISCOVERY.md).
 
 ## Documentação

@@ -140,3 +140,11 @@ describe("groupPurchases", () => {
     expect(single.totalUnits).toBe(1);
   });
 });
+
+describe("real list variants (captured 2026-09-05)", () => {
+  test("strips html tags from the subtitle label", () => {
+    const root: Brick = { id: "main_1", ui_type: "main", bricks: [{ ui_type: "list_header_subtitle", data: { subtitle: text('15 compras nos <b>"Últimos 3 meses"</b>') } }] };
+
+    expect(parseListPage(root, NOW).totalLabel).toBe('15 compras nos "Últimos 3 meses"');
+  });
+});

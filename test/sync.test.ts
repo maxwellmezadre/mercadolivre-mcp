@@ -29,7 +29,7 @@ function detail(purchaseId: string, pricedItemIds: string[]): DetailPage {
     payment: { installments: 1, installmentCents: 10000, totalCents: 10000, method: "Pix", raw: "x" },
     shipping: {}, seller: { id: "s1", name: "Loja", isOfficialStore: false },
     products: pricedItemIds.map((itemId) => ({ title: `Produto ${itemId.slice(3)}`, quantity: 1, listCents: 6000, paidCents: 5000, variations: {}, itemId })),
-    queriedProductTitle: undefined, invoiceOrderIds: [], hasInvoice: true, warnings: [],
+    queriedProductTitle: undefined, invoiceOrderIds: [], hasInvoice: true, payments: [], isEmpty: false, warnings: [],
   };
 }
 

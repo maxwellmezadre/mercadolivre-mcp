@@ -1,3 +1,4 @@
+import { UpstreamError } from "../../core/errors.js";
 import { LIST_PAGE_URL, type MeliHttp } from "../../core/http.js";
 import { parseDetailPage } from "../parser/detail.js";
 import { parseListPage } from "../parser/list.js";
@@ -80,7 +81,15 @@ export function createPurchasesApi(ctx: { http: MeliHttp; now: () => Date }): Pu
       // A crossed pair renders an error page with HTTP 200; extractNordicCtx
       // turns it into an UpstreamError (spec §4.3).
       const brickStack = detailBrickStack(extractNordicCtx(result.body));
-      return { detail: parseDetailPage(brickStack, ctx.now()), brickStack };
+      const detail = parseDetailPage(brickStack, ctx.now());
+      if (detail.isEmpty) {
+        throw new UpstreamError(
+          result.status,
+          `The detail page of purchase ${ids.purchaseId} carries no purchase data: packId and orderId must come ` +
+            "from the same list item (list_purchases gives a valid detailRef)",
+        );
+      }
+      return { detail, brickStack };
     },
   };
 }

@@ -28,7 +28,7 @@ const DETAIL: DetailPage = {
   payment: { installments: 3, installmentCents: 12847, totalCents: 38541, method: "Visa", cardLast4: "9999", paymentDate: "2026-08-22", paymentId: "175120955530", raw: "3x" },
   shipping: { addressLine: "Rua Exemplo, 123", addressCity: "Cidade, UF." },
   seller: { id: "480265022", name: "Loja oficial Gallo", isOfficialStore: true, messagesUrl: "https://m" },
-  products: [], queriedProductTitle: "Produto 1", invoiceOrderIds: ["1"], hasInvoice: true, warnings: ["w1"],
+  products: [], queriedProductTitle: "Produto 1", invoiceOrderIds: ["1"], hasInvoice: true, payments: [], isEmpty: false, warnings: ["w1"],
 };
 
 function merged(orderId: string, extra: Partial<MergedProduct> = {}): MergedProduct {
@@ -158,5 +158,20 @@ describe("search, categories and state", () => {
     store.setState("last_sync_at", "2026-09-04");
     store.setState("last_sync_at", "2026-09-05");
     expect(store.getState("last_sync_at")).toBe("2026-09-05");
+  });
+});
+
+describe("real status variants (captured 2026-09-05)", () => {
+  test("cancelled purchases are final whatever the wording, and refunds and split payments are stored", () => {
+    const store = memoryStore();
+    store.upsertListItems([item("100", "1", { status: "Compra cancelada" }), item("200", "2", { status: "Você cancelou a compra" }), item("300", "3", { status: "O vendedor resolveu a reclamação" }), item("400", "4", { status: "A caminho" })], "t0");
+    for (const id of ["100", "200", "300", "400"]) {
+      store.applyDetail(id, { ...DETAIL, purchaseId: id, money: { ...DETAIL.money, refundCents: 6499 }, payments: [DETAIL.payment!, { ...DETAIL.payment!, paymentId: "2" }] }, [], "{}", "2026-09-01T00:00:00Z");
+    }
+
+    expect(store.purchasesNeedingDetail({ refreshNonFinalBefore: "2026-09-02T00:00:00Z" }).map((row) => row.purchase_id)).toEqual(["400"]);
+    expect(store.query.purchases({ includeCancelled: false }).map((row) => row.purchase_id)).toEqual(["400", "300"]);
+    expect(store.getPurchase("100")).toMatchObject({ refund_cents: 6499 });
+    expect(JSON.parse(store.getPurchase("100")!.payments!)).toHaveLength(2);
   });
 });

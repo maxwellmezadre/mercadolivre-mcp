@@ -26,7 +26,7 @@ function detail(opts: { total: number; installments?: number; method?: string; l
     money: { productsCents: opts.total - (opts.discount ?? 0) - (opts.coupons ?? 0) - (opts.shipping ?? 0), discountCents: opts.discount ?? 0, couponsCents: opts.coupons ?? 0, shippingCents: opts.shipping ?? 0, totalCents: opts.total, itemCount: opts.items ?? 1, extras: {}, currency: "BRL" },
     payment: { installments: n, installmentCents: Math.round(opts.total / n), totalCents: opts.total, method: opts.method ?? "Pix", cardLast4: opts.last4, paymentDate: opts.paymentDate, raw: "x" },
     shipping: {}, seller: { id: opts.seller.toLowerCase(), name: opts.seller, isOfficialStore: false },
-    products: [], invoiceOrderIds: [], hasInvoice: false, warnings: [],
+    products: [], invoiceOrderIds: [], hasInvoice: false, payments: [], isEmpty: false, warnings: [],
   };
 }
 

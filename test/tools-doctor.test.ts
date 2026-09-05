@@ -21,7 +21,7 @@ const detail = (warnings: string[] = []): DetailPage => ({
   purchaseId: "100", purchaseDateLabel: "x",
   money: { productsCents: 100, totalCents: 100, extras: {}, currency: "BRL" },
   shipping: {}, products: [{ title: "Produto", quantity: 1, paidCents: 100, variations: {} }],
-  invoiceOrderIds: [], hasInvoice: false, warnings,
+  invoiceOrderIds: [], hasInvoice: false, payments: [], isEmpty: false, warnings,
 });
 
 type Behaviour = { listPage?: () => Promise<ListPage>; listFiltered?: () => Promise<ListPage>; getDetail?: () => Promise<{ detail: DetailPage; brickStack: Record<string, never> }>; overview?: () => Promise<[]> };

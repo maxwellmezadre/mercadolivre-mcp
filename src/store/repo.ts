@@ -15,8 +15,8 @@ import { createQueries, ftsQuery, type Queries } from "./queries.js";
 // keep their provenance: `detail` rows, NF-e `invoice` values (gross, kept in
 // their own columns) or `none`.
 
-/** Statuses that never change again; their details are not refreshed. */
-export const FINAL_STATUSES = ["Entregue", "Cancelado"];
+/** Final statuses (delivered, cancelled, claim resolved, refunded) never change; their details are not refreshed. */
+export const FINAL_STATUS_PATTERNS = ["%ntregue%", "%ancel%", "%resolveu%", "%eembols%"];
 
 export type PurchaseRow = {
   purchase_id: string;
@@ -38,6 +38,7 @@ export type PurchaseRow = {
   shipping_cents: number | null;
   total_cents: number | null;
   interest_cents: number | null;
+  refund_cents: number | null;
   item_count: number | null;
   extras: string | null;
   installments: number | null;
@@ -46,6 +47,7 @@ export type PurchaseRow = {
   card_last4: string | null;
   payment_id: string | null;
   payment_date: string | null;
+  payments: string | null;
   address_line: string | null;
   address_city: string | null;
   has_invoice: number | null;
@@ -207,8 +209,9 @@ export function createStore(db: Database): Store {
              purchase_date = COALESCE(?, purchase_date), date_label = COALESCE(?, date_label),
              seller_id = ?, seller_name = ?, is_official = ?, messages_url = ?,
              products_cents = ?, discount_cents = ?, coupons_cents = ?, shipping_cents = ?, total_cents = ?,
-             interest_cents = ?, item_count = ?, extras = ?,
+             interest_cents = ?, refund_cents = ?, item_count = ?, extras = ?,
              installments = ?, installment_cents = ?, pay_method = ?, card_last4 = ?, payment_id = ?, payment_date = ?,
+             payments = ?,
              address_line = ?, address_city = ?, has_invoice = ?, invoice_order_ids = ?,
              detail_fetched_at = ?, raw_detail = ?, warnings = ?
            WHERE purchase_id = ?`,
@@ -216,9 +219,10 @@ export function createStore(db: Database): Store {
           orNull(seller?.id), orNull(seller?.name), flag(seller?.isOfficialStore), orNull(seller?.messagesUrl),
           orNull(money.productsCents), orNull(money.discountCents), orNull(money.couponsCents),
           orNull(money.shippingCents), orNull(money.totalCents), orNull(money.interestCents),
-          orNull(money.itemCount), json(money.extras),
+          orNull(money.refundCents), orNull(money.itemCount), json(money.extras),
           orNull(payment?.installments), orNull(payment?.installmentCents), orNull(payment?.method),
           orNull(payment?.cardLast4), orNull(payment?.paymentId), orNull(payment?.paymentDate),
+          json(detail.payments ?? (payment ? [payment] : [])),
           orNull(shipping.addressLine), orNull(shipping.addressCity),
           flag(detail.hasInvoice), json(detail.invoiceOrderIds),
           fetchedAt, rawDetail, json(detail.warnings), purchaseId,
@@ -338,13 +342,13 @@ export function createStore(db: Database): Store {
       ).map((row) => row.category),
 
     purchasesNeedingDetail({ refreshNonFinalBefore }) {
-      const placeholders = FINAL_STATUSES.map(() => "?").join(", ");
+      const final = FINAL_STATUS_PATTERNS.map(() => "COALESCE(status, '') LIKE ?").join(" OR ");
       return all<PurchaseRow>(
         `SELECT * FROM purchases
          WHERE detail_fetched_at IS NULL
-            OR (? IS NOT NULL AND detail_fetched_at < ? AND COALESCE(status, '') NOT IN (${placeholders}))
+            OR (? IS NOT NULL AND detail_fetched_at < ? AND NOT (${final}))
          ORDER BY purchase_date DESC, rowid`,
-        refreshNonFinalBefore ?? null, refreshNonFinalBefore ?? null, ...FINAL_STATUSES,
+        refreshNonFinalBefore ?? null, refreshNonFinalBefore ?? null, ...FINAL_STATUS_PATTERNS,
       );
     },
 

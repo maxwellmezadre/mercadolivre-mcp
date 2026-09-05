@@ -96,3 +96,18 @@ histórico de consumo.
 `list_installments` calcula parcelas pagas/restantes assumindo cobranças mensais a
 partir de `paymentDate` (ou da data da compra). O site não expõe o cronograma real; a
 saída leva `note` e prefixo `estimated*` para deixar isso claro.
+
+## Ajustes medidos na conta real (2026-09-05)
+
+- `MoneyBreakdown.refundCents`: valor devolvido ("Reembolso"), fora da identidade.
+- `DetailPage.payments`: todas as linhas de pagamento (pagamento dividido tem duas);
+  `payment` é a primeira. No cache: coluna `payments` (JSON) além das colunas do
+  primeiro pagamento.
+- `ShippingAddress.pickup`: retirada no vendedor no lugar do endereço.
+- Tolerância da conferência de pagamentos: um centavo por parcela ("N parcelas de X"
+  vem arredondado), além dos 2 centavos da identidade do ticket.
+- Cancelamento: qualquer status contendo "cancel" ("Compra cancelada", "Você cancelou a
+  compra"). Finais (não refeitos pelo `sync`): entregue, cancelado, reclamação
+  resolvida, reembolsado.
+- `DetailPage.isEmpty`: página sem `ticket`, rubricas e produtos; `get_purchase` a trata
+  como par `packId`/`orderId` inválido.

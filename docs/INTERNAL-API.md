@@ -112,3 +112,40 @@ texto e preço é um `RichText`:
 Sem quota publicada. A ferramenta faz uma requisição por vez com intervalo de 1 s mais
 jitter de 200–600 ms, e backoff de 2 s e 8 s em 403/429 (três tentativas). Um `sync`
 completo de ~70 compras custa ~140–180 requisições (~3 min).
+
+## Observações da conta real (2026-09-05)
+
+Medidas na captura completa (68 compras, 113 pedidos) e refletidas no código:
+
+- **Ticket com linhas de pagamento.** Além das rubricas, o `ticket_row` traz linhas
+  `Pagamento`, `Pagamentos` ou com rótulo vazio (uma por cartão: "N parcelas de X",
+  `secondary_text` com a bandeira), `Reembolso` e `Subtotal`. Nenhuma delas entra na
+  soma; o parser as ignora ou guarda como informação (`refundCents`, `extras`).
+- **Pagamentos divididos.** Seis compras têm dois `detail_information_row` de pagamento
+  (cartão + cartão, cartão + saldo). Cada um vira um `Payment`; a soma é conferida com o
+  total com tolerância de um centavo por parcela, porque "N parcelas de X" vem
+  arredondado.
+- **Retirada no vendedor.** O brick de endereço pode ser `…information_pickup` com o
+  texto "Retirada no endereço do vendedor" (`shipping.pickup = true`).
+- **Assets de pagamento vistos:** `buflo_payment_issuer_mastercard`,
+  `buflo_payment_method_credit-card-mp`, `buflo_one_tap_payment_method_pix`,
+  `buflo_payment_melidolar`, `bf_v6_linea_de_credito`, `bf_v6_am` e linhas sem asset.
+- **Status na lista:** `Entregue`, `Compra cancelada`, `Você cancelou a compra`,
+  `O vendedor resolveu a reclamação`. Cancelamento é detectado por `%ancel%`.
+- **Manchetes:** "Chegou no dia D", "Chegou no dia D. Enviado por FULL", "Você recebeu a
+  compra", "Seu reembolso foi confirmado".
+- **Vendedor ausente** em 20 compras: a página não traz o `list_row` de mensagens, só
+  linhas de ajuda e cashback. `seller` é opcional por isso.
+- **Filtro de categoria ausente.** O `tag_dropdown` de `filterCategory` não estava na
+  página (nem no endpoint JSON) para esta conta; só o `dropdown` de `filterDate` e o
+  campo de busca. `list_categories` devolve vazio e o passo de categorias do `sync` não
+  faz requisições nesse caso.
+- **Par cruzado dentro da mesma compra** renderiza uma página normal (a compra é a
+  mesma); a página de erro descrita na spec vale para ids de compras diferentes. Uma
+  página sem `ticket`, `ticket_row` e produtos é tratada como "sem dados".
+- **`invoices-overview` aceita 20 ids** por chamada (medido); o cliente usa lotes de 20.
+  98 dos 113 pedidos tinham NF-e.
+- **Sem sessão**, as quatro superfícies (lista SSR, JSON, overview, download) respondem
+  `302` para `https://www.mercadolivre.com/jms/mlb/lgz/login?...`.
+- **Subtítulo com HTML:** `15 compras nos <b>"Últimos 3 meses"</b>`; as tags são
+  removidas.

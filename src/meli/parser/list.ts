@@ -29,7 +29,11 @@ type ListItemData = {
 
 /** Prose with collapsed whitespace and no space before punctuation. */
 function prose(text: RichText | undefined): string | undefined {
-  const value = text?.accessibility?.replace(/\s+/g, " ").replace(/\s+([.,;:])/g, "$1").trim();
+  const value = text?.accessibility
+    ?.replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,;:])/g, "$1")
+    .trim();
   return value ? value : undefined;
 }
 

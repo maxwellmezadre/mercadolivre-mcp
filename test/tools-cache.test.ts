@@ -27,7 +27,7 @@ function detail(purchaseId: string, totalCents: number, seller: string, products
     payment: { installments: 1, installmentCents: totalCents, totalCents, method: "Pix", raw: "x" },
     shipping: {}, seller: { id: seller.toLowerCase(), name: seller, isOfficialStore: false },
     products: products.map((product) => ({ title: `Produto ${product.itemId.slice(3)}`, quantity: product.quantity ?? 1, listCents: product.listCents, paidCents: product.paidCents, variations: {}, itemId: product.itemId })),
-    invoiceOrderIds: [], hasInvoice: false, warnings: [],
+    invoiceOrderIds: [], hasInvoice: false, payments: [], isEmpty: false, warnings: [],
   };
 }
 

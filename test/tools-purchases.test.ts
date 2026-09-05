@@ -29,7 +29,7 @@ const DETAIL: DetailPage = {
   shipping: { addressLine: "Rua Exemplo, 123", addressCity: "Cidade, UF." },
   seller: { id: "480265022", name: "Loja oficial Gallo", isOfficialStore: true },
   products: [{ title: "Produto 1", quantity: 1, listCents: 3299, paidCents: 2790, variations: {}, itemId: "MLB1" }],
-  queriedProductTitle: "Produto 1", invoiceOrderIds: ["1"], hasInvoice: true, warnings: [],
+  queriedProductTitle: "Produto 1", invoiceOrderIds: ["1"], hasInvoice: true, payments: [], isEmpty: false, warnings: [],
 };
 
 function fakeCtx(opts: { pages?: ListPage[]; filtered?: ListPage; detail?: DetailPage; invoices?: InvoiceOverview[] }) {

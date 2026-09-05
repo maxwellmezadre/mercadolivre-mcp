@@ -42,7 +42,8 @@ export type ProductWithPurchase = ProductRow & {
   purchase_total_cents: number | null;
 };
 
-const CANCELLED = "Cancelado";
+/** "Cancelado", "Compra cancelada", "Você cancelou a compra"... */
+const CANCELLED_LIKE = "%ancel%";
 
 /** FTS5 query: every whitespace-separated term quoted, so user text never breaks the syntax. */
 export function ftsQuery(query: string): string {
@@ -119,7 +120,7 @@ function purchaseWhere(query: PurchaseQuery, alias = "u"): Where {
       ftsQuery(query.search),
     );
   }
-  if (query.includeCancelled === false) where.add(`COALESCE(${alias}.status, '') <> ?`, CANCELLED);
+  if (query.includeCancelled === false) where.add(`COALESCE(${alias}.status, '') NOT LIKE ?`, CANCELLED_LIKE);
   return where;
 }
 
@@ -203,7 +204,7 @@ export function createQueries(db: Database): Queries {
         where.add("(LOWER(u.seller_name) LIKE ? OR u.seller_id = ?)", `%${query.seller.toLowerCase()}%`, query.seller);
       }
       if (query.includeCancelled !== true) {
-        where.add("COALESCE(u.status, '') <> ? AND COALESCE(p.status, '') <> ?", CANCELLED, CANCELLED);
+        where.add("COALESCE(u.status, '') NOT LIKE ? AND COALESCE(p.status, '') NOT LIKE ?", CANCELLED_LIKE, CANCELLED_LIKE);
       }
       return all<ProductWithPurchase>(
         `SELECT p.*, u.purchase_date, u.status AS purchase_status, u.seller_name, u.seller_id,

@@ -139,6 +139,8 @@ export type MoneyBreakdown = {
   totalCents?: number;
   /** Installment interest: total minus the rest, only when paying in N > 1. */
   interestCents?: number;
+  /** Money returned to the buyer ("Reembolso"); informational, outside the identity. */
+  refundCents?: number;
   /** Units in the purchase, from the "Produtos (N)" label. */
   itemCount?: number;
   /** Labels the parser does not know, normalized, with their cents. */
@@ -162,7 +164,12 @@ export type Payment = {
   raw: string;
 };
 
-export type ShippingAddress = { addressLine?: string; addressCity?: string };
+export type ShippingAddress = {
+  addressLine?: string;
+  addressCity?: string;
+  /** Pickup at the seller instead of a delivery address. */
+  pickup?: boolean;
+};
 
 export type Seller = {
   id?: string;
@@ -189,7 +196,10 @@ export type DetailPage = {
   purchaseDateLabel?: string;
   purchaseDate?: string;
   money: MoneyBreakdown;
+  /** First payment (convenience). */
   payment?: Payment;
+  /** Every payment row; split payments have two. */
+  payments: Payment[];
   shipping: ShippingAddress;
   seller?: Seller;
   /** Subset of the purchase's products (complete only for small purchases). */
@@ -198,6 +208,8 @@ export type DetailPage = {
   queriedProductTitle?: string;
   invoiceOrderIds: string[];
   hasInvoice: boolean;
+  /** No ticket, no rows, no products: the page did not render a purchase. */
+  isEmpty: boolean;
   /** Invariant violations, reported instead of hidden. */
   warnings: string[];
 };

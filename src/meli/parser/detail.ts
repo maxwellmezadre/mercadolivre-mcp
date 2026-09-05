@@ -8,6 +8,7 @@ import type {
   RichNode,
   RichText,
   Seller,
+  ShippingAddress,
 } from "../types.js";
 import { collectFromStack } from "./bricks.js";
 import { parsePaymentInfo, parsePtBrDate } from "./dates.js";
@@ -23,11 +24,14 @@ import {
   stripAccents,
 } from "./rich.js";
 
-// Purchase detail page -> canonical facts (spec §6.4). Pure function over
-// the flat brick map (AR-5). Everything here describes the WHOLE purchase
-// except `context_with_ellipsis`, which names the order the page was queried
-// with; the product rows are a subset for large purchases (spec §6.5), so the
-// inventory itself comes from the list.
+// Purchase detail page -> canonical facts (spec §6.4, revised against the
+// real account on 2026-09-05). Pure function over the flat brick map (AR-5).
+// Everything here describes the WHOLE purchase except `context_with_ellipsis`,
+// which names the order the page was queried with; the product rows are a
+// subset for large purchases (spec §6.5), so the inventory comes from the
+// list. The ticket also carries payment rows ("Pagamento", "Pagamentos", a
+// blank label: n x installment per card), refunds and subtotals — those are
+// informational and never enter the money identity.
 
 const MONEY_TOLERANCE_CENTS = 2;
 const PURCHASE_NUMBER = /compra numero\s+(\d+)/;
@@ -39,10 +43,10 @@ const INSTALLMENTS_PROSE = /(\d+|uma|um)\s+parcelas?\s+de\s+/;
 
 type MoneyField = keyof Pick<
   MoneyBreakdown,
-  "productsCents" | "discountCents" | "couponsCents" | "shippingCents" | "totalCents" | "interestCents"
+  "productsCents" | "discountCents" | "couponsCents" | "shippingCents" | "totalCents" | "interestCents" | "refundCents"
 >;
 
-/** Normalized ticket labels -> money fields; unknown labels go to `extras`. */
+/** Normalized ticket labels -> money fields. Labels observed on the real account. */
 const LABELS: Record<string, MoneyField> = {
   produto: "productsCents",
   produtos: "productsCents",
@@ -54,14 +58,21 @@ const LABELS: Record<string, MoneyField> = {
   frete: "shippingCents",
   total: "totalCents",
   juros: "interestCents",
+  reembolso: "refundCents",
 };
+
+/** Several rows of the same kind add up (e.g. "Desconto" + "Desconto à vista"). */
+const ACCUMULATED: Set<MoneyField> = new Set(["discountCents", "couponsCents", "shippingCents", "refundCents"]);
+
+/** Ticket rows that repeat the payment (per card, n x installment): skipped. */
+const PAYMENT_LABELS = new Set(["pagamento", "pagamentos", ""]);
 
 type TextLike = string | RichText | undefined;
 
 function prose(value: TextLike): string | undefined {
   if (value === undefined) return undefined;
   const text = typeof value === "string" ? value : (value.accessibility ?? richText(value));
-  const clean = text.replace(/\s+/g, " ").replace(/\s+([.,;:])/g, "$1").trim();
+  const clean = text.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").replace(/\s+([.,;:])/g, "$1").trim();
   return clean ? clean : undefined;
 }
 
@@ -126,23 +137,25 @@ function parseMoney(rows: Brick[]): { money: MoneyBreakdown; installments?: numb
     const data = row.data as
       | { left_column?: { primary_text?: TextLike }; right_column?: { primary_text?: TextLike } }
       | undefined;
-    const label = prose(data?.left_column?.primary_text);
-    const amount = readAmount(data?.right_column?.primary_text);
-    if (!label || !amount) continue;
+    const label = prose(data?.left_column?.primary_text) ?? "";
     const key = normalizeLabel(label);
+    if (PAYMENT_LABELS.has(key)) continue;
+    const amount = readAmount(data?.right_column?.primary_text);
+    if (!amount) continue;
+    const cents = amount.unitCents * amount.installments;
     const field = LABELS[key];
     if (!field) {
-      money.extras[key] = amount.unitCents * amount.installments;
+      money.extras[key] = cents;
       continue;
     }
-    money[field] = amount.unitCents * amount.installments;
+    money[field] = ACCUMULATED.has(field) ? (money[field] ?? 0) + cents : cents;
     if (field === "productsCents") money.itemCount = labelCount(label) ?? 1;
     if (field === "totalCents") installments = amount.installments;
   }
   return { money, installments };
 }
 
-/** products + discount + coupons + shipping + extras must equal total (AR-7). */
+/** products + discount + coupons + shipping must equal total (AR-7); extras are informational. */
 function checkMoney(money: MoneyBreakdown, installments: number): string[] {
   if (money.productsCents === undefined || money.totalCents === undefined) return [];
   const parts = {
@@ -150,9 +163,8 @@ function checkMoney(money: MoneyBreakdown, installments: number): string[] {
     discount: money.discountCents ?? 0,
     coupons: money.couponsCents ?? 0,
     shipping: money.shippingCents ?? 0,
-    extras: Object.values(money.extras).reduce((sum, cents) => sum + cents, 0),
   };
-  const expected = parts.products + parts.discount + parts.coupons + parts.shipping + parts.extras;
+  const expected = parts.products + parts.discount + parts.coupons + parts.shipping;
   const diff = money.totalCents - expected;
   if (Math.abs(diff) <= MONEY_TOLERANCE_CENTS) return [];
   if (installments > 1 && diff > 0) {
@@ -161,8 +173,7 @@ function checkMoney(money: MoneyBreakdown, installments: number): string[] {
   }
   return [
     `money breakdown does not add up: products ${parts.products} + discount ${parts.discount} + ` +
-      `coupons ${parts.coupons} + shipping ${parts.shipping} + extras ${parts.extras} = ${expected}, ` +
-      `total ${money.totalCents}`,
+      `coupons ${parts.coupons} + shipping ${parts.shipping} = ${expected}, total ${money.totalCents}`,
   ];
 }
 
@@ -213,8 +224,8 @@ function parseProducts(rows: Brick[]): DetailProduct[] {
   });
 }
 
-function parsePayment(row: Brick | undefined, now: Date): Payment | undefined {
-  const data = row?.data as { title?: RichText; secondary_title?: RichText[] } | undefined;
+function parsePayment(row: Brick, now: Date): Payment | undefined {
+  const data = row.data as { title?: RichText; secondary_title?: RichText[] } | undefined;
   const amount = readAmount(data?.title);
   if (!amount) return undefined;
   const [methodLine, infoLine] = (data?.secondary_title ?? []).map((line) => prose(line));
@@ -256,6 +267,18 @@ function assetId(row: Brick): string {
   return asset?.data?.id ?? "";
 }
 
+/** Delivery address ("shipping") or pickup at the seller ("pickup"). */
+function parseShipping(row: Brick | undefined): ShippingAddress {
+  if (!row) return {};
+  const data = row.data as { title?: RichText; secondary_title?: RichText[] } | undefined;
+  const pickup = assetId(row).includes("pickup");
+  return {
+    addressLine: prose(data?.title),
+    addressCity: prose(data?.secondary_title?.[0]),
+    ...(pickup ? { pickup: true } : {}),
+  };
+}
+
 export function parseDetailPage(stack: BrickStack, now: Date): DetailPage {
   const ticket = collectFromStack(stack, "ticket")[0]?.data as { subtitle?: RichText } | undefined;
   const subtitle = prose(ticket?.subtitle);
@@ -264,31 +287,34 @@ export function parseDetailPage(stack: BrickStack, now: Date): DetailPage {
     : undefined;
   const purchaseDateLabel = subtitle?.split(".")[0]?.trim() || undefined;
 
-  const { money, installments: ticketInstallments } = parseMoney(collectFromStack(stack, "ticket_row"));
+  const ticketRows = collectFromStack(stack, "ticket_row");
+  const { money, installments: ticketInstallments } = parseMoney(ticketRows);
 
   const infoRows = collectFromStack(stack, "detail_information_row");
-  const shippingRow = infoRows.find((row) => assetId(row).includes("shipping"));
-  const paymentRow =
-    infoRows.find((row) => assetId(row).includes("payment")) ??
-    infoRows.find((row) => row !== shippingRow);
-  const shippingData = shippingRow?.data as
-    | { title?: RichText; secondary_title?: RichText[] }
-    | undefined;
-  const payment = parsePayment(paymentRow, now);
+  const isShippingRow = (row: Brick) => /shipping|pickup/.test(assetId(row));
+  const shippingRow = infoRows.find(isShippingRow);
+  const payments = infoRows
+    .filter((row) => !isShippingRow(row))
+    .map((row) => parsePayment(row, now))
+    .filter((payment): payment is Payment => payment !== undefined);
+  const payment = payments[0];
 
-  const warnings = checkMoney(money, ticketInstallments ?? payment?.installments ?? 1);
-  if (
-    payment &&
-    money.totalCents !== undefined &&
-    Math.abs(payment.totalCents - money.totalCents) > MONEY_TOLERANCE_CENTS
-  ) {
-    warnings.push(`payment total ${payment.totalCents} differs from ticket total ${money.totalCents}`);
+  const maxInstallments = Math.max(ticketInstallments ?? 1, ...payments.map((entry) => entry.installments));
+  const warnings = checkMoney(money, maxInstallments);
+  if (payments.length > 0 && money.totalCents !== undefined) {
+    const paid = payments.reduce((sum, entry) => sum + entry.totalCents, 0);
+    // "N parcelas de X" shows X rounded to the cent: N x X may miss the total by up to N cents.
+    const tolerance = Math.max(MONEY_TOLERANCE_CENTS, payments.reduce((sum, entry) => sum + entry.installments, 0));
+    if (Math.abs(paid - money.totalCents) > tolerance) {
+      warnings.push(`payments total ${paid} differs from ticket total ${money.totalCents}`);
+    }
   }
 
   const invoiceCard = collectFromStack(stack, "itm_invoices_overview_card")[0]?.data as
     | { identifiers?: unknown[] }
     | undefined;
   const invoiceOrderIds = (invoiceCard?.identifiers ?? []).map(String).filter(Boolean);
+  const products = parseProducts(collectFromStack(stack, "row_with_ellipsis"));
 
   return {
     purchaseId,
@@ -296,17 +322,16 @@ export function parseDetailPage(stack: BrickStack, now: Date): DetailPage {
     purchaseDate: purchaseDateLabel ? parsePtBrDate(purchaseDateLabel, now) : undefined,
     money,
     payment,
-    shipping: {
-      addressLine: prose(shippingData?.title),
-      addressCity: prose(shippingData?.secondary_title?.[0]),
-    },
+    payments,
+    shipping: parseShipping(shippingRow),
     seller: parseSeller(collectFromStack(stack, "list_row")),
-    products: parseProducts(collectFromStack(stack, "row_with_ellipsis")),
+    products,
     queriedProductTitle: prose(
       (collectFromStack(stack, "context_with_ellipsis")[0]?.data as { title?: RichText } | undefined)?.title,
     ),
     invoiceOrderIds,
     hasInvoice: invoiceOrderIds.length > 0,
+    isEmpty: !ticket && ticketRows.length === 0 && products.length === 0,
     warnings,
   };
 }

@@ -42,6 +42,7 @@ export function moneyToReais(money: MoneyBreakdown) {
     shipping: reais(money.shippingCents),
     total: reais(money.totalCents),
     interest: reais(money.interestCents),
+    refund: reais(money.refundCents),
     itemCount: money.itemCount,
     extras: Object.fromEntries(
       Object.entries(money.extras).map(([label, cents]) => [label, centsToNumber(cents)]),
@@ -116,8 +117,12 @@ export function cachedPurchase(row: PurchaseRow, products: ProductRow[], categor
     discount: reais(row.discount_cents),
     coupons: reais(row.coupons_cents),
     shipping: reais(row.shipping_cents),
+    refund: reais(row.refund_cents),
     installments: row.installments ?? undefined,
     paymentMethod: row.pay_method ?? undefined,
+    payments: row.payments && (JSON.parse(row.payments) as Payment[]).length > 1
+      ? (JSON.parse(row.payments) as Payment[]).map(paymentToReais)
+      : undefined,
     seller: row.seller_name
       ? { id: row.seller_id ?? undefined, name: row.seller_name, isOfficialStore: row.is_official === 1 }
       : undefined,
@@ -340,6 +345,7 @@ export const getPurchase = defineTool({
       status: first?.status,
       money: moneyToReais(detail.money),
       payment: detail.payment ? paymentToReais(detail.payment) : undefined,
+      payments: detail.payments.length > 1 ? detail.payments.map(paymentToReais) : undefined,
       shipping: compactObject({
         ...detail.shipping,
         headline: first?.deliveryHeadline,

@@ -131,12 +131,12 @@ describe("invoices api", () => {
 
     const invoices = await api.overview(ids);
 
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(2);
     expect(calls[0]?.url).toBe(`${WWW}/emissor/omni/api/invoices-overview?identifiers=${ids.slice(0, OVERVIEW_BATCH).join("%2C")}`);
     expect(calls[0]?.options.kind).toBe("json");
     expect(invoices.map((invoice) => invoice.orderId)).toEqual(ids.filter((_, index) => index % OVERVIEW_BATCH === 0));
     expect(await api.overview([])).toEqual([]);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(2);
   });
 
   test("download decides the format by the url suffix and checks the magic bytes", async () => {
@@ -165,5 +165,14 @@ describe("invoices api", () => {
     const api = createInvoicesApi({ http });
 
     await expect(api.download("1", "pdf")).rejects.toBeInstanceOf(UpstreamError);
+  });
+});
+
+describe("crossed pair (real behaviour)", () => {
+  test("getDetail rejects a page without purchase data instead of returning an empty detail", async () => {
+    const { http } = fakeHttp(() => detailHtml({ layout_1: { id: "layout_1", ui_type: "layout" } }));
+    const api = createPurchasesApi({ http, now: () => NOW });
+
+    await expect(api.getDetail({ purchaseId: "10", packId: "20", orderId: "99" })).rejects.toThrow(/packId and orderId/);
   });
 });

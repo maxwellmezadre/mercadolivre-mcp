@@ -231,3 +231,107 @@ describe("helpers", () => {
     expect(parseVariations("sem atributo")).toEqual({});
   });
 });
+
+describe("real ticket variants (captured 2026-09-05)", () => {
+  const ticket = (rows: Array<[string, string, string?]>) =>
+    Object.fromEntries(rows.map(([label, value, secondary], i) => [`ticket_row_${i}`, ticketRow(`ticket_row_${i}`, label, text(value), secondary)]));
+
+  test("payment rows inside the ticket (Pagamento, Pagamentos, blank label) never enter the breakdown", () => {
+    const stack: BrickStack = {
+      ticket_1: { id: "ticket_1", ui_type: "ticket", data: { subtitle: text("10 de maio. Compra número 2000017120127222") } },
+      ...ticket([
+        ["Total", "10 parcelas de 53 reais com 55 centavos", "Mastercard **** 3507"],
+        ["Pagamento", "10 parcelas de 53 reais com 55 centavos", "Mastercard **** 3507"],
+        ["Frete", "Grátis"],
+        ["Cupons", "- 59 reais com 50 centavos"],
+        ["Desconto", "- 105 reais"],
+        ["Produtos (2)", "699 reais com 99 centavos"],
+      ]),
+    };
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.money).toMatchObject({ productsCents: 69999, discountCents: -10500, couponsCents: -5950, shippingCents: 0, totalCents: 53550, extras: {} });
+    expect(detail.money.interestCents).toBeUndefined();
+    expect(detail.warnings).toEqual([]);
+  });
+
+  test("blank and plural payment labels, refunds and subtotals are informational only", () => {
+    const stack: BrickStack = {
+      ...ticket([
+        ["Total", "Uma parcela de 131 reais com 80 centavos", "Visa **** 4770"],
+        ["", "Uma parcela de 59 reais com 89 centavos", "Visa **** 4770"],
+        ["Pagamentos", "5 parcelas de 14 reais com 38 centavos", "Visa **** 4770"],
+        ["Reembolso", "64 reais com 99 centavos", "Visa terminado em 4770"],
+        ["Subtotal", "516 reais com 55 centavos"],
+        ["Frete", "Grátis"],
+        ["Cupons", "- 14 reais com 64 centavos"],
+        ["Desconto", "- 113 reais com 5 centavos"],
+        ["Produtos (3)", "259 reais com 49 centavos"],
+      ]),
+    };
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.money).toMatchObject({ productsCents: 25949, discountCents: -11305, couponsCents: -1464, totalCents: 13180, refundCents: 6499, extras: { subtotal: 51655 } });
+    expect(detail.warnings).toEqual([]);
+  });
+
+  test("two discount rows add up instead of overwriting each other", () => {
+    const stack: BrickStack = ticket([
+      ["Total", "100 reais"],
+      ["Desconto", "- 10 reais"],
+      ["Desconto à vista", "- 5 reais"],
+      ["Produto", "115 reais"],
+    ]);
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.money.discountCents).toBe(-1500);
+    expect(detail.warnings).toEqual([]);
+  });
+
+  test("split payments: every payment row is kept and their sum is checked against the total", () => {
+    const stack: BrickStack = {
+      ...ticket([["Total", "131 reais com 80 centavos"], ["Produtos (3)", "131 reais com 80 centavos"]]),
+      detail_information_row_1: { id: "detail_information_row_1", ui_type: "detail_information_row", data: { asset: { data: { id: "buflo_payment_method_credit-card-mp" } }, title: text("Uma parcela de 59 reais com 89 centavos"), secondary_title: [text("Visa **** 4770"), text("12 de junho. Pagamento número 111111111111")] } },
+      detail_information_row_2: { id: "detail_information_row_2", ui_type: "detail_information_row", data: { title: text("5 parcelas de 14 reais com 38 centavos"), secondary_title: [text("Visa **** 4770"), text("12 de junho. Pagamento número 222222222222")] } },
+    };
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.payments).toHaveLength(2);
+    expect(detail.payments.map((payment) => [payment.installments, payment.totalCents, payment.paymentId])).toEqual([[1, 5989, "111111111111"], [5, 7190, "222222222222"]]);
+    expect(detail.payment?.paymentId).toBe("111111111111");
+    expect(detail.warnings).toEqual([]);
+  });
+
+  test("pickup at the seller is shipping information, not a payment", () => {
+    const stack: BrickStack = {
+      ...ticket([["Total", "10 reais"], ["Produto", "10 reais"]]),
+      detail_information_row_1: { id: "detail_information_row_1", ui_type: "detail_information_row", data: { asset: { data: { id: "buflo_congrats_information_pickup" } }, title: text("Retirada no endereço do vendedor") } },
+      detail_information_row_2: { id: "detail_information_row_2", ui_type: "detail_information_row", data: { title: text("2 parcelas de 5 reais"), secondary_title: [text("Visa **** 1234")] } },
+    };
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.shipping).toEqual({ addressLine: "Retirada no endereço do vendedor", pickup: true });
+    expect(detail.payments).toHaveLength(1);
+    expect(detail.payment?.installments).toBe(2);
+  });
+
+  test("a page without purchase data (crossed pair) is reported as empty", () => {
+    const detail = parseDetailPage({ layout_1: { id: "layout_1", ui_type: "layout" } }, NOW);
+
+    expect(detail.isEmpty).toBe(true);
+  });
+});
+
+describe("installment rounding (captured 2026-09-05)", () => {
+  test("n x a rounded installment may differ from the total by up to n cents", () => {
+    const stack: BrickStack = {
+      ticket_row_1: ticketRow("ticket_row_1", "Total", text("1.476 reais com 67 centavos")),
+      ticket_row_2: ticketRow("ticket_row_2", "Produto", text("1.476 reais com 67 centavos")),
+      detail_information_row_1: { id: "detail_information_row_1", ui_type: "detail_information_row", data: { title: text("12 parcelas de 123 reais com 6 centavos"), secondary_title: [text("Visa **** 1234")] } },
+    };
+    const detail = parseDetailPage(stack, NOW);
+
+    expect(detail.payment?.totalCents).toBe(147672);
+    expect(detail.warnings).toEqual([]);
+  });
+});

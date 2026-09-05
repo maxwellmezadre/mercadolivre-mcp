@@ -11,7 +11,7 @@ import type { InvoiceOverview, InvoiceXml } from "../types.js";
 // first bytes.
 
 export const WWW_URL = "https://www.mercadolivre.com.br";
-export const OVERVIEW_BATCH = 10;
+export const OVERVIEW_BATCH = 20;
 
 export type InvoiceFormat = "pdf" | "xml";
 
