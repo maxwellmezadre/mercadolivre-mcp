@@ -96,3 +96,12 @@ describe("centsToNumber", () => {
     expect(centsToNumber(0)).toBe(0);
   });
 });
+
+describe("parseQuantity on real list labels (captured 2026-09-05)", () => {
+  test("a pack size inside the title never wins over the quantity phrase that closes the sentence", () => {
+    expect(parseQuantity("Fardo Papel Higiênico Folha Dupla 30m Delicatto 16 Unidades Uma unidade. Tipo de embalagem Pacote com 8 unidades")).toBe(1);
+    expect(parseQuantity("Preservativo Prudence 8 Unidades 3 unidades.")).toBe(3);
+    expect(parseQuantity("Coala 3 unidades")).toBe(3);
+    expect(parseQuantity("R$ 20,49 R$ 18,45 | 1 unidade")).toBe(1);
+  });
+});

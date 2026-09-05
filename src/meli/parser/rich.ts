@@ -58,16 +58,22 @@ export function stripAccents(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-/** "| 3 unidades", "Uma unidade.", "1 un." -> number; undefined when absent. */
+/**
+ * "| 3 unidades", "Uma unidade.", "1 un." -> number; undefined when absent.
+ * Titles carry pack sizes ("16 Unidades"); the quantity phrase is the one that
+ * closes the sentence (followed by "." or the end), else the last one.
+ */
 export function parseQuantity(text: string): number | undefined {
   const plain = stripAccents(text);
+  const candidates: Array<{ value: number; closing: boolean }> = [];
   for (const match of plain.matchAll(QUANTITY)) {
     const token = (match[1] as string).toLowerCase();
-    if (/^\d+$/.test(token)) return Number(token);
-    const word = QUANTITY_WORDS[token];
-    if (word !== undefined) return word;
+    const value = /^\d+$/.test(token) ? Number(token) : QUANTITY_WORDS[token];
+    if (value === undefined) continue;
+    const rest = plain.slice((match.index ?? 0) + match[0].length);
+    candidates.push({ value, closing: /^\s*(?:\.|$)/.test(rest) });
   }
-  return undefined;
+  return (candidates.find((candidate) => candidate.closing) ?? candidates[candidates.length - 1])?.value;
 }
 
 /** "Produtos (14)" -> "produtos"; "Desconto à vista" -> "desconto a vista". */
