@@ -31,7 +31,13 @@ async function invoke(
     if (!tool) throw new Error(`Tool not found: ${toolName}`);
     const ctx = createContext(loadConfig());
     const result = await runTool(tool, compactObject(args), ctx);
-    console.log(json ? JSON.stringify(result, null, 2) : formatHuman(result));
+    // Await the write: a large result piped to a slow reader is truncated when
+    // the process exits before stdout drains.
+    await new Promise<void>((resolve, reject) =>
+      process.stdout.write(`${json ? JSON.stringify(result, null, 2) : formatHuman(result)}\n`, (error) =>
+        error ? reject(error) : resolve(),
+      ),
+    );
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
