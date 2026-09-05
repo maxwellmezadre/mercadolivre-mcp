@@ -14,7 +14,7 @@ import type { ProductRow, Store } from "../store/repo.js";
 // network at all; it also runs automatically when PARSER_VERSION changes.
 
 /** Bump when a parser changes what it extracts; cached pages get reparsed. */
-export const PARSER_VERSION = 1;
+export const PARSER_VERSION = 2;
 
 export type SyncMode = "incremental" | "full" | "reparse";
 

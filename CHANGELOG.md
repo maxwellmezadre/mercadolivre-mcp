@@ -5,7 +5,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); versioname
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-09-04
+## [0.1.0] - 2026-09-05
 
 ### Added
 
@@ -26,6 +26,9 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); versioname
   `sync`, `raw_get`.
 - Anonimizador determinístico de fixtures, scripts de captura e de geração de
   `docs/TOOLS.md`, documentação em pt-BR e ADRs.
+- Parsers validados contra a conta real (68 compras, 113 pedidos): linhas de pagamento
+  no ticket, reembolso, pagamento dividido, retirada no vendedor, status de cancelamento,
+  quantidade vs tamanho do pacote, junção das linhas do detalhe pelo id do pedido.
 
 [Unreleased]: https://github.com/maxwellmezadre/mercadolivre-mcp/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/maxwellmezadre/mercadolivre-mcp/releases/tag/v0.1.0
