@@ -4,8 +4,9 @@ import type { DetailProduct, PurchaseListItem } from "./types.js";
 // Joins the two product sources of a purchase (spec §6.6): the list is the
 // complete inventory (one item per order, with quantity), the detail rows
 // carry prices and variations for a subset. Rows are matched to list items
-// by unique item id, then item id plus quantity, then normalized title, then
-// the queried-order anchor. Unmatched rows are reported, never inserted.
+// by the order id they link to (real pages), then unique item id, item id
+// plus quantity, normalized title, and the queried-order anchor. Unmatched
+// rows are reported, never inserted.
 
 export type PriceSource = "detail" | "invoice" | "none";
 
@@ -82,7 +83,9 @@ export function mergeProducts(
   for (const row of rows) {
     let index: number | undefined;
 
-    if (row.itemId) {
+    if (row.orderId) index = candidates((item) => item.orderId === row.orderId)[0];
+
+    if (index === undefined && row.itemId) {
       const byId = candidates((item) => item.itemId === row.itemId);
       if (byId.length > 0) index = byId.length === 1 ? byId[0] : preferQuantity(byId, row);
     }

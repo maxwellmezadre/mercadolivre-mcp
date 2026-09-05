@@ -86,3 +86,15 @@ describe("mergeProducts", () => {
     expect(products[0]?.orderId).toBeUndefined();
   });
 });
+
+describe("order id join (captured 2026-09-05)", () => {
+  test("a row that names its order matches that order before any other rule", () => {
+    const { products, unmatchedRows } = mergeProducts(
+      [item({ orderId: "1", productTitle: "Titulo Da Lista Diferente", itemId: "MLB1" }), item({ orderId: "2", productTitle: "Outro", itemId: "MLB1" })],
+      [row({ title: "Titulo Do Detalhe", orderId: "2", paidCents: 500 })],
+    );
+
+    expect(unmatchedRows).toEqual([]);
+    expect(products.map((product) => [product.orderId, product.priceSource, product.paidCents])).toEqual([["1", "none", undefined], ["2", "detail", 500]]);
+  });
+});

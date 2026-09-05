@@ -180,6 +180,9 @@ export type Seller = {
 
 /** One `row_with_ellipsis`: prices are LINE TOTALS, already times quantity. */
 export type DetailProduct = {
+  /** The row links to its own order's detail page: the exact join key to the list. */
+  orderId?: string;
+  packId?: string;
   title: string;
   quantity: number;
   listCents?: number;

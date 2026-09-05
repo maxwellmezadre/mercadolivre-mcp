@@ -335,3 +335,25 @@ describe("installment rounding (captured 2026-09-05)", () => {
     expect(detail.warnings).toEqual([]);
   });
 });
+
+describe("product rows carry their order (captured 2026-09-05)", () => {
+  test("the row url is the order's own detail url: packId and orderId are read from it", () => {
+    const stack: BrickStack = {
+      row_with_ellipsis_1: {
+        id: "row_with_ellipsis_1",
+        ui_type: "row_with_ellipsis",
+        data: {
+          title: text("Produto Real"),
+          secondary_title: [{ rich: [price("18", "45"), { type: "text", value: { text: " | 1 unidade" } }] }],
+          image: { url: "https://http2.mlstatic.com/D_837563-MLA99441282294_112025-N.jpg", alt: "Produto Real" },
+          event: { type: "go_to", data: { url: "https://myaccount.mercadolivre.com.br/my_purchases/2000252563335855/status?packId=2000060780013512&orderId=2000234497749204" } },
+        },
+      },
+    };
+    const [row] = parseDetailPage(stack, NOW).products;
+
+    expect(row).toMatchObject({ orderId: "2000234497749204", packId: "2000060780013512", paidCents: 1845, quantity: 1 });
+    expect(row?.itemId).toBeUndefined();
+    expect(row?.itemUrl).toBeUndefined();
+  });
+});
