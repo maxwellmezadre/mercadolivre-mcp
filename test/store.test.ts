@@ -175,3 +175,21 @@ describe("real status variants (captured 2026-09-05)", () => {
     expect(JSON.parse(store.getPurchase("100")!.payments!)).toHaveLength(2);
   });
 });
+
+describe("migrations", () => {
+  test("upgrades a v1 database in place, adding the payment and refund columns", () => {
+    const { Database } = require("bun:sqlite") as typeof import("bun:sqlite");
+    const { MIGRATIONS, migrate } = require("../src/store/db.js") as typeof import("../src/store/db.js");
+    const db = new Database(":memory:");
+    db.exec(MIGRATIONS[0] as string);
+    db.exec("PRAGMA user_version = 1");
+    db.exec("INSERT INTO purchases (purchase_id, total_cents) VALUES ('1', 100)");
+
+    migrate(db);
+
+    expect((db.query("PRAGMA user_version").get() as { user_version: number }).user_version).toBe(SCHEMA_VERSION);
+    const columns = (db.query("PRAGMA table_info(purchases)").all() as Array<{ name: string }>).map((column) => column.name);
+    expect(columns).toEqual(expect.arrayContaining(["refund_cents", "payments"]));
+    expect(db.query("SELECT total_cents FROM purchases WHERE purchase_id = '1'").get()).toEqual({ total_cents: 100 });
+  });
+});

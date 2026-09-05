@@ -8,9 +8,10 @@ import { Database } from "bun:sqlite";
 // WAL lets the CLI `sync` and the MCP server share the file; migrations are
 // ordered and tracked in `user_version`.
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
-const MIGRATIONS: string[] = [
+/** Ordered, append-only: a released version is never edited. */
+export const MIGRATIONS: string[] = [
   // v1 — spec §10.2, revised: integer cents, price provenance, categories.
   `
   CREATE TABLE purchases (
@@ -33,7 +34,6 @@ const MIGRATIONS: string[] = [
     shipping_cents    INTEGER,
     total_cents       INTEGER,
     interest_cents    INTEGER,
-    refund_cents      INTEGER,
     item_count        INTEGER,
     extras            TEXT,
     installments      INTEGER,
@@ -42,7 +42,6 @@ const MIGRATIONS: string[] = [
     card_last4        TEXT,
     payment_id        TEXT,
     payment_date      TEXT,
-    payments          TEXT,
     address_line      TEXT,
     address_city      TEXT,
     has_invoice       INTEGER,
@@ -117,6 +116,11 @@ const MIGRATIONS: string[] = [
     variations,
     tokenize = 'unicode61 remove_diacritics 2'
   );
+  `,
+  // v2 — real account (2026-09-05): refunds and split payments.
+  `
+  ALTER TABLE purchases ADD COLUMN refund_cents INTEGER;
+  ALTER TABLE purchases ADD COLUMN payments TEXT;
   `,
 ];
 
