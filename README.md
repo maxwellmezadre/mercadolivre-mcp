@@ -53,7 +53,7 @@ bun run build:binary   # gera ./mercadolivre (embute o runtime)
 ```
 
 O binário não embute o Playwright: rode o `login` a partir do checkout ou do
-pacote npm (`bunx @maxwellmezadre/mercadolivre-mcp login`), ou use
+pacote npm (`bunx -p @maxwellmezadre/mercadolivre-mcp mercadolivre login`), ou use
 `MERCADOLIVRE_COOKIE` (ver [Configuração](docs/CONFIGURATION.md)).
 
 ## Login
