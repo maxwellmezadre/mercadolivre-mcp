@@ -78,6 +78,9 @@ Sem `--pack/--order`, a ferramenta procura o par no cache e, se preciso, varre a
 
 ## Claude Code
 
+A partir do checkout, `bun run setup` instala o pacote global, registra o servidor no
+escopo de usuário e copia a Skill para `~/.claude/skills/mercadolivre-mcp/`. À mão:
+
 ```sh
 claude mcp add -s user mercadolivre -- mercadolivre mcp
 ```

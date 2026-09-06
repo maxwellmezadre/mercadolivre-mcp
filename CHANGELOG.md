@@ -5,6 +5,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); versioname
 
 ## [Unreleased]
 
+### Added
+
+- `bun run setup` (`scripts/setup.ts`): instala o pacote global (`--link` usa o checkout),
+  registra o servidor MCP no escopo de usuário do Claude Code com caminho absoluto e
+  instala a Skill em `~/.claude/skills/mercadolivre-mcp/`.
+
+### Fixed
+
+- README: `bunx`/`npx` precisam de `-p` e do nome do executável; sem isso o binário
+  homônimo do pacote (o servidor MCP) é executado no lugar da CLI.
+
 ## [0.1.0] - 2026-09-05
 
 ### Added

@@ -28,7 +28,8 @@
     "test": "bun test",
     "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --outdir dist --external playwright-core",
     "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre --external playwright-core",
-    "prepublishOnly": "bun run build:dist"
+    "prepublishOnly": "bun run build:dist",
+    "setup": "bun run scripts/setup.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

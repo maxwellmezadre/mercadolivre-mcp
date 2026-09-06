@@ -32,17 +32,59 @@ comprei esse café e a que preço?". A conta é **somente leitura**.
 
 Requer [Bun](https://bun.sh) ≥ 1.2 (o cache usa `bun:sqlite`).
 
+### npm
+
+```sh
+bun install -g @maxwellmezadre/mercadolivre-mcp   # instala `mercadolivre` e `mercadolivre-mcp` no PATH
+mercadolivre --version
+```
+
+`npm i -g` também funciona. O `login` usa o `playwright-core`, que vem junto como
+dependência opcional do pacote.
+
+Sem instalar nada:
+
+```sh
+bunx -p @maxwellmezadre/mercadolivre-mcp mercadolivre purchases
+npx -p @maxwellmezadre/mercadolivre-mcp mercadolivre purchases
+```
+
+O `-p` e o nome do executável são necessários: o pacote declara dois binários
+(`mercadolivre` e `mercadolivre-mcp`) e, sem eles, `bunx @maxwellmezadre/mercadolivre-mcp`
+executa o homônimo do pacote, que é o servidor MCP, e não a CLI.
+
+Binários pré-compilados para linux-x64, darwin-arm64 e windows-x64 estão nas
+[Releases](https://github.com/maxwellmezadre/mercadolivre-mcp/releases); eles não
+fazem `login` (ver [Binário único](#binário-único)).
+
+### Tudo de uma vez (Claude Code)
+
+A partir do checkout, um comando instala o pacote global, registra o servidor MCP no
+escopo de usuário do Claude Code (vale em qualquer projeto) e instala a
+[Skill](SKILL.md) em `~/.claude/skills/mercadolivre-mcp/`:
+
 ```sh
 git clone https://github.com/maxwellmezadre/mercadolivre-mcp.git
 cd mercadolivre-mcp
 bun install
-bun run src/bin.ts --help
+bun run setup            # ou `bun run setup --link` para usar este checkout no lugar do npm
 ```
 
-Para ter o comando `mercadolivre` no PATH:
+Reinicie o Claude Code depois; para atualizar, rode o mesmo comando. Sem o checkout,
+a Skill sozinha:
 
 ```sh
-bun link            # ou: npm i -g @maxwellmezadre/mercadolivre-mcp
+mkdir -p ~/.claude/skills/mercadolivre-mcp
+curl -fsSL https://raw.githubusercontent.com/maxwellmezadre/mercadolivre-mcp/main/SKILL.md \
+  -o ~/.claude/skills/mercadolivre-mcp/SKILL.md
+```
+
+### A partir do código
+
+```sh
+bun install
+bun run src/bin.ts --help
+bun run setup --link     # `mercadolivre` no PATH apontando para este checkout
 ```
 
 ### Binário único
@@ -109,6 +151,9 @@ Claude Code (escopo do usuário):
 ```sh
 claude mcp add -s user mercadolivre -- mercadolivre mcp
 ```
+
+`bun run setup` faz esse registro sozinho, com o caminho absoluto do executável
+(clientes como o Claude Desktop não herdam o PATH do shell), e instala a Skill.
 
 Claude Desktop ou qualquer cliente que leia `mcpServers`:
 
