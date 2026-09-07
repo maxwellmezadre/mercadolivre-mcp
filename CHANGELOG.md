@@ -5,6 +5,8 @@ versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-07
+
 Padronização com os outros MCPs de histórico de compras (amazon, shein,
 shopee, aliexpress). A conta continua somente leitura; o que muda é a
 superfície local.
@@ -97,5 +99,6 @@ superfície local.
   no ticket, reembolso, pagamento dividido, retirada no vendedor, status de cancelamento,
   quantidade vs tamanho do pacote, junção das linhas do detalhe pelo id do pedido.
 
-[Unreleased]: https://github.com/maxwellmezadre/mercadolivre-mcp/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/maxwellmezadre/mercadolivre-mcp/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/maxwellmezadre/mercadolivre-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/maxwellmezadre/mercadolivre-mcp/releases/tag/v0.1.0

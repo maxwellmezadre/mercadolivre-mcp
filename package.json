@@ -1,6 +1,6 @@
 {
   "name": "@maxwellmezadre/mercadolivre-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI + servidor MCP para o histórico de compras do Mercado Livre (compras, produtos, preços, parcelamento, vendedores e notas fiscais) sobre um núcleo compartilhado",
   "type": "module",
   "license": "MIT",
