@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import type { Ctx } from "../src/context.js";
-import type { DetailPage, PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase } from "../src/store/db.js";
-import { createStore, type Store } from "../src/store/repo.js";
+import type { DetailPage, PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase } from "../src/cache/db.js";
+import { createStore, type Store } from "../src/cache/repo.js";
 import { listInstallments, listPaymentMethods, spendingSummary } from "../src/tools/analytics.js";
 import { runTool } from "../src/tools/define.js";
 
@@ -80,7 +80,7 @@ describe("spending_summary", () => {
     expect(year.groups.map((group) => [group.key, group.total])).toEqual([["2026", 420], ["2025", 322.9]]);
     expect(seller.groups.map((group) => [group.key, group.total])).toEqual([["Loja A", 382.9], ["Loja B", 360]]);
     expect(category.groups.map((group) => [group.key, group.total])).toEqual([["Casa", 682.9], ["Alimentos e Bebidas", 420]]);
-    expect(category.note).toMatch(/more than one category/);
+    expect(category.note).toMatch(/mais de uma categoria/);
     expect(none.groups).toEqual([{ key: "all", total: 742.9, purchases: 3, products: 5 }]);
   });
 
@@ -110,7 +110,7 @@ describe("list_installments", () => {
       estimatedPaidInstallments: 1, estimatedRemaining: 2, estimatedEndDate: "2026-10-12", estimatedRemainingAmount: 240,
     });
     expect(result.monthlyCommitment).toBe(120);
-    expect(result.note).toMatch(/estimate/i);
+    expect(result.note).toMatch(/estimativa/i);
   });
 
   test("onlyMultiple=false lists every paid purchase, newest first", async () => {

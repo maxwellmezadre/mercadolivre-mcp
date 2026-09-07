@@ -1,22 +1,20 @@
-name: Feature request
-description: Sugira uma melhoria ou nova capacidade
+name: Ideia
+description: Sugerir uma melhoria
 labels: [enhancement]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Qual problema isso resolve?
-      description: O caso de uso por trás da sugestão.
+      label: Que problema isso resolve
+      description: A situação concreta, não a solução.
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: idea
     attributes:
-      label: Proposta
-      description: Como você imagina que funcione (tool/comando, parâmetros, saída).
-    validations:
-      required: true
-  - type: textarea
-    id: alternatives
+      label: O que você imagina
+  - type: markdown
     attributes:
-      label: Alternativas consideradas
+      value: |
+        Este projeto é somente leitura na conta: cancelar uma compra, abrir reclamação, avaliar o vendedor ou pagar estão
+        fora de escopo por decisão de projeto.

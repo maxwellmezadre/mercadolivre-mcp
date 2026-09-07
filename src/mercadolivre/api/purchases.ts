@@ -53,7 +53,7 @@ export function listItemsUrl(filters: ListFilters): string {
 /** Detail page. All three ids are required and must come from one list item (AR-10). */
 export function detailUrl(ids: DetailIds): string {
   for (const key of ["purchaseId", "packId", "orderId"] as const) {
-    if (!ids[key]) throw new Error(`Detail page needs ${key}: purchaseId, packId and orderId come together from one list item`);
+    if (!ids[key]) throw new Error(`A página de detalhe precisa de ${key}: purchaseId, packId e orderId vêm juntos de um item da lista`);
   }
   return `${MYACCOUNT_URL}/my_purchases/${ids.purchaseId}/status?packId=${ids.packId}&orderId=${ids.orderId}`;
 }
@@ -85,8 +85,8 @@ export function createPurchasesApi(ctx: { http: MeliHttp; now: () => Date }): Pu
       if (detail.isEmpty) {
         throw new UpstreamError(
           result.status,
-          `The detail page of purchase ${ids.purchaseId} carries no purchase data: packId and orderId must come ` +
-            "from the same list item (list_purchases gives a valid detailRef)",
+          `A página de detalhe da compra ${ids.purchaseId} não traz dados da compra: packId e orderId precisam ` +
+            "vir do mesmo item da lista (list_purchases devolve um detailRef válido)",
         );
       }
       return { detail, brickStack };

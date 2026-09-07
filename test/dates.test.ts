@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parsePaymentInfo, parsePtBrDate } from "../src/meli/parser/dates.js";
+import { parsePaymentInfo, parsePtBrDate } from "../src/mercadolivre/parser/dates.js";
 
 const NOW = new Date("2026-09-04T12:00:00Z");
 

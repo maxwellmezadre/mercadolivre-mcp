@@ -6,7 +6,7 @@ import {
   floxJsonRootBrick,
   listRootBrick,
   sliceBalancedJson,
-} from "../src/meli/parser/nordic.js";
+} from "../src/mercadolivre/parser/nordic.js";
 
 // Synthetic page reproducing the three real traps of spec §5.1: the script
 // tag carries a nonce, the JSON is followed by more JavaScript, and strings

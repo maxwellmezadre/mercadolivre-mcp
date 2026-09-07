@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseDetailPage } from "../../src/meli/parser/detail.js";
-import { parseListPage } from "../../src/meli/parser/list.js";
-import { detailBrickStack, extractNordicCtx, listRootBrick } from "../../src/meli/parser/nordic.js";
+import { parseDetailPage } from "../../src/mercadolivre/parser/detail.js";
+import { parseListPage } from "../../src/mercadolivre/parser/list.js";
+import { detailBrickStack, extractNordicCtx, listRootBrick } from "../../src/mercadolivre/parser/nordic.js";
 
 // Golden corpus: the raw captures of the whole account (private, gitignored,
 // produced by scripts/capture-fixtures.ts). Every purchase must parse with

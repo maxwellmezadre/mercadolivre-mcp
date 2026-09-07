@@ -2,10 +2,10 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { MergedProduct } from "../src/meli/merge.js";
-import type { DetailPage, InvoiceOverview, InvoiceXml, PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase, SCHEMA_VERSION } from "../src/store/db.js";
-import { createStore, type Store } from "../src/store/repo.js";
+import type { MergedProduct } from "../src/mercadolivre/merge.js";
+import type { DetailPage, InvoiceOverview, InvoiceXml, PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase, SCHEMA_VERSION } from "../src/cache/db.js";
+import { createStore, type Store } from "../src/cache/repo.js";
 
 // The cache is the query surface (AR-6). Money is stored in cents (AR-7),
 // products are keyed by order id and purchases by purchase id (AR-8).
@@ -43,7 +43,7 @@ describe("openDatabase", () => {
   test("creates the schema once, idempotently, with restrictive permissions and WAL", () => {
     const dir = mkdtempSync(join(tmpdir(), "ml-store-"));
     dirs.push(dir);
-    const path = join(dir, "cache.sqlite");
+    const path = join(dir, "cache.db");
 
     const first = openDatabase(path);
     first.close();
@@ -179,7 +179,7 @@ describe("real status variants (captured 2026-09-05)", () => {
 describe("migrations", () => {
   test("upgrades a v1 database in place, adding the payment and refund columns", () => {
     const { Database } = require("bun:sqlite") as typeof import("bun:sqlite");
-    const { MIGRATIONS, migrate } = require("../src/store/db.js") as typeof import("../src/store/db.js");
+    const { MIGRATIONS, migrate } = require("../src/cache/db.js") as typeof import("../src/cache/db.js");
     const db = new Database(":memory:");
     db.exec(MIGRATIONS[0] as string);
     db.exec("PRAGMA user_version = 1");

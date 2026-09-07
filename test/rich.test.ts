@@ -8,8 +8,8 @@ import {
   parseQuantity,
   priceNodeToCents,
   richText,
-} from "../src/meli/parser/rich.js";
-import type { RichText } from "../src/meli/types.js";
+} from "../src/mercadolivre/parser/rich.js";
+import type { RichText } from "../src/mercadolivre/types.js";
 
 const ROW_PRICES: RichText = {
   rich: [

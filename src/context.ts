@@ -1,11 +1,13 @@
-import { createSessionStore, type SessionStore } from "./auth/session.js";
+import { existsSync, renameSync } from "node:fs";
+import { join } from "node:path";
 import type { Config } from "./config.js";
+import { openDatabase } from "./cache/db.js";
+import { createStore, type Store } from "./cache/repo.js";
 import { createMeliHttp, type HttpDeps, type MeliHttp } from "./core/http.js";
 import { createLogger, type Logger } from "./core/logger.js";
-import { createInvoicesApi, type InvoicesApi } from "./meli/api/invoices.js";
-import { createPurchasesApi, type PurchasesApi } from "./meli/api/purchases.js";
-import { openDatabase } from "./store/db.js";
-import { createStore, type Store } from "./store/repo.js";
+import { createInvoicesApi, type InvoicesApi } from "./mercadolivre/api/invoices.js";
+import { createPurchasesApi, type PurchasesApi } from "./mercadolivre/api/purchases.js";
+import { createSessionStore, type SessionStore } from "./session/store.js";
 
 // Injection context (AR-4): collaborators are passed explicitly, no globals.
 // Everything that touches time or the network is replaceable in tests. The
@@ -29,23 +31,49 @@ export type ContextDeps = {
   cacheFile?: string;
 };
 
+/**
+ * Versions before 0.2 kept `cache.sqlite` and `profile/` under the config
+ * directory. Renamed once, only when the new name does not exist yet. The
+ * SQLite sidecars move together: nothing has the file open at this point in
+ * the process, and a rename keeps them consistent with the main file.
+ */
+export function migrateLegacyFiles(config: Config, log: Pick<Logger, "info">): void {
+  const legacyDb = join(config.configDir, "cache.sqlite");
+  if (existsSync(legacyDb) && !existsSync(config.dbPath)) {
+    for (const suffix of ["", "-wal", "-shm"]) {
+      if (existsSync(legacyDb + suffix)) renameSync(legacyDb + suffix, config.dbPath + suffix);
+    }
+    log.info("Cache migrado de cache.sqlite para cache.db.");
+  }
+  const legacyProfile = join(config.configDir, "profile");
+  if (existsSync(legacyProfile) && !existsSync(config.browserProfileDir)) {
+    renameSync(legacyProfile, config.browserProfileDir);
+    log.info("Perfil do navegador migrado de profile/ para browser-profile/.");
+  }
+}
+
 export function createContext(config: Config, deps: ContextDeps = {}): Ctx {
   const now = deps.now ?? (() => Date.now());
   const clock = () => new Date(now());
   // Shared by reference: the session store appends cookie values (NFR-4).
   const secrets: string[] = [];
   const log = createLogger({ logFile: config.logFile, secrets, sink: deps.logSink });
+  migrateLegacyFiles(config, log);
   const session = createSessionStore({
-    sessionFile: config.sessionFile,
+    sessionPath: config.sessionPath,
+    keyPath: config.keyPath,
+    sessionKey: config.sessionKey,
     cookie: config.cookie,
     secrets,
     now,
+    log,
   });
   const http = createMeliHttp(
     {
       session,
       userAgent: config.userAgent,
-      requestIntervalMs: config.requestIntervalMs,
+      minIntervalMs: config.minIntervalMs,
+      jitterMs: config.jitterMs,
       timeoutMs: config.httpTimeoutMs,
       log,
     },
@@ -62,6 +90,6 @@ export function createContext(config: Config, deps: ContextDeps = {}): Ctx {
       purchases: createPurchasesApi({ http, now: clock }),
       invoices: createInvoicesApi({ http }),
     },
-    store: () => (store ??= createStore(openDatabase(deps.cacheFile ?? config.cacheFile))),
+    store: () => (store ??= createStore(openDatabase(deps.cacheFile ?? config.dbPath))),
   };
 }

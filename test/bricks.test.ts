@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { collect, collectFromStack, uiTypeOf, walk } from "../src/meli/parser/bricks.js";
-import type { Brick } from "../src/meli/types.js";
+import { collect, collectFromStack, uiTypeOf, walk } from "../src/mercadolivre/parser/bricks.js";
+import type { Brick } from "../src/mercadolivre/types.js";
 
 const tree: Brick = {
   id: "main_1",

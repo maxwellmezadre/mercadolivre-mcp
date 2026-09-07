@@ -173,8 +173,8 @@ function checkMoney(money: MoneyBreakdown, installments: number): string[] {
     return [];
   }
   return [
-    `money breakdown does not add up: products ${parts.products} + discount ${parts.discount} + ` +
-      `coupons ${parts.coupons} + shipping ${parts.shipping} = ${expected}, total ${money.totalCents}`,
+    `o breakdown financeiro não fecha: produtos ${parts.products} + desconto ${parts.discount} + ` +
+      `cupons ${parts.coupons} + frete ${parts.shipping} = ${expected}, total ${money.totalCents}`,
   ];
 }
 
@@ -311,7 +311,7 @@ export function parseDetailPage(stack: BrickStack, now: Date): DetailPage {
     // "N parcelas de X" shows X rounded to the cent: N x X may miss the total by up to N cents.
     const tolerance = Math.max(MONEY_TOLERANCE_CENTS, payments.reduce((sum, entry) => sum + entry.installments, 0));
     if (Math.abs(paid - money.totalCents) > tolerance) {
-      warnings.push(`payments total ${paid} differs from ticket total ${money.totalCents}`);
+      warnings.push(`a soma dos pagamentos ${paid} difere do total do ticket ${money.totalCents}`);
     }
   }
 

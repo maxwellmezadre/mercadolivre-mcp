@@ -1,12 +1,20 @@
 // Typed, non-fatal errors (NFR-6). Every one of them becomes a tool error
-// (`isError: true`) at the MCP boundary and a non-zero exit in the CLI —
-// never a crash. Messages are actionable and never carry cookie values (NFR-4).
+// (`isError: true`) at the MCP boundary and a non-zero exit in the CLI,
+// never a crash. Messages are user-facing (pt-BR), actionable and never carry
+// cookie values (NFR-4).
 
 export const LOGIN_HINT =
-  "Run `mercadolivre login` (you type the password in the browser; the tool " +
-  "only stores the session) or set MERCADOLIVRE_COOKIE.";
+  "Rode `mercadolivre login` no terminal (você digita a senha no navegador; a ferramenta " +
+  "só guarda a sessão), ou `mercadolivre login --from-browser chrome` para importar a " +
+  "sessão de um navegador já logado, ou defina MERCADOLIVRE_COOKIE.";
 
-export type SessionErrorCode = "NO_SESSION" | "EXPIRED";
+export type SessionErrorCode = "NO_SESSION" | "EXPIRED" | "UNREADABLE";
+
+const SESSION_MESSAGES: Record<SessionErrorCode, string> = {
+  NO_SESSION: "Nenhuma sessão do Mercado Livre salva.",
+  EXPIRED: "A sessão do Mercado Livre expirou ou foi recusada.",
+  UNREADABLE: "Não foi possível ler a sessão salva.",
+};
 
 /** No usable session, or Mercado Livre answered with its login page (NFR-9). */
 export class SessionError extends Error {
@@ -14,11 +22,7 @@ export class SessionError extends Error {
     public readonly code: SessionErrorCode,
     detail?: string,
   ) {
-    const base =
-      code === "NO_SESSION"
-        ? "No Mercado Livre session found."
-        : "Mercado Livre session expired or rejected.";
-    super([base, detail, LOGIN_HINT].filter(Boolean).join(" "));
+    super([SESSION_MESSAGES[code], detail, LOGIN_HINT].filter(Boolean).join(" "));
     this.name = "SessionError";
   }
 }
@@ -39,8 +43,8 @@ export class RateLimitError extends UpstreamError {
   constructor(status: number, attempts: number) {
     super(
       status,
-      `Mercado Livre refused the request with HTTP ${status} after ${attempts} ` +
-        "attempts (rate limited or blocked). Wait a few minutes before retrying.",
+      `O Mercado Livre recusou a requisição com HTTP ${status} depois de ${attempts} ` +
+        "tentativas (rate limit ou bloqueio). Espere alguns minutos antes de tentar de novo.",
     );
     this.name = "RateLimitError";
   }
@@ -49,7 +53,15 @@ export class RateLimitError extends UpstreamError {
 /** The page or payload does not have the shape we know (layout changed?). */
 export class ParseError extends Error {
   constructor(message: string) {
-    super(message);
+    super(`${message} Rode \`mercadolivre doctor\` para ver qual camada quebrou.`);
     this.name = "ParseError";
+  }
+}
+
+/** The interactive login or the browser import did not complete. */
+export class LoginError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "LoginError";
   }
 }

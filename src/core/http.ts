@@ -2,7 +2,7 @@ import {
   assertAuthenticated,
   type ResponseKind,
   type SessionStore,
-} from "../auth/session.js";
+} from "../session/store.js";
 import { RateLimitError, SessionError, UpstreamError } from "./errors.js";
 import type { Logger } from "./logger.js";
 
@@ -17,7 +17,7 @@ import type { Logger } from "./logger.js";
 // Temporal collaborators (now/sleep/random) and fetch itself are injectable
 // for deterministic tests with a fake clock.
 
-/** Subset of `Response` we rely on — keeps the fakes small. */
+/** Subset of `Response` we rely on; keeps the fakes small. */
 export type FetchResponse = {
   status: number;
   headers: { get(name: string): string | null; getSetCookie(): string[] };
@@ -68,8 +68,6 @@ export const DEFAULT_USER_AGENT =
 const MAX_ATTEMPTS = 3;
 const BACKOFF_MS = [2000, 8000];
 const MAX_REDIRECTS = 5;
-const JITTER_MIN_MS = 200;
-const JITTER_RANGE_MS = 400;
 const LOGIN_PATH = /\/jms\/[a-z]{3}\/lgz\/login/;
 
 const realSleep = (ms: number): Promise<void> =>
@@ -123,7 +121,8 @@ export function createMeliHttp(
   opts: {
     session: SessionStore;
     userAgent?: string;
-    requestIntervalMs: number;
+    minIntervalMs: number;
+    jitterMs: number;
     timeoutMs: number;
     log: Logger;
   },
@@ -143,9 +142,9 @@ export function createMeliHttp(
 
   function schedule<T>(task: () => Promise<T>): Promise<T> {
     const run = chain.then(async () => {
-      if (opts.requestIntervalMs > 0 && lastStartedAt !== undefined) {
-        const jitter = JITTER_MIN_MS + Math.floor(random() * JITTER_RANGE_MS);
-        const wait = lastStartedAt + opts.requestIntervalMs + jitter - now();
+      if (opts.minIntervalMs > 0 && lastStartedAt !== undefined) {
+        const jitter = Math.floor(random() * opts.jitterMs);
+        const wait = lastStartedAt + opts.minIntervalMs + jitter - now();
         if (wait > 0) await sleep(wait);
       }
       lastStartedAt = now();
@@ -179,11 +178,11 @@ export function createMeliHttp(
     } catch (error) {
       const reason =
         error instanceof Error && error.name === "TimeoutError"
-          ? `timed out after ${opts.timeoutMs}ms`
+          ? `estourou o tempo limite de ${opts.timeoutMs}ms`
           : error instanceof Error
             ? error.message
             : String(error);
-      throw new UpstreamError(0, `Request to ${pathOf(url)} failed: ${reason}`);
+      throw new UpstreamError(0, `A requisição a ${pathOf(url)} falhou: ${reason}`);
     }
     opts.session.applySetCookies(host, response.headers.getSetCookie());
     opts.log.debug(
@@ -207,11 +206,11 @@ export function createMeliHttp(
       if (!redirected) return { response, url };
       const next = new URL(location, url).toString();
       if (LOGIN_PATH.test(next)) {
-        throw new SessionError("EXPIRED", "Redirected to the login page.");
+        throw new SessionError("EXPIRED", "Redirecionado para a página de login.");
       }
       url = next;
     }
-    throw new UpstreamError(0, `Too many redirects starting at ${pathOf(startUrl)}`);
+    throw new UpstreamError(0, `Redirecionamentos demais a partir de ${pathOf(startUrl)}`);
   }
 
   async function readBody(
@@ -241,7 +240,7 @@ export function createMeliHttp(
         if (attempt < MAX_ATTEMPTS) {
           const backoff = BACKOFF_MS[attempt - 1] ?? 0;
           opts.log.warn(
-            `HTTP ${response.status} from ${pathOf(url)}; retrying in ${backoff}ms`,
+            `HTTP ${response.status} de ${pathOf(url)}; nova tentativa em ${backoff}ms`,
           );
           await sleep(backoff);
           continue;
@@ -249,7 +248,7 @@ export function createMeliHttp(
         if (response.status >= 500) {
           throw new UpstreamError(
             response.status,
-            `Mercado Livre answered HTTP ${response.status} for ${pathOf(url)} after ${attempt} attempts`,
+            `O Mercado Livre respondeu HTTP ${response.status} para ${pathOf(url)} depois de ${attempt} tentativas`,
           );
         }
         throw new RateLimitError(response.status, attempt);
@@ -257,7 +256,7 @@ export function createMeliHttp(
       if (response.status >= 400) {
         throw new UpstreamError(
           response.status,
-          `Mercado Livre answered HTTP ${response.status} for ${pathOf(url)}`,
+          `O Mercado Livre respondeu HTTP ${response.status} para ${pathOf(url)}`,
         );
       }
       return readBody(response, url, kind);

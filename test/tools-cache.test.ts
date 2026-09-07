@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import type { Ctx } from "../src/context.js";
-import type { PurchasesApi } from "../src/meli/api/purchases.js";
-import type { DetailPage, ListPage, PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase } from "../src/store/db.js";
-import { createStore, type Store } from "../src/store/repo.js";
+import type { PurchasesApi } from "../src/mercadolivre/api/purchases.js";
+import type { DetailPage, ListPage, PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase } from "../src/cache/db.js";
+import { createStore, type Store } from "../src/cache/repo.js";
 import { runTool } from "../src/tools/define.js";
 import { listProducts, productHistory } from "../src/tools/products.js";
 import { listPurchases, searchPurchases } from "../src/tools/purchases.js";
@@ -198,6 +198,6 @@ describe("product_history", () => {
 
     const byId = (await runTool(productHistory, { itemId: "MLB2" }, ctx)) as { timesBought: number };
     expect(byId.timesBought).toBe(1);
-    await expect(runTool(productHistory, {}, ctx)).rejects.toThrow(/itemId or titleContains/);
+    await expect(runTool(productHistory, {}, ctx)).rejects.toThrow(/itemId ou titleContains/);
   });
 });

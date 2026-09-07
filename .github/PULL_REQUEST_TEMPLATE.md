@@ -1,14 +1,14 @@
 ## O que muda
 
-<!-- Descreva a mudança e o porquê. Referencie issues (#123) se houver. -->
+<!-- A mudança e o porquê. Referencie issues (#123) se houver. -->
 
 ## Checklist
 
-- [ ] `bun test` verde e `bunx tsc --noEmit` limpo
+- [ ] `bun run verify` verde (typecheck + testes + invariantes do servidor MCP)
 - [ ] Teste escrito antes da implementação (falhou, depois passou)
-- [ ] Documentação atualizada quando o comportamento muda
-      (`README`, `docs/`, `SKILL.md`; `bun run scripts/gen-tools-doc.ts` se mudou tool)
 - [ ] `PARSER_VERSION` incrementado se um parser mudou
+- [ ] `bun run docs:tools` rodado se uma tool mudou
+- [ ] Documentação atualizada quando o comportamento muda (`README`, `docs/`, `SKILL.md`)
 - [ ] Commits em [Conventional Commits](https://www.conventionalcommits.org)
-      (sem escopo, uma linha, inglês, ≤ 72 chars)
+      (inglês, sem escopo, uma linha, até 72 caracteres)
 - [ ] Nenhum dado pessoal em fixtures, logs ou exemplos

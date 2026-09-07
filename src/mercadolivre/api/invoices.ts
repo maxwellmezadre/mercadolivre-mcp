@@ -43,7 +43,7 @@ export function createInvoicesApi(ctx: { http: MeliHttp }): InvoicesApi {
     if (!MAGIC[format].test(head)) {
       throw new UpstreamError(
         result.status,
-        `Invoice download for order ${orderId} did not return a ${format.toUpperCase()} file`,
+        `O download da NF-e do pedido ${orderId} não devolveu um arquivo ${format.toUpperCase()}`,
       );
     }
     return { bytes, contentType: result.contentType };

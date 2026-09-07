@@ -1,126 +1,95 @@
-# Uso
+# Do zero à primeira resposta
 
-## Setup (uma vez)
+## 1. Instalar
 
 ```sh
+git clone https://github.com/maxwellmezadre/mercadolivre-mcp.git
+cd mercadolivre-mcp
 bun install
-bun run src/bin.ts login          # abre o navegador padrão (Chromium-based); sessão em ~/.config/mercadolivre-mcp
-bun run src/bin.ts status --verify
-bun run src/bin.ts sync --full    # carga inicial: ~3 min para ~70 compras
+bun run setup
 ```
 
-Com `bun link` (ou o pacote npm) os exemplos abaixo usam `mercadolivre` direto.
+Binário em `~/.local/bin/mercadolivre`, servidor MCP registrado no Claude Code e
+Skill em `~/.claude/skills/mercadolivre-mcp/`. Ou `npm i -g
+@maxwellmezadre/mercadolivre-mcp`, com o Bun instalado.
 
-## Cache e site
-
-Por padrão as tools leem o cache SQLite (`~/.config/mercadolivre-mcp/cache.sqlite`).
-O site só é consultado:
-
-- por `sync` (incremental por padrão: página 1 até uma página já conhecida, detalhes
-  das compras novas e das que ainda não chegaram);
-- por `list_purchases` com `fromCache=false` (`--live`), `search_purchases` com
-  `scope=live` (`--live`) e `get_purchase` (sempre busca o detalhe no site);
-- enquanto o cache está vazio (`list_purchases` avisa com `note`).
-
-Rode `mercadolivre sync` de vez em quando (ou peça ao agente). O status de entrega e
-a NF-e de compras recentes mudam com o tempo; compras entregues ou canceladas nunca
-são refeitas.
-
-## Receitas
-
-**Quanto gastei por mês este ano?**
+## 2. Entrar na conta
 
 ```sh
-mercadolivre spending --date Y --json
+mercadolivre login                        # abre o navegador padrão
+mercadolivre login --from-browser chrome  # ou importa de um navegador já logado (macOS)
+mercadolivre status --verify
 ```
 
-**Quanto gastei em uma categoria?**
-
-```sh
-mercadolivre categories
-mercadolivre spending --group-by category --date 1Y
+```
+loggedIn: true
+verified: true
+source: file
+nickname: SEUNICK
+cookieCount: 19
+soonestExpiry: 2026-10-01T12:00:00.000Z
 ```
 
-**Recompras e evolução de preço de um produto**
+## 3. Baixar o histórico
 
 ```sh
+mercadolivre sync --full
+```
+
+Cerca de 3 minutos para 70 compras: uma requisição por página da lista, uma por
+compra (o detalhe), o overview das NF-e em lotes e, se houver, uma por
+categoria. O progresso sai no stderr. Depois disso, `mercadolivre sync`
+incremental para na primeira página sem novidade.
+
+## 4. Perguntar
+
+```sh
+mercadolivre purchases --date 3M
+mercadolivre spending --by month --date Y
+mercadolivre spending --by category --date 1Y     # se o site oferecer o filtro
 mercadolivre product-history --title "café torrado"
-mercadolivre product-history --item MLB2086446083
-```
-
-**Parcelas ainda em aberto (estimativa)**
-
-```sh
-mercadolivre installments
-```
-
-A ferramenta não vê o cronograma real: assume cobranças mensais a partir da data do
-pagamento. Confira na fatura do cartão.
-
-**Todas as NF-e de um período para a contabilidade**
-
-```sh
+mercadolivre products --seller "gallo"
+mercadolivre installments                          # estimativa, confira na fatura
 mercadolivre export-invoices --date 1Y --format both
+mercadolivre export --format csv --scope products
 ```
 
-Os arquivos vão para `MERCADOLIVRE_DOWNLOAD_DIR` (default `~/Downloads/mercadolivre-nfe`),
-como `nfe-<orderId>.pdf` e `.xml`. Uma nota por pedido (= por produto).
+Os arquivos de `export` e das NF-e vão para `MERCADOLIVRE_EXPORT_DIR`
+(default `~/Downloads/mercadolivre-export`), as notas como `nfe-<orderId>.pdf`
+e `.xml`, uma por pedido.
 
-**Detalhe de uma compra**
+Detalhe de uma compra:
 
 ```sh
 mercadolivre purchases --search "garrafa"          # pega purchaseId e detailRef
 mercadolivre purchase 2000000000000001 --pack 2000000000000001 --order 2000000000000001
 ```
 
-Sem `--pack/--order`, a ferramenta procura o par no cache e, se preciso, varre a lista
-(uma requisição por página).
+Sem `--pack/--order`, a ferramenta procura o par no cache e, se preciso, varre
+a lista, uma requisição por página.
 
-## Claude Code
+## 5. Pelo Claude
 
-A partir do checkout, `bun run setup` instala o pacote global, registra o servidor no
-escopo de usuário e copia a Skill para `~/.claude/skills/mercadolivre-mcp/`. À mão:
+Reinicie o Claude Code e pergunte em português:
 
-```sh
-claude mcp add -s user mercadolivre -- mercadolivre mcp
-```
+- "quanto gastei no Mercado Livre este ano?"
+- "quantas vezes comprei esse café e a que preço?"
+- "quais compras eu parcelei e quanto ainda falta?"
+- "me manda as notas fiscais de 2025"
 
-Ou, a partir do checkout:
+O Claude usa `auth_status`, depois `sync` se o cache estiver vazio, depois a
+tool certa. A Skill já ensina as regras que evitam resposta errada, sobretudo
+que compra não é pedido e que parcelas são estimativa. No Claude Desktop, faça
+a carga inicial pelo terminal: o timeout de tools lá é curto.
 
-```sh
-claude mcp add -s user mercadolivre -- bun run /caminho/para/mercadolivre-mcp/src/bin.ts mcp
-```
-
-Em uma sessão nova: "rode auth_status", "faça um sync", "quanto gastei em agosto?".
-O `sync --full` cabe no timeout do Claude Code (30 min para stdio), mas é mais
-confortável no terminal.
-
-## Claude Desktop
-
-`claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "mercadolivre": {
-      "command": "/caminho/para/mercadolivre",
-      "args": ["mcp"],
-      "env": { "MERCADOLIVRE_HOME": "/Users/voce/.config/mercadolivre-mcp" }
-    }
-  }
-}
-```
-
-O Claude Desktop tem timeout curto para tools: faça a carga inicial pelo terminal
-(`mercadolivre sync --full`) e deixe o agente com os `sync` incrementais.
-
-## Sem navegador
+## Manutenção
 
 ```sh
-export MERCADOLIVRE_COOKIE="$(pbpaste)"   # header Cookie copiado do DevTools
-mercadolivre status --verify
+mercadolivre sync              # incremental
+mercadolivre sync --full       # percorre todo o histórico de novo
+mercadolivre sync --reparse    # reprocessa o cache sem rede, depois de atualizar
+mercadolivre doctor            # quando algo falhar de um jeito estranho
 ```
 
-Como copiar: DevTools → Network → qualquer requisição para `myaccount.mercadolivre.com.br`
-→ Request Headers → `Cookie` → Copy value. Os cookies HTTP-only só aparecem aí, nunca em
-`document.cookie`.
+O status de entrega e a NF-e de compras recentes mudam com o tempo; compras
+entregues ou canceladas nunca são refeitas.

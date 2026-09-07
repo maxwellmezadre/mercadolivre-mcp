@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { mergeProducts, normalizeTitle } from "../src/meli/merge.js";
-import type { DetailProduct, PurchaseListItem } from "../src/meli/types.js";
+import { mergeProducts, normalizeTitle } from "../src/mercadolivre/merge.js";
+import type { DetailProduct, PurchaseListItem } from "../src/mercadolivre/types.js";
 
 // The list is the complete inventory (one item per order); the detail rows
 // carry the prices for a subset. Matching precedence: unique item id, item id

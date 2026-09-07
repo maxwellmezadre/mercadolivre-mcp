@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { groupPurchases, parseListPage } from "../src/meli/parser/list.js";
-import type { Brick } from "../src/meli/types.js";
+import { groupPurchases, parseListPage } from "../src/mercadolivre/parser/list.js";
+import type { Brick } from "../src/mercadolivre/types.js";
 
 // Synthetic list page shaped exactly like spec §6.2 / appendix A.1-A.2. The
 // real anonymized capture (test/fixtures/list-p1.html) exercises the same

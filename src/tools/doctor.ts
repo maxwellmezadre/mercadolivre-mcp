@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { LOGIN_HINT, SessionError } from "../core/errors.js";
-import type { PurchaseListItem } from "../meli/types.js";
+import type { PurchaseListItem } from "../mercadolivre/types.js";
 import { compactObject, defineTool } from "./define.js";
 
 // F-15: the rediscovery checklist (spec appendix B.5). Each check is
@@ -17,9 +17,9 @@ const message = (error: unknown): string =>
 export const doctor = defineTool({
   name: "doctor",
   description:
-    "Diagnoses the setup end to end: session, purchases list page, JSON list endpoint, purchase detail page, " +
-    "money identity, invoices overview and the local cache. Names the endpoint that broke when Mercado Livre " +
-    "changes something; run it before reporting a problem. Costs up to four requests.",
+    "Diagnostica a instalação de ponta a ponta: sessão, página da lista de compras, endpoint JSON da lista, " +
+    "página de detalhe, identidade financeira, overview das NF-e e cache local. Diz qual camada quebrou quando o " +
+    "Mercado Livre muda alguma coisa; rode antes de reportar um problema. Gasta até 4 requisições.",
   readOnly: true,
   input: Type.Object({}),
   run: async (_args, ctx) => {
@@ -27,14 +27,19 @@ export const doctor = defineTool({
     const push = (name: string, ok: boolean, detail: string) => checks.push({ name, ok, detail });
     const has = (name: string) => checks.some((check) => check.name === name);
 
-    let sessionOk = ctx.session.hasSession();
-    push(
-      "session",
-      sessionOk,
-      sessionOk
-        ? `${ctx.session.source()} session with ${ctx.session.cookies().length} cookie(s)`
-        : "no session configured",
-    );
+    let sessionOk = false;
+    try {
+      sessionOk = ctx.session.hasSession();
+      push(
+        "session",
+        sessionOk,
+        sessionOk
+          ? `sessão de ${ctx.session.source() === "env" ? "MERCADOLIVRE_COOKIE" : "arquivo"} com ${ctx.session.cookies().length} cookie(s)`
+          : "nenhuma sessão configurada",
+      );
+    } catch (error) {
+      push("session", false, message(error));
+    }
 
     let first: PurchaseListItem | undefined;
     if (sessionOk) {
@@ -44,7 +49,7 @@ export const doctor = defineTool({
         push(
           "list_page",
           page.totalPages > 0 && page.items.length > 0,
-          `${page.totalPages} pages, ${page.items.length} items on page 1, ${page.categories.length} categories`,
+          `${page.totalPages} páginas, ${page.items.length} itens na página 1, ${page.categories.length} categorias`,
         );
       } catch (error) {
         if (error instanceof SessionError) {
@@ -59,7 +64,7 @@ export const doctor = defineTool({
     if (sessionOk) {
       try {
         const page = await ctx.meli.purchases.listFiltered({ dateFilter: "3M" });
-        push("json_endpoint", true, `${page.items.length} items for the last 3 months`);
+        push("json_endpoint", true, `${page.items.length} itens nos últimos 3 meses`);
       } catch (error) {
         push("json_endpoint", false, message(error));
       }
@@ -77,21 +82,21 @@ export const doctor = defineTool({
             "detail_page",
             hasTotal && hasRows,
             hasTotal && hasRows
-              ? `purchase ${first.purchaseId}: ticket total present, ${detail.products.length} product row(s)`
-              : `purchase ${first.purchaseId}: ${hasTotal ? "no product rows" : "no ticket total"}`,
+              ? `compra ${first.purchaseId}: total do ticket presente, ${detail.products.length} linha(s) de produto`
+              : `compra ${first.purchaseId}: ${hasTotal ? "sem linhas de produto" : "sem total do ticket"}`,
           );
           push(
             "money_identity",
             detail.warnings.length === 0,
-            detail.warnings.length === 0 ? "breakdown adds up" : detail.warnings.join("; "),
+            detail.warnings.length === 0 ? "o breakdown fecha" : detail.warnings.join("; "),
           );
         } catch (error) {
           push("detail_page", false, message(error));
-          push("money_identity", false, "skipped: the detail page failed");
+          push("money_identity", false, "pulado: a página de detalhe falhou");
         }
         try {
           const invoices = await ctx.meli.invoices.overview([first.orderId]);
-          push("invoices_overview", true, `${invoices.length} invoice(s) for order ${first.orderId}`);
+          push("invoices_overview", true, `${invoices.length} nota(s) para o pedido ${first.orderId}`);
         } catch (error) {
           push("invoices_overview", false, message(error));
         }
@@ -99,7 +104,7 @@ export const doctor = defineTool({
     }
 
     for (const name of NETWORK_CHECKS) {
-      if (!has(name)) push(name, false, sessionOk ? "skipped: no purchase on page 1" : "skipped: no valid session");
+      if (!has(name)) push(name, false, sessionOk ? "pulado: nenhuma compra na página 1" : "pulado: sem sessão válida");
     }
 
     try {
@@ -108,8 +113,8 @@ export const doctor = defineTool({
       push(
         "cache",
         true,
-        `${counts.purchases} purchases, ${counts.products} products, ${counts.invoices} invoices; ` +
-          `last sync ${store.getState("last_sync_at") ?? "never"}`,
+        `${counts.purchases} compras, ${counts.products} produtos, ${counts.invoices} notas; ` +
+          `último sync ${store.getState("last_sync_at") ?? "nunca"}`,
       );
     } catch (error) {
       push("cache", false, message(error));

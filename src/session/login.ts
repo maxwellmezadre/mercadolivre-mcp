@@ -1,17 +1,18 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import type { Config } from "../config.js";
+import { LoginError } from "../core/errors.js";
 import { LIST_PAGE_URL } from "../core/http.js";
 import type { Logger } from "../core/logger.js";
 import { INSTALL_HINT, resolveLoginBrowser, type Browser } from "./browser.js";
-import type { SessionCookie, SessionStore } from "./session.js";
+import type { SessionCookie, SessionStore } from "./store.js";
 
 // Interactive login (F-2, spec §3.3): the user's default browser (Chromium
-// based — see browser.ts) is opened headed, with its own persistent profile,
+// based, see browser.ts) is opened headed, with its own persistent profile,
 // on the purchases page; the user authenticates by hand (password, 2FA,
-// captcha — nothing is automated and the tool never sees the credentials).
+// captcha: nothing is automated and the tool never sees the credentials).
 // Once the purchases list renders, the browser's storage state becomes our
 // session. Playwright is loaded lazily so the MCP server and the rest of the
-// CLI never depend on it.
+// CLI never pay for it.
 
 export type PageLike = {
   goto(url: string, options?: { waitUntil?: string; timeout?: number }): Promise<unknown>;
@@ -41,6 +42,11 @@ export type LoginDeps = {
   resolveBrowser?: (override: string | undefined) => { browser: Browser; warnings: string[] };
 };
 
+export type LoginOptions = {
+  /** Wipe the persistent browser profile first (start from a clean browser). */
+  fresh?: boolean;
+};
+
 export type LoginResult = {
   browser: string;
   cookieCount: number;
@@ -49,13 +55,12 @@ export type LoginResult = {
 };
 
 const LIST_ITEM_SELECTOR = "[id^=list_item_]";
-const LOGIN_TIMEOUT_MS = 5 * 60_000;
+export const LOGIN_TIMEOUT_MS = 5 * 60_000;
 
 export const PLAYWRIGHT_HINT =
-  "playwright-core is needed only for `login`. Run the login from the npm package " +
-  "(`bunx @maxwellmezadre/mercadolivre-mcp login`) or from a checkout (`bun run src/bin.ts login`), " +
-  "or skip the browser entirely: set MERCADOLIVRE_COOKIE with the Cookie header copied from your " +
-  "browser's DevTools (see docs/CONFIGURATION.md).";
+  "O `login` precisa do playwright-core, que vem com o pacote e com o binário. " +
+  "Se ele não carregar, reinstale (`bun install`) ou use `mercadolivre login --from-browser chrome` " +
+  "(importa a sessão de um navegador já logado, sem abrir janela) ou MERCADOLIVRE_COOKIE.";
 
 async function defaultImport(): Promise<PlaywrightLike> {
   return (await import("playwright-core")) as unknown as PlaywrightLike;
@@ -71,6 +76,7 @@ const LAUNCH_OPTIONS = {
 
 export async function interactiveLogin(
   ctx: { config: Config; session: SessionStore; log: Logger },
+  options: LoginOptions = {},
   deps: LoginDeps = {},
 ): Promise<LoginResult> {
   let playwright: PlaywrightLike;
@@ -78,31 +84,34 @@ export async function interactiveLogin(
     playwright = await (deps.importPlaywright ?? defaultImport)();
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
-    throw new Error(`Could not load playwright-core (${reason}). ${PLAYWRIGHT_HINT}`);
+    throw new LoginError(`Não consegui carregar o playwright-core (${reason}). ${PLAYWRIGHT_HINT}`);
   }
 
   const resolve = deps.resolveBrowser ?? ((override) => resolveLoginBrowser({ override }));
   const { browser, warnings } = resolve(ctx.config.loginBrowser);
   for (const warning of warnings) ctx.log.warn(warning);
 
-  mkdirSync(ctx.config.profileDir, { recursive: true, mode: 0o700 });
-  ctx.log.info(`Opening ${browser.name} for the Mercado Livre login...`);
+  if (options.fresh) rmSync(ctx.config.browserProfileDir, { recursive: true, force: true });
+  mkdirSync(ctx.config.browserProfileDir, { recursive: true, mode: 0o700 });
+  ctx.log.info(`Abrindo ${browser.name} para o login no Mercado Livre...`);
   let context: BrowserContextLike;
   try {
-    context = await playwright.chromium.launchPersistentContext(ctx.config.profileDir, {
+    context = await playwright.chromium.launchPersistentContext(ctx.config.browserProfileDir, {
       ...LAUNCH_OPTIONS,
       executablePath: browser.executablePath,
     });
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
-    throw new Error(`Could not start ${browser.name} (${browser.executablePath}): ${reason}. ${INSTALL_HINT}`);
+    throw new LoginError(
+      `Não consegui abrir ${browser.name} (${browser.executablePath}): ${reason}. ${INSTALL_HINT}`,
+    );
   }
 
   try {
     const page = await context.newPage();
     await page.goto(LIST_PAGE_URL, { waitUntil: "domcontentloaded" });
     ctx.log.info(
-      "Log in to Mercado Livre in the browser window. Waiting for the purchases list to render (up to 5 minutes)...",
+      "Entre na sua conta na janela do navegador. Aguardando a lista de compras carregar (até 5 minutos)...",
     );
     await page.waitForSelector(LIST_ITEM_SELECTOR, { timeout: LOGIN_TIMEOUT_MS });
     const userAgent = await page.evaluate<string>("navigator.userAgent");

@@ -1,9 +1,8 @@
 import { Command } from "commander";
-import { interactiveLogin } from "../auth/login.js";
 import { loadConfig } from "../config.js";
 import { createContext } from "../context.js";
 import { compactObject, runTool } from "../tools/define.js";
-import { toolByName } from "../tools/registry.js";
+import { activeTools, toolByName } from "../tools/registry.js";
 
 // Commander program (F-17). Every command maps onto a registry tool and calls
 // `runTool`, so CLI and MCP share validation and behaviour (AR-1). stdout
@@ -27,9 +26,16 @@ async function invoke(
   json: boolean,
 ): Promise<void> {
   try {
-    const tool = toolByName(toolName);
-    if (!tool) throw new Error(`Tool not found: ${toolName}`);
-    const ctx = createContext(loadConfig());
+    const config = loadConfig();
+    const tool = activeTools(config).find((candidate) => candidate.name === toolName);
+    if (!tool) {
+      throw new Error(
+        toolByName(toolName)
+          ? `A tool ${toolName} não está disponível com MERCADOLIVRE_READ_ONLY=1.`
+          : `Tool desconhecida: ${toolName}`,
+      );
+    }
+    const ctx = createContext(config);
     const result = await runTool(tool, compactObject(args), ctx);
     // Await the write: a large result piped to a slow reader is truncated when
     // the process exits before stdout drains.
@@ -48,40 +54,72 @@ function toNumber(value: string | undefined): number | undefined {
   return value === undefined ? undefined : Number(value);
 }
 
+const PERIOD = "ALL, 30D, 3M, 6M, Y, 1Y..4Y";
+
 export async function runCli(argv: string[], version: string): Promise<void> {
   const program = new Command();
   program
     .name("mercadolivre")
-    .description("Mercado Livre purchase history — CLI and MCP server")
+    .description("Histórico de compras do Mercado Livre: CLI e servidor MCP")
     .version(version);
 
   // Every command accepts --json for structured output.
   const command = (signature: string) =>
-    program.command(signature).option("--json", "structured JSON output");
+    program.command(signature).option("--json", "saída em JSON");
 
   command("status")
-    .description("Show whether a Mercado Livre session is configured")
-    .option("--verify", "also request the purchases page to confirm the session")
+    .description("Mostra a sessão salva (origem, apelido, validade dos cookies)")
+    .option("--verify", "gasta 1 requisição para confirmar que o site aceita a sessão")
     .action((options) =>
       invoke("auth_status", { verify: options.verify ?? false }, options.json ?? false),
     );
 
+  command("login")
+    .description("Abre o navegador para você entrar na conta e salva a sessão cifrada")
+    .option("--fresh", "apaga o perfil do navegador de automação antes")
+    .option("--from-browser <navegador>", "importa a sessão de um navegador já logado (macOS): arc|chrome|chromium|brave|edge")
+    .action((options) =>
+      invoke("login", { fresh: options.fresh, from_browser: options.fromBrowser }, options.json ?? false),
+    );
+
   command("doctor")
-    .description("Check the session and every Mercado Livre endpoint this tool depends on")
+    .description("Diagnóstico camada a camada: sessão, cada endpoint do site e o cache")
     .action((options) => invoke("doctor", {}, options.json ?? false));
 
+  command("sync")
+    .description("Sincroniza o cache local (incremental por padrão; --full uma vez; --reparse sem rede)")
+    .option("--full", "percorre todas as páginas e categorias")
+    .option("--reparse", "reprocessa as páginas em cache, sem rede")
+    .option("--max-pages <n>", "teto de páginas da lista (default 10)")
+    .option("--no-details", "pula o detalhe das compras")
+    .option("--no-invoices", "pula o overview e o XML das NF-e")
+    .option("--no-categories", "pula a passada por categoria")
+    .action((options) =>
+      invoke(
+        "sync",
+        {
+          mode: options.reparse ? "reparse" : options.full ? "full" : "incremental",
+          maxPages: toNumber(options.maxPages),
+          withDetails: options.details,
+          withInvoices: options.invoices,
+          withCategories: options.categories,
+        },
+        options.json ?? false,
+      ),
+    );
+
   command("purchases")
-    .description("List purchases (grouped by purchase) with optional filters")
-    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
-    .option("--category <name>", "exact category name (see categories)")
-    .option("--search <text>", "free text search")
-    .option("--from <date>", "cache: purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "cache: purchase date <= YYYY-MM-DD")
-    .option("--limit <n>", "cache: maximum purchases (default 50)")
-    .option("--offset <n>", "cache: purchases to skip")
-    .option("--live", "read the site instead of the cache")
-    .option("--page <n>", "site: first page (default 1)")
-    .option("--max-pages <n>", "site: consecutive pages to read (default 1)")
+    .description("Lista as compras (agrupadas por compra) com filtros")
+    .option("--date <filtro>", PERIOD)
+    .option("--category <nome>", "nome exato da categoria (veja categories)")
+    .option("--search <texto>", "busca por texto")
+    .option("--from <data>", "cache: data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "cache: data da compra <= YYYY-MM-DD")
+    .option("--limit <n>", "cache: máximo de compras (default 50)")
+    .option("--offset <n>", "cache: compras a pular")
+    .option("--live", "lê o site em vez do cache")
+    .option("--page <n>", "site: primeira página (default 1)")
+    .option("--max-pages <n>", "site: páginas consecutivas a ler (default 1)")
     .action((options) =>
       invoke(
         "list_purchases",
@@ -102,11 +140,11 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("purchase <purchaseId>")
-    .description("Full detail of one purchase (money, installments, products, seller, invoice)")
-    .option("--pack <packId>", "pack id paired with --order")
-    .option("--order <orderId>", "order id paired with --pack")
-    .option("--no-invoice", "skip the NF-e metadata")
-    .option("--max-lookup-pages <n>", "pages to scan when --pack/--order are missing")
+    .description("Detalhe completo de uma compra (financeiro, parcelas, produtos, vendedor, NF-e)")
+    .option("--pack <packId>", "id do pacote, par de --order")
+    .option("--order <orderId>", "id do pedido, par de --pack")
+    .option("--no-invoice", "pula os metadados da NF-e")
+    .option("--max-lookup-pages <n>", "páginas a varrer quando --pack/--order não são informados")
     .action((purchaseId: string, options) =>
       invoke(
         "get_purchase",
@@ -121,10 +159,10 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       ),
     );
 
-  command("search <query>")
-    .description("Search the purchase history by product title, brand or variation")
-    .option("--live", "ask the site instead of the cache")
-    .option("--limit <n>", "cache: maximum products")
+  command("search <texto>")
+    .description("Busca no histórico por título, marca ou variação do produto")
+    .option("--live", "pergunta ao site em vez do cache")
+    .option("--limit <n>", "cache: máximo de produtos")
     .action((query: string, options) =>
       invoke(
         "search_purchases",
@@ -134,20 +172,20 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("categories")
-    .description("Category names and time windows accepted by the purchase filters")
+    .description("Categorias e janelas de tempo aceitas pelos filtros")
     .action((options) => invoke("list_categories", {}, options.json ?? false));
 
   command("products")
-    .description("Purchased products from the cache, with prices paid")
-    .option("--from <date>", "purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "purchase date <= YYYY-MM-DD")
-    .option("--seller <name>", "seller name (partial) or id")
-    .option("--min-paid <brl>", "minimum amount paid for the line")
-    .option("--max-paid <brl>", "maximum amount paid for the line")
-    .option("--title <text>", "text contained in the title")
-    .option("--sort <order>", "date_desc, date_asc, paid_desc or paid_asc")
-    .option("--limit <n>", "maximum rows (default 100)")
-    .option("--include-cancelled", "include cancelled purchases")
+    .description("Produtos comprados, do cache, com preço pago e unitário")
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
+    .option("--seller <nome>", "nome (parcial) ou id do vendedor")
+    .option("--min-paid <reais>", "valor mínimo pago na linha")
+    .option("--max-paid <reais>", "valor máximo pago na linha")
+    .option("--title <texto>", "texto contido no título")
+    .option("--sort <ordem>", "date_desc, date_asc, paid_desc ou paid_asc")
+    .option("--limit <n>", "máximo de linhas (default 100)")
+    .option("--include-cancelled", "inclui compras canceladas")
     .action((options) =>
       invoke(
         "list_products",
@@ -167,9 +205,9 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("product-history")
-    .description("Every purchase of one product and its unit price trend")
-    .option("--item <itemId>", "item id, e.g. MLB2086446083")
-    .option("--title <text>", "text contained in the title")
+    .description("Cada compra de um produto e a evolução do preço unitário")
+    .option("--item <itemId>", "id do item, por exemplo MLB2086446083")
+    .option("--title <texto>", "texto contido no título")
     .action((options) =>
       invoke(
         "product_history",
@@ -179,17 +217,17 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("spending")
-    .description("Spending summary from the cache, grouped by month, year, seller, category or none")
-    .option("--group-by <key>", "month (default), year, seller, category or none")
-    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
-    .option("--from <date>", "purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "purchase date <= YYYY-MM-DD")
-    .option("--include-cancelled", "include cancelled purchases")
+    .description("Resumo de gastos do cache, por mês, ano, vendedor, categoria ou sem agrupar")
+    .option("--by <chave>", "month (default), year, seller, category ou none")
+    .option("--date <filtro>", PERIOD)
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
+    .option("--include-cancelled", "inclui compras canceladas")
     .action((options) =>
       invoke(
         "spending_summary",
         {
-          groupBy: options.groupBy,
+          groupBy: options.by,
           dateFilter: options.date,
           from: options.from,
           to: options.to,
@@ -200,11 +238,11 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("installments")
-    .description("Purchases paid in installments, with an estimate of what is still open")
-    .option("--all", "every paid purchase, not only 2+ installments")
-    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
-    .option("--from <date>", "purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .description("Compras parceladas, com a estimativa do que ainda falta pagar")
+    .option("--all", "toda compra paga, não só as de 2 ou mais parcelas")
+    .option("--date <filtro>", PERIOD)
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
     .action((options) =>
       invoke(
         "list_installments",
@@ -214,10 +252,10 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("payment-methods")
-    .description("Payment methods used and how much went through each")
-    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
-    .option("--from <date>", "purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "purchase date <= YYYY-MM-DD")
+    .description("Meios de pagamento usados e quanto passou por cada um")
+    .option("--date <filtro>", PERIOD)
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
     .action((options) =>
       invoke(
         "list_payment_methods",
@@ -227,15 +265,15 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("invoice <orderId>")
-    .description("NF-e metadata and download links of one order")
+    .description("Metadados e links da NF-e de um pedido")
     .action((orderId: string, options) =>
       invoke("get_invoice", { orderId }, options.json ?? false),
     );
 
   command("download-invoice <orderId>")
-    .description("Download the NF-e of one order (pdf or xml) into the download directory")
-    .requiredOption("--format <format>", "pdf or xml")
-    .option("--name <fileName>", "file name inside the download directory")
+    .description("Baixa a NF-e de um pedido (pdf ou xml) para o diretório de exportação")
+    .requiredOption("--format <formato>", "pdf ou xml")
+    .option("--name <arquivo>", "nome do arquivo dentro do diretório de exportação")
     .action((orderId: string, options) =>
       invoke(
         "download_invoice",
@@ -245,13 +283,13 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   command("export-invoices")
-    .description("Download every cached NF-e of a period (pdf, xml or both)")
-    .option("--date <filter>", "ALL, 30D, 3M, 6M, Y, 1Y..4Y")
-    .option("--from <date>", "purchase date >= YYYY-MM-DD")
-    .option("--to <date>", "purchase date <= YYYY-MM-DD")
-    .option("--format <format>", "pdf, xml or both (default both)")
-    .option("--overwrite", "download again over existing files")
-    .option("--include-cancelled", "include cancelled purchases")
+    .description("Baixa todas as NF-e do período que estão no cache (pdf, xml ou os dois)")
+    .option("--date <filtro>", PERIOD)
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
+    .option("--format <formato>", "pdf, xml ou both (default both)")
+    .option("--overwrite", "baixa de novo por cima dos arquivos existentes")
+    .option("--include-cancelled", "inclui compras canceladas")
     .action((options) =>
       invoke(
         "export_invoices",
@@ -267,32 +305,35 @@ export async function runCli(argv: string[], version: string): Promise<void> {
       ),
     );
 
-  command("sync")
-    .description("Synchronize the local cache (incremental by default; --full once, --reparse offline)")
-    .option("--full", "walk every page and category")
-    .option("--reparse", "re-run the parsers on cached pages, no network")
-    .option("--max-pages <n>", "safety cap on list pages (default 10)")
-    .option("--no-details", "skip purchase details")
-    .option("--no-invoices", "skip NF-e overviews and xml")
-    .option("--no-categories", "skip the category pass")
+  command("export")
+    .description("Exporta o cache para JSON ou CSV, dentro de MERCADOLIVRE_EXPORT_DIR")
+    .option("--format <formato>", "json | csv", "csv")
+    .option("--scope <escopo>", "purchases | products", "purchases")
+    .option("--date <filtro>", PERIOD)
+    .option("--from <data>", "data da compra >= YYYY-MM-DD")
+    .option("--to <data>", "data da compra <= YYYY-MM-DD")
+    .option("--include-cancelled", "inclui compras canceladas")
+    .option("--filename <nome>", "nome do arquivo")
     .action((options) =>
       invoke(
-        "sync",
+        "export",
         {
-          mode: options.reparse ? "reparse" : options.full ? "full" : "incremental",
-          maxPages: toNumber(options.maxPages),
-          withDetails: options.details,
-          withInvoices: options.invoices,
-          withCategories: options.categories,
+          format: options.format,
+          scope: options.scope,
+          dateFilter: options.date,
+          from: options.from,
+          to: options.to,
+          includeCancelled: options.includeCancelled,
+          filename: options.filename,
         },
         options.json ?? false,
       ),
     );
 
   command("raw <url>")
-    .description("Authenticated GET on an allowed Mercado Livre host (rediscovery)")
-    .option("--as <mode>", "html, json or nordic", "html")
-    .option("--max-bytes <n>", "cap the returned body")
+    .description("GET autenticado num host permitido do Mercado Livre (redescoberta)")
+    .option("--as <modo>", "html, json ou nordic", "html")
+    .option("--max-bytes <n>", "limita o corpo devolvido")
     .action((url: string, options) =>
       invoke(
         "raw_get",
@@ -302,23 +343,8 @@ export async function runCli(argv: string[], version: string): Promise<void> {
     );
 
   program
-    .command("login")
-    .description(
-      "Open a browser window to log in; the session is saved locally (this tool never sees the password)",
-    )
-    .action(async () => {
-      try {
-        const result = await interactiveLogin(createContext(loadConfig()));
-        console.error(`Session saved to ${result.sessionFile} (${result.cookieCount} cookies).`);
-      } catch (error) {
-        console.error(error instanceof Error ? error.message : String(error));
-        process.exitCode = 1;
-      }
-    });
-
-  program
     .command("mcp")
-    .description("Start the MCP server (stdio)")
+    .description("Sobe o servidor MCP (stdio)")
     .action(async () => {
       const { startMcpServer } = await import("../mcp/server.js");
       await startMcpServer(createContext(loadConfig()), version);

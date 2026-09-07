@@ -4,9 +4,9 @@ import { join } from "node:path";
 import { loadConfig } from "../src/config.js";
 import { createContext } from "../src/context.js";
 import { DEFAULT_USER_AGENT, type MeliHttp } from "../src/core/http.js";
-import type { ResponseKind } from "../src/auth/session.js";
-import { collect } from "../src/meli/parser/bricks.js";
-import { extractNordicCtx, listRootBrick } from "../src/meli/parser/nordic.js";
+import type { ResponseKind } from "../src/session/store.js";
+import { collect } from "../src/mercadolivre/parser/bricks.js";
+import { extractNordicCtx, listRootBrick } from "../src/mercadolivre/parser/nordic.js";
 
 // Raw capture of the whole account into a private directory (gitignored).
 // The output is the golden corpus for test/local and the source of the

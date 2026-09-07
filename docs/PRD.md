@@ -1,4 +1,4 @@
-# PRD — mercadolivre-mcp
+# PRD: mercadolivre-mcp
 
 Documento de requisitos do produto. Os identificadores `F-n` (funcional),
 `NFR-n` (não funcional) e `AR-n` (princípio de arquitetura) são citados nos
@@ -59,7 +59,7 @@ fiscais (especialmente para PJ) exige clicar compra a compra.
 | ID | Requisito |
 |---|---|
 | F-1 | `auth_status`: diz se a sessão é válida, nickname, id do usuário e expiração mais próxima; instrui o re-login quando inválida |
-| F-2 | `login` (CLI): abre navegador headed; o usuário autentica; a sessão é salva com permissão 0600 |
+| F-2 | `login` (CLI e tool): abre o navegador padrão headed e o usuário autentica, ou importa a sessão de um navegador já logado (macOS); a sessão é salva cifrada com permissão 0600 |
 | F-3 | `list_purchases`: lista compras **agrupadas por `purchase_id`**, com filtros de período, categoria, busca e paginação; cache por padrão |
 | F-4 | `get_purchase`: detalhe completo de uma compra (financeiro, parcelas, entrega, vendedor, produtos, NF-e) |
 | F-5 | `search_purchases`: busca textual no cache (FTS) ou ao vivo |
@@ -75,6 +75,8 @@ fiscais (especialmente para PJ) exige clicar compra a compra.
 | F-15 | `doctor`: valida sessão e cada endpoint, dizendo qual quebrou |
 | F-16 | `raw_get`: GET autenticado em hosts permitidos, saída capada, para redescoberta |
 | F-17 | Todo tool tem um comando CLI equivalente com `--json` |
+| F-18 | `export`: o cache em JSON ou CSV (compras ou produtos), só dentro do diretório configurado |
+| F-19 | `MERCADOLIVRE_READ_ONLY=1` não registra as tools que escrevem em disco |
 
 ## 6. Requisitos não funcionais
 
@@ -84,12 +86,12 @@ fiscais (especialmente para PJ) exige clicar compra a compra.
 | NFR-2 | Rate limit serial: 1 requisição por vez, intervalo mínimo configurável, jitter, backoff em 403/429 |
 | NFR-3 | `stdout` é exclusivo do JSON-RPC; todo log vai para `stderr` |
 | NFR-4 | Cookies nunca aparecem em log, erro ou saída de tool |
-| NFR-5 | `session.json` e `cache.sqlite` têm permissão 0600 (contêm dados pessoais) |
+| NFR-5 | `session.enc` (cifrado com AES-256-GCM) e `cache.db` têm permissão 0600 (contêm dados pessoais) |
 | NFR-6 | Falha de validação ou de rede vira tool error (`isError`), nunca crash do processo |
 | NFR-7 | Parsers testados contra fixtures reais anonimizados versionados |
 | NFR-8 | Nenhum dado pessoal no repositório: ids, títulos, endereço, cartão e vendedor são reescritos deterministicamente |
 | NFR-9 | Sessão ausente ou expirada produz mensagem acionável (como fazer o login de novo) |
-| NFR-10 | Nenhum arquivo de lógica passa de ~400 linhas |
+| NFR-10 | Nenhum arquivo de lógica passa de cerca de 450 linhas |
 
 ## 7. Princípios de arquitetura
 
@@ -108,14 +110,14 @@ fiscais (especialmente para PJ) exige clicar compra a compra.
 
 ## 8. Riscos
 
-- A superfície é interna e pode mudar sem aviso → `doctor`, fixtures versionados e `docs/REDISCOVERY.md`.
-- Anti-bot pode rejeitar requisições fora do navegador → `fetch` injetável permite um adapter via navegador.
-- Sessão expira sem aviso → detecção por redirecionamento/HTML de login e mensagem de re-login.
+- A superfície é interna e pode mudar sem aviso: `doctor`, fixtures versionados e `docs/REDISCOVERY.md`.
+- Anti-bot pode rejeitar requisições fora do navegador: `fetch` injetável permite um adapter via navegador.
+- Sessão expira sem aviso: detecção por redirecionamento/HTML de login e mensagem de re-login.
 
-## Apêndice A — Variáveis de ambiente
+## Apêndice A: variáveis de ambiente
 
 Ver [CONFIGURATION.md](CONFIGURATION.md).
 
-## Apêndice B — Inventário de tools
+## Apêndice B: inventário de tools
 
 Ver [TOOLS.md](TOOLS.md) (gerado a partir do registry).

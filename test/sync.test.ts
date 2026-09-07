@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { UpstreamError } from "../src/core/errors.js";
 import { createLogger } from "../src/core/logger.js";
-import type { InvoicesApi } from "../src/meli/api/invoices.js";
-import type { ListFilters, PurchasesApi } from "../src/meli/api/purchases.js";
-import type { DetailPage, InvoiceOverview, InvoiceXml, ListPage, PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase } from "../src/store/db.js";
-import { createStore, type Store } from "../src/store/repo.js";
-import { PARSER_VERSION, runSync } from "../src/sync/sync.js";
+import type { InvoicesApi } from "../src/mercadolivre/api/invoices.js";
+import type { ListFilters, PurchasesApi } from "../src/mercadolivre/api/purchases.js";
+import type { DetailPage, InvoiceOverview, InvoiceXml, ListPage, PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase } from "../src/cache/db.js";
+import { createStore, type Store } from "../src/cache/repo.js";
+import { PARSER_VERSION, runSync } from "../src/cache/sync.js";
 
 // Sync against a fake site: pagination, one detail per purchase, invoice
 // batches, NF-e fill for priced-less products, the categories pass, the

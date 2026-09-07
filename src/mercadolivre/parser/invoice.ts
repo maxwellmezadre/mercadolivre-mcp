@@ -21,10 +21,10 @@ export function parseInvoiceOverview(body: string): InvoiceOverview[] {
   try {
     envelope = JSON.parse(body);
   } catch {
-    throw new ParseError("invoices-overview did not return JSON");
+    throw new ParseError("invoices-overview não devolveu JSON.");
   }
   if (!Array.isArray(envelope.invoices)) {
-    throw new ParseError("invoices-overview envelope changed: no invoices array");
+    throw new ParseError("O envelope de invoices-overview mudou: sem o array invoices.");
   }
   return (envelope.invoices as RawInvoice[]).flatMap((invoice) => {
     const urls = (invoice.actions ?? [])
@@ -77,7 +77,7 @@ function toCents(value: string | undefined): number {
 
 export function parseInvoiceXml(xml: string): InvoiceXml {
   if (!/<(?:\w+:)?(?:nfeProc|NFe)\b/.test(xml)) {
-    throw new ParseError("Body is not an NF-e XML (nfeProc/NFe root not found)");
+    throw new ParseError("O corpo não é um XML de NF-e (raiz nfeProc/NFe não encontrada).");
   }
   const items: InvoiceXmlItem[] = [
     ...xml.matchAll(/<(?:\w+:)?det\b[^>]*>([\s\S]*?)<\/(?:\w+:)?det>/g),

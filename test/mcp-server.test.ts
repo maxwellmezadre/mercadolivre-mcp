@@ -12,10 +12,10 @@ afterAll(() => rmSync(home, { recursive: true, force: true }));
 
 type Rpc = { id?: number; result?: Record<string, unknown>; error?: unknown };
 
-async function talk(messages: object[]): Promise<{ replies: Rpc[]; stdout: string }> {
+async function talk(messages: object[], env: Record<string, string> = {}): Promise<{ replies: Rpc[]; stdout: string }> {
   const proc = Bun.spawn(["bun", "run", "src/bin.ts", "mcp"], {
     cwd: new URL("..", import.meta.url).pathname,
-    env: { ...process.env, MERCADOLIVRE_HOME: home },
+    env: { ...process.env, MERCADOLIVRE_CONFIG_DIR: home, ...env },
     stdin: "pipe",
     stdout: "pipe",
     stderr: "pipe",
@@ -46,8 +46,23 @@ test("mcp handshake lists the tools and calls auth_status without a session", as
 
   const status = replies.find((reply) => reply.id === 3)?.result as { isError?: boolean; content: Array<{ text: string }> };
   expect(status.isError).toBeUndefined();
-  expect(JSON.parse(status.content[0]!.text).authenticated).toBe(false);
+  expect(JSON.parse(status.content[0]!.text).loggedIn).toBe(false);
 
   const unknown = replies.find((reply) => reply.id === 4)?.result as { isError: boolean };
   expect(unknown.isError).toBe(true);
+}, 20_000);
+
+test("MERCADOLIVRE_READ_ONLY=1 registers exactly the read-only subset", async () => {
+  const { replies } = await talk(
+    [
+      { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "test", version: "0" } } },
+      { jsonrpc: "2.0", method: "notifications/initialized" },
+      { jsonrpc: "2.0", id: 2, method: "tools/list" },
+    ],
+    { MERCADOLIVRE_READ_ONLY: "1" },
+  );
+
+  const list = replies.find((reply) => reply.id === 2)?.result as { tools: Array<{ name: string }> };
+  expect(list.tools.map((tool) => tool.name)).toEqual(allTools.filter((tool) => tool.readOnly).map((tool) => tool.name));
+  expect(list.tools.map((tool) => tool.name)).not.toContain("sync");
 }, 20_000);

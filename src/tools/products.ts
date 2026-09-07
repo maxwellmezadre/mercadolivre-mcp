@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import { centsToNumber } from "../meli/parser/rich.js";
-import type { ProductSort, ProductWithPurchase } from "../store/queries.js";
+import { centsToNumber } from "../mercadolivre/parser/rich.js";
+import type { ProductSort, ProductWithPurchase } from "../cache/queries.js";
 import { compactObject, defineTool } from "./define.js";
 
 // Product tools over the cache (F-7, F-8). Prices are line totals; the unit
@@ -39,27 +39,27 @@ export function productRowToOutput(row: ProductWithPurchase) {
 const sortField = Type.Optional(
   Type.Union(
     [Type.Literal("date_desc"), Type.Literal("date_asc"), Type.Literal("paid_desc"), Type.Literal("paid_asc")],
-    { description: "Sort order (default date_desc)" },
+    { description: "Ordenação (default date_desc)" },
   ),
 );
 
 export const listProducts = defineTool({
   name: "list_products",
   description:
-    "Lists purchased products from the local cache (run sync first) with the price paid, unit price, quantity, " +
-    "variations and seller. Filters by date range, seller, price range and title. Cancelled purchases are left " +
-    "out unless includeCancelled=true. Amounts in BRL.",
+    "Lista os produtos comprados a partir do cache local (rode sync antes), sem rede, com preço pago, preço " +
+    "unitário, quantidade, variações e vendedor. Filtra por período, vendedor, faixa de preço e título. Compras " +
+    "canceladas ficam de fora, a menos que includeCancelled=true. Valores em reais.",
   readOnly: true,
   input: Type.Object({
-    from: Type.Optional(Type.String({ description: "Purchase date >= YYYY-MM-DD" })),
-    to: Type.Optional(Type.String({ description: "Purchase date <= YYYY-MM-DD" })),
-    seller: Type.Optional(Type.String({ minLength: 1, description: "Seller name (partial) or seller id" })),
-    minPaid: Type.Optional(Type.Number({ minimum: 0, description: "Minimum amount paid for the line, in BRL" })),
-    maxPaid: Type.Optional(Type.Number({ minimum: 0, description: "Maximum amount paid for the line, in BRL" })),
-    titleContains: Type.Optional(Type.String({ minLength: 1, description: "Text contained in the product title" })),
+    from: Type.Optional(Type.String({ description: "Data da compra >= YYYY-MM-DD" })),
+    to: Type.Optional(Type.String({ description: "Data da compra <= YYYY-MM-DD" })),
+    seller: Type.Optional(Type.String({ minLength: 1, description: "Nome do vendedor (parcial) ou id do vendedor" })),
+    minPaid: Type.Optional(Type.Number({ minimum: 0, description: "Valor mínimo pago na linha, em reais" })),
+    maxPaid: Type.Optional(Type.Number({ minimum: 0, description: "Valor máximo pago na linha, em reais" })),
+    titleContains: Type.Optional(Type.String({ minLength: 1, description: "Texto contido no título do produto" })),
     sort: sortField,
-    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 1000, description: "Maximum rows (default 100)" })),
-    includeCancelled: Type.Optional(Type.Boolean({ description: "Include cancelled purchases (default false)" })),
+    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 1000, description: "Máximo de linhas (default 100)" })),
+    includeCancelled: Type.Optional(Type.Boolean({ description: "Inclui compras canceladas (default false)" })),
   }),
   run: (args, ctx) => {
     const rows = ctx.store().query.products({
@@ -86,16 +86,17 @@ export const listProducts = defineTool({
 export const productHistory = defineTool({
   name: "product_history",
   description:
-    "Every purchase of one product (by item id or title text) from the local cache, oldest first, with the unit " +
-    "price trend: useful for 'how much did I pay for this before?' and repurchase questions. Amounts in BRL.",
+    "Todas as compras de um produto (por id do item ou texto do título) a partir do cache local, sem rede, da " +
+    "mais antiga para a mais nova, com a evolução do preço unitário: serve para 'quanto paguei nisso antes?' e " +
+    "perguntas de recompra. Valores em reais.",
   readOnly: true,
   input: Type.Object({
-    itemId: Type.Optional(Type.String({ minLength: 1, description: "Item id, e.g. MLB2086446083" })),
-    titleContains: Type.Optional(Type.String({ minLength: 1, description: "Text contained in the product title" })),
+    itemId: Type.Optional(Type.String({ minLength: 1, description: "Id do item, por exemplo MLB2086446083" })),
+    titleContains: Type.Optional(Type.String({ minLength: 1, description: "Texto contido no título do produto" })),
   }),
   run: (args, ctx) => {
     if (!args.itemId && !args.titleContains) {
-      throw new Error("product_history needs itemId or titleContains");
+      throw new Error("product_history precisa de itemId ou titleContains");
     }
     const rows = ctx.store().query.products({
       itemId: args.itemId,

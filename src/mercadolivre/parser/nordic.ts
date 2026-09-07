@@ -32,7 +32,7 @@ export function sliceBalancedJson(src: string, start: number): string {
       if (depth === 0) return src.slice(start, i + 1);
     }
   }
-  throw new ParseError("Unbalanced JSON in the Nordic rendering context");
+  throw new ParseError("JSON desbalanceado no contexto Nordic.");
 }
 
 /**
@@ -45,7 +45,7 @@ export function extractNordicCtx(html: string): NordicCtx {
   if (!match) {
     throw new SessionError(
       "EXPIRED",
-      "The page has no Nordic rendering context (login page or new layout).",
+      "A página veio sem o contexto Nordic (página de login ou layout novo).",
     );
   }
   let ctx: NordicCtx;
@@ -54,7 +54,7 @@ export function extractNordicCtx(html: string): NordicCtx {
   } catch (error) {
     if (error instanceof ParseError) throw error;
     throw new ParseError(
-      `Nordic rendering context is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
+      `O contexto Nordic não é JSON válido: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
   const pageProps = ctx.appProps?.pageProps;
@@ -62,7 +62,7 @@ export function extractNordicCtx(html: string): NordicCtx {
   if (pageProps?.errorType || (status !== undefined && status >= 400)) {
     throw new UpstreamError(
       status ?? 500,
-      `Mercado Livre rendered an error page: ${pageProps?.title ?? pageProps?.errorType ?? "unknown error"}`,
+      `O Mercado Livre renderizou uma página de erro: ${pageProps?.title ?? pageProps?.errorType ?? "erro desconhecido"}`,
     );
   }
   return ctx;
@@ -72,7 +72,7 @@ export function extractNordicCtx(html: string): NordicCtx {
 export function listRootBrick(ctx: NordicCtx): Brick {
   const brick = ctx.appProps?.pageProps?.floxResponse?.data?.brick;
   if (!brick) {
-    throw new ParseError("List page layout changed: floxResponse.data.brick not found");
+    throw new ParseError("O layout da lista mudou: floxResponse.data.brick não encontrado.");
   }
   return brick;
 }
@@ -82,7 +82,7 @@ export function detailBrickStack(ctx: NordicCtx): BrickStack {
   const stack =
     ctx.appProps?.pageProps?.floxPreloadedState?.[FLOX_STATE_KEY]?.brickStack;
   if (!stack) {
-    throw new ParseError("Detail page layout changed: FLOX_STATE.brickStack not found");
+    throw new ParseError("O layout do detalhe mudou: FLOX_STATE.brickStack não encontrado.");
   }
   return stack;
 }
@@ -93,11 +93,11 @@ export function floxJsonRootBrick(body: string): Brick {
   try {
     envelope = JSON.parse(body);
   } catch {
-    throw new ParseError("list_items endpoint did not return JSON");
+    throw new ParseError("O endpoint list_items não devolveu JSON.");
   }
   if (envelope.type !== "register_and_render" || !envelope.data?.brick) {
     throw new ParseError(
-      `list_items envelope changed: expected type register_and_render, got ${envelope.type ?? "none"}`,
+      `O envelope de list_items mudou: esperava type register_and_render, veio ${envelope.type ?? "nenhum"}.`,
     );
   }
   return envelope.data.brick;

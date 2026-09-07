@@ -1,54 +1,82 @@
 #!/usr/bin/env bun
 import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { allTools } from "../src/tools/registry.js";
 
-// Generates docs/TOOLS.md from the registry, so the reference never drifts
-// from the schemas the MCP client actually sees (AR-3).
-//
-// Usage: bun run scripts/gen-tools-doc.ts
+// docs/TOOLS.md is generated from the registry so the reference can never drift
+// from the schemas the MCP client sees (AR-3). Run it whenever a tool changes:
+// `bun run docs:tools`.
 
-type Property = { type?: string; description?: string; const?: unknown; anyOf?: Property[]; minimum?: number; maximum?: number };
-type Schema = { properties?: Record<string, Property>; required?: string[] };
+type Schema = {
+  type?: string;
+  description?: string;
+  properties?: Record<string, Schema>;
+  required?: string[];
+  anyOf?: Schema[];
+  const?: unknown;
+  minimum?: number;
+  maximum?: number;
+  minLength?: number;
+  pattern?: string;
+};
 
-function typeOf(property: Property): string {
-  if (property.anyOf) {
-    return property.anyOf.map((option) => (option.const !== undefined ? `\`${String(option.const)}\`` : typeOf(option))).join(" \\| ");
+function typeOf(schema: Schema): string {
+  if (schema.anyOf) {
+    const literals = schema.anyOf.filter((option) => option.const !== undefined);
+    if (literals.length === schema.anyOf.length) {
+      return literals.map((option) => `\`${String(option.const)}\``).join(" \\| ");
+    }
+    return schema.anyOf.map(typeOf).join(" \\| ");
   }
-  if (property.const !== undefined) return `\`${String(property.const)}\``;
-  return property.type ?? "any";
+  const bounds: string[] = [];
+  if (schema.minimum !== undefined) bounds.push(`≥ ${schema.minimum}`);
+  if (schema.maximum !== undefined) bounds.push(`≤ ${schema.maximum}`);
+  if (schema.minLength !== undefined) bounds.push(`min ${schema.minLength} chars`);
+  if (schema.pattern) bounds.push(`\`${schema.pattern}\``);
+  return `${schema.type ?? "any"}${bounds.length > 0 ? ` (${bounds.join(", ")})` : ""}`;
 }
 
-const lines: string[] = [
-  "# Tools",
-  "",
-  "Referência das tools MCP, gerada por `bun run scripts/gen-tools-doc.ts` a partir do registry.",
-  "Os comandos equivalentes da CLI estão em [CLI.md](CLI.md). Valores monetários saem em BRL (reais);",
-  "as datas são `YYYY-MM-DD`.",
-  "",
-  `Total: ${allTools.length} tools. *Read-only* indica que a tool não escreve nada no disco local`,
-  "(a conta do Mercado Livre é somente leitura em todas elas).",
-  "",
-];
+const escape = (text: string): string => text.replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-for (const tool of allTools) {
-  const schema = tool.input as unknown as Schema;
-  const required = new Set(schema.required ?? []);
-  lines.push(`## \`${tool.name}\``, "", tool.readOnly ? "*Read-only.*" : "*Escreve no disco (cache ou downloads).*", "", tool.description, "");
-  const properties = Object.entries(schema.properties ?? {});
-  if (properties.length === 0) {
-    lines.push("Sem parâmetros.", "");
-    continue;
+function render(): string {
+  const lines: string[] = [
+    "# Tools",
+    "",
+    "> Gerado por `bun run docs:tools` a partir de `src/tools/registry.ts`. Não edite à mão.",
+    "",
+    `O servidor expõe **${allTools.length} tools**. Com \`MERCADOLIVRE_READ_ONLY=1\` as ` +
+      `${allTools.filter((tool) => !tool.readOnly).length} que escrevem algo (sessão, cache, arquivo) ` +
+      "não são registradas. A conta do Mercado Livre é somente leitura em todas elas. Valores em reais; datas `YYYY-MM-DD`.",
+    "",
+    "| Tool | Escreve | O que faz |",
+    "| --- | --- | --- |",
+  ];
+  for (const tool of allTools) {
+    lines.push(
+      `| [\`${tool.name}\`](#${tool.name.replace(/_/g, "")}) | ${tool.readOnly ? "não" : "sim"} | ${escape(tool.description.slice(0, 110))}... |`,
+    );
   }
-  lines.push("| Parâmetro | Tipo | Obrigatório | Descrição |", "| --- | --- | --- | --- |");
-  for (const [name, property] of properties) {
-    const range =
-      property.minimum !== undefined || property.maximum !== undefined
-        ? ` (${[property.minimum !== undefined ? `min ${property.minimum}` : "", property.maximum !== undefined ? `max ${property.maximum}` : ""].filter(Boolean).join(", ")})`
-        : "";
-    lines.push(`| \`${name}\` | ${typeOf(property)}${range} | ${required.has(name) ? "sim" : "não"} | ${property.description ?? ""} |`);
+
+  for (const tool of allTools) {
+    const schema = JSON.parse(JSON.stringify(tool.input)) as Schema;
+    const properties = schema.properties ?? {};
+    const required = new Set(schema.required ?? []);
+    lines.push("", `## \`${tool.name}\``, "", tool.description, "");
+    lines.push(`**Escreve em disco/cache:** ${tool.readOnly ? "não" : "sim"}`, "");
+    if (Object.keys(properties).length === 0) {
+      lines.push("Sem parâmetros.");
+      continue;
+    }
+    lines.push("| Parâmetro | Tipo | Obrigatório | Descrição |", "| --- | --- | --- | --- |");
+    for (const [name, property] of Object.entries(properties)) {
+      lines.push(
+        `| \`${name}\` | ${typeOf(property)} | ${required.has(name) ? "sim" : "não"} | ${escape(property.description ?? "")} |`,
+      );
+    }
   }
-  lines.push("");
+  return `${lines.join("\n")}\n`;
 }
 
-writeFileSync(new URL("../docs/TOOLS.md", import.meta.url), `${lines.join("\n").trimEnd()}\n`);
-console.error(`docs/TOOLS.md: ${allTools.length} tools`);
+const target = join(import.meta.dir, "..", "docs", "TOOLS.md");
+writeFileSync(target, render());
+console.error(`docs/TOOLS.md gerado (${allTools.length} tools).`);

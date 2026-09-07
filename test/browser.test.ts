@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { detectDefaultBrowser, resolveLoginBrowser, type Probe } from "../src/auth/browser.js";
+import { detectDefaultBrowser, resolveLoginBrowser, type Probe } from "../src/session/browser.js";
 
 // The login opens the user's DEFAULT browser when Playwright can drive it
 // (Chrome, Brave, Edge, Vivaldi, Chromium...). Safari and Firefox are other
@@ -87,7 +87,7 @@ describe("macOS default browser", () => {
     expect(browser.name).toBe("Google Chrome");
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toMatch(/Arc/);
-    expect(warnings[0]).toMatch(/not compatible/i);
+    expect(warnings[0]).toMatch(/não é compatível/i);
     expect(warnings[0]).toMatch(/DevTools/);
     expect(warnings[0]).toMatch(/Google Chrome/);
   });
@@ -98,14 +98,14 @@ describe("macOS default browser", () => {
     expect(detectDefaultBrowser(probe)).toMatchObject({ name: "Safari", compatible: false });
     const { browser, warnings } = resolveLoginBrowser({}, probe);
     expect(browser.name).toBe("Brave Browser");
-    expect(warnings[0]).toMatch(/Safari.*not compatible/i);
+    expect(warnings[0]).toMatch(/Safari.*não é compatível/i);
     expect(warnings[0]).toMatch(/Brave Browser/);
   });
 
   test("tells the user to install Chrome or another drivable browser when none is available", () => {
     const probe = probeFor({ https: "org.mozilla.firefox", apps: { "/Applications/Firefox.app": { id: "org.mozilla.firefox", exe: "firefox", name: "Firefox" }, "/Applications/Safari.app": SAFARI } });
 
-    expect(() => resolveLoginBrowser({}, probe)).toThrow(/Firefox.*not compatible[\s\S]*Google Chrome[\s\S]*Brave/);
+    expect(() => resolveLoginBrowser({}, probe)).toThrow(/Firefox.*não é compatível[\s\S]*Google Chrome[\s\S]*Brave/);
   });
 
   test("an unknown browser is not trusted; the message points at the override", () => {

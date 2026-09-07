@@ -1,8 +1,8 @@
 import { Type } from "@sinclair/typebox";
-import type { DateFilterValue } from "../meli/api/purchases.js";
-import { centsToNumber } from "../meli/parser/rich.js";
-import { dateFilterRange } from "../store/queries.js";
-import type { PurchaseRow, Store } from "../store/repo.js";
+import type { DateFilterValue } from "../mercadolivre/api/purchases.js";
+import { centsToNumber } from "../mercadolivre/parser/rich.js";
+import { dateFilterRange } from "../cache/queries.js";
+import type { PurchaseRow, Store } from "../cache/repo.js";
 import { compactObject, defineTool } from "./define.js";
 import { dateFilterField } from "./purchases.js";
 
@@ -14,16 +14,16 @@ import { dateFilterField } from "./purchases.js";
 
 const rangeFields = {
   dateFilter: dateFilterField,
-  from: Type.Optional(Type.String({ description: "Purchase date >= YYYY-MM-DD" })),
-  to: Type.Optional(Type.String({ description: "Purchase date <= YYYY-MM-DD" })),
-  includeCancelled: Type.Optional(Type.Boolean({ description: "Include cancelled purchases (default false)" })),
+  from: Type.Optional(Type.String({ description: "Data da compra >= YYYY-MM-DD" })),
+  to: Type.Optional(Type.String({ description: "Data da compra <= YYYY-MM-DD" })),
+  includeCancelled: Type.Optional(Type.Boolean({ description: "Inclui compras canceladas (default false)" })),
 };
 
 type RangeArgs = { dateFilter?: string; from?: string; to?: string; includeCancelled?: boolean };
 
 const INSTALLMENT_NOTE =
-  "Estimates: Mercado Livre does not expose the real installment schedule. Charges are assumed monthly " +
-  "starting on the payment date (or the purchase date); check the card statement for the real dates.";
+  "Estimativa: o Mercado Livre não expõe o cronograma real das parcelas. As cobranças são assumidas mensais " +
+  "a partir da data do pagamento (ou da compra); confira as datas reais na fatura do cartão.";
 
 function purchasesInRange(store: Store, args: RangeArgs, now: Date) {
   const window = dateFilterRange(args.dateFilter as DateFilterValue | undefined, now);
@@ -48,16 +48,17 @@ type Group = { total: number; purchases: number; products: number };
 export const spendingSummary = defineTool({
   name: "spending_summary",
   description:
-    "Spending summary from the local cache: total paid, discounts, coupons, shipping, purchase and product counts " +
-    "and average ticket, grouped by month (default), year, seller, category or none. Accepts a time window " +
-    "(dateFilter) or explicit from/to dates. Cancelled purchases are excluded unless includeCancelled=true. Amounts in BRL.",
+    "Resumo de gastos a partir do cache local, sem rede: total pago, descontos, cupons, frete, quantidade de " +
+    "compras e produtos e ticket médio, agrupados por mês (default), ano, vendedor, categoria ou nada. Aceita " +
+    "uma janela de tempo (dateFilter) ou datas from/to. Compras canceladas ficam de fora, a menos que " +
+    "includeCancelled=true. Valores em reais.",
   readOnly: true,
   input: Type.Object({
     ...rangeFields,
     groupBy: Type.Optional(
       Type.Union(
         [Type.Literal("month"), Type.Literal("year"), Type.Literal("seller"), Type.Literal("category"), Type.Literal("none")],
-        { description: "month (default), year, seller, category or none" },
+        { description: "month (default), year, seller, category ou none" },
       ),
     ),
   }),
@@ -81,9 +82,9 @@ export const spendingSummary = defineTool({
     if (groupBy === "category") {
       const categories = store.query.categoriesByPurchase(priced.map((row) => row.purchase_id));
       for (const row of priced) {
-        const list = categories.get(row.purchase_id) ?? ["(no category)"];
+        const list = categories.get(row.purchase_id) ?? ["(sem categoria)"];
         if (list.length > 1) {
-          note = "Some purchases belong to more than one category; their totals are counted in each of them.";
+          note = "Algumas compras pertencem a mais de uma categoria; o total delas conta em cada uma.";
         }
         for (const category of list) add(category, row);
       }
@@ -93,7 +94,7 @@ export const spendingSummary = defineTool({
         const key =
           groupBy === "month" ? date.slice(0, 7) || "?"
           : groupBy === "year" ? date.slice(0, 4) || "?"
-          : groupBy === "seller" ? (row.seller_name ?? "(no seller)")
+          : groupBy === "seller" ? (row.seller_name ?? "(sem vendedor)")
           : "all";
         add(key, row);
       }
@@ -146,13 +147,14 @@ function addMonths(iso: string, months: number): string {
 export const listInstallments = defineTool({
   name: "list_installments",
   description:
-    "Purchases paid in installments, from the local cache: installment count and value, card, payment date and an " +
-    "ESTIMATE of how many installments are still open and when the last one falls (the site does not expose the real " +
-    "schedule). monthlyCommitment sums the open installments. onlyMultiple=false lists every paid purchase. Amounts in BRL.",
+    "Compras parceladas, a partir do cache local e sem rede: quantidade e valor da parcela, cartão, data do " +
+    "pagamento e uma ESTIMATIVA de quantas parcelas ainda faltam e quando cai a última (o site não expõe o " +
+    "cronograma real). monthlyCommitment soma as parcelas em aberto. onlyMultiple=false lista toda compra paga. " +
+    "Valores em reais.",
   readOnly: true,
   input: Type.Object({
     ...rangeFields,
-    onlyMultiple: Type.Optional(Type.Boolean({ description: "Only purchases with 2+ installments (default true)" })),
+    onlyMultiple: Type.Optional(Type.Boolean({ description: "Só compras com 2 ou mais parcelas (default true)" })),
   }),
   run: (args, ctx) => {
     const { rows } = purchasesInRange(ctx.store(), args, ctx.now());
@@ -195,8 +197,9 @@ export const listInstallments = defineTool({
 export const listPaymentMethods = defineTool({
   name: "list_payment_methods",
   description:
-    "Payment methods used in the purchases of the local cache (card brand plus last digits, Pix, boleto, account " +
-    "balance), with how many purchases and how much went through each, biggest first. Amounts in BRL.",
+    "Meios de pagamento usados nas compras do cache local (bandeira e últimos dígitos do cartão, Pix, boleto, " +
+    "saldo em conta), com quantas compras e quanto passou por cada um, do maior para o menor. Sem rede. Valores " +
+    "em reais.",
   readOnly: true,
   input: Type.Object(rangeFields),
   run: (args, ctx) => {

@@ -1,7 +1,7 @@
 # Fixtures
 
 Páginas reais da conta, capturadas em 2026-09-05 e **anonimizadas** por
-`scripts/anonymize-fixture.ts` (ver [ADR-0008](../../docs/adr/0008-anonymized-real-fixtures.md)).
+`scripts/anonymize-fixture.ts` (ver [ADR-0008](../../docs/adr/0008-anonymized-fixtures.md)).
 Valores, quantidades e datas são os reais; ids, palavras de produto, vendedor,
 endereço e cartão são substitutos determinísticos. `test/fixtures.test.ts` lê tudo aqui.
 

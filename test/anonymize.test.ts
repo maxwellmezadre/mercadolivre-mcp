@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { extractNordicCtx } from "../src/meli/parser/nordic.js";
+import { extractNordicCtx } from "../src/mercadolivre/parser/nordic.js";
 import { createAnonymizer, prune, pruneJson, wrapAsPage } from "../scripts/anonymize-fixture.js";
 
 // The anonymizer is the gate that lets real captures into a public repo

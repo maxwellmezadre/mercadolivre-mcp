@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { parseDetailPage } from "../src/meli/parser/detail.js";
-import { parseInvoiceOverview, parseInvoiceXml } from "../src/meli/parser/invoice.js";
-import { groupPurchases, parseListPage } from "../src/meli/parser/list.js";
-import { detailBrickStack, extractNordicCtx, floxJsonRootBrick, listRootBrick } from "../src/meli/parser/nordic.js";
+import { parseDetailPage } from "../src/mercadolivre/parser/detail.js";
+import { parseInvoiceOverview, parseInvoiceXml } from "../src/mercadolivre/parser/invoice.js";
+import { groupPurchases, parseListPage } from "../src/mercadolivre/parser/list.js";
+import { detailBrickStack, extractNordicCtx, floxJsonRootBrick, listRootBrick } from "../src/mercadolivre/parser/nordic.js";
 
 // Real pages of the account, anonymized (test/fixtures/README.md). Amounts,
 // quantities and dates are the real ones; ids and product words are stand-ins.

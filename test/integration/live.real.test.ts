@@ -1,21 +1,34 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
+import { existsSync } from "node:fs";
 import { loadConfig } from "../../src/config.js";
-import { createContext } from "../../src/context.js";
+import { type Ctx, createContext } from "../../src/context.js";
 import { runTool } from "../../src/tools/define.js";
 import { doctor } from "../../src/tools/doctor.js";
 
-// REAL integration against Mercado Livre — the risk this project lives with
-// is the internal layout changing under it. Gated: runs only with
-// MERCADOLIVRE_REAL=1 and a valid session (`mercadolivre login`). Skipped
-// visibly otherwise; never part of CI. Each test costs one or two requests
-// at the tool's own pace (one per second).
+// REAL integration against Mercado Livre: the risk this project lives with
+// is the internal layout changing under it. Gated twice: runs only with
+// MERCADOLIVRE_LIVE=1 AND a session file on this machine. Skipped visibly
+// otherwise; never part of CI. Each test costs one or two requests at the
+// tool's own pace.
 
-const enabled = process.env.MERCADOLIVRE_REAL === "1";
+const config = (() => {
+  try {
+    return loadConfig();
+  } catch {
+    return null;
+  }
+})();
+const enabled = process.env.MERCADOLIVRE_LIVE === "1" && config !== null && existsSync(config.sessionPath);
 const gated = enabled ? describe : describe.skip;
 const TIMEOUT = 90_000;
 
 gated("real Mercado Livre session", () => {
-  const ctx = createContext(loadConfig(), { cacheFile: ":memory:" });
+  // Built in beforeAll, never at registration: a skipped suite must not touch
+  // the user's config dir (createContext migrates legacy files on construction).
+  let ctx: Ctx;
+  beforeAll(() => {
+    ctx = createContext(config ?? loadConfig(), { cacheFile: ":memory:" });
+  });
 
   test(
     "the purchases list page parses with at least one purchase",

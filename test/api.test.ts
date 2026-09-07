@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { UpstreamError } from "../src/core/errors.js";
 import type { GetOptions, HttpResult, MeliHttp } from "../src/core/http.js";
-import { createInvoicesApi, OVERVIEW_BATCH } from "../src/meli/api/invoices.js";
-import { createPurchasesApi, detailUrl, listItemsUrl, listPageUrl } from "../src/meli/api/purchases.js";
-import type { Brick, BrickStack } from "../src/meli/types.js";
+import { createInvoicesApi, OVERVIEW_BATCH } from "../src/mercadolivre/api/invoices.js";
+import { createPurchasesApi, detailUrl, listItemsUrl, listPageUrl } from "../src/mercadolivre/api/purchases.js";
+import type { Brick, BrickStack } from "../src/mercadolivre/types.js";
 
 // The api layer only glues urls, the http funnel and the parsers together;
 // these tests pin the urls (spec §4) and the response routing.
@@ -173,6 +173,6 @@ describe("crossed pair (real behaviour)", () => {
     const { http } = fakeHttp(() => detailHtml({ layout_1: { id: "layout_1", ui_type: "layout" } }));
     const api = createPurchasesApi({ http, now: () => NOW });
 
-    await expect(api.getDetail({ purchaseId: "10", packId: "20", orderId: "99" })).rejects.toThrow(/packId and orderId/);
+    await expect(api.getDetail({ purchaseId: "10", packId: "20", orderId: "99" })).rejects.toThrow(/packId e orderId/);
   });
 });

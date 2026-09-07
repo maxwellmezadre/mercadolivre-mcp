@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseDetailPage, parseVariations, proseToCents } from "../src/meli/parser/detail.js";
-import type { Brick, BrickStack, RichText } from "../src/meli/types.js";
+import { parseDetailPage, parseVariations, proseToCents } from "../src/mercadolivre/parser/detail.js";
+import type { Brick, BrickStack, RichText } from "../src/mercadolivre/types.js";
 
 // Synthetic detail page shaped like spec §6.4 / appendix A.3-A.5: the
 // 14-unit purchase 2000014741074853 (10 orders, 5 rows shown in the detail).
@@ -195,7 +195,7 @@ describe("money edge cases", () => {
 
     expect(detail.money.totalCents).toBe(10000);
     expect(detail.warnings).toHaveLength(1);
-    expect(detail.warnings[0]).toMatch(/does not add up/);
+    expect(detail.warnings[0]).toMatch(/não fecha/);
   });
 
   test("unknown labels land in extras instead of being dropped", () => {

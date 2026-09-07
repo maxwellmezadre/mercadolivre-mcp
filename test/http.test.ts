@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createSessionStore, type SessionStore } from "../src/auth/session.js";
+import { createSessionStore, type SessionStore } from "../src/session/store.js";
 import { RateLimitError, SessionError, UpstreamError } from "../src/core/errors.js";
 import { createMeliHttp, type FetchLike, type FetchResponse } from "../src/core/http.js";
 import { createLogger } from "../src/core/logger.js";
@@ -48,16 +48,13 @@ function harness(opts: {
 }) {
   const dir = mkdtempSync(join(tmpdir(), "ml-http-"));
   dirs.push(dir);
-  const sessionFile = join(dir, "session.json");
-  writeFileSync(
-    sessionFile,
-    JSON.stringify({
-      cookies: [
-        { name: "ssid", value: "secret-cookie-value", domain: ".mercadolivre.com.br", path: "/", expires: -1, httpOnly: true, secure: true },
-      ],
-    }),
-  );
-  const session: SessionStore = createSessionStore({ sessionFile, now: () => clock.t });
+  const paths = { sessionPath: join(dir, "session.enc"), keyPath: join(dir, "session.key") };
+  createSessionStore(paths).save({
+    cookies: [
+      { name: "ssid", value: "secret-cookie-value", domain: ".mercadolivre.com.br", path: "/", expires: -1, httpOnly: true, secure: true },
+    ],
+  });
+  const session: SessionStore = createSessionStore({ ...paths, now: () => clock.t });
   const clock = {
     t: 0,
     sleeps: [] as number[],
@@ -85,7 +82,8 @@ function harness(opts: {
     {
       session,
       userAgent: "UA/test",
-      requestIntervalMs: opts.intervalMs ?? 0,
+      minIntervalMs: opts.intervalMs ?? 0,
+      jitterMs: 400,
       timeoutMs: 30_000,
       log: createLogger({ sink: () => {} }),
     },
@@ -95,7 +93,7 @@ function harness(opts: {
 }
 
 describe("pacing", () => {
-  test("spaces consecutive requests by the interval plus 200-600ms jitter", async () => {
+  test("spaces consecutive requests by the interval plus 0-400ms jitter", async () => {
     const h = harness({
       responses: [response(200, { body: CTX_HTML }), response(200, { body: CTX_HTML })],
       intervalMs: 1000,
@@ -105,10 +103,10 @@ describe("pacing", () => {
     await h.http.get(LIST_URL, { kind: "html" });
     await h.http.get(LIST_URL, { kind: "html" });
 
-    expect(h.calls[1]!.at - h.calls[0]!.at).toBe(1400);
+    expect(h.calls[1]!.at - h.calls[0]!.at).toBe(1200);
   });
 
-  test("jitter starts at 200ms even when random returns 0", async () => {
+  test("no jitter when random returns 0", async () => {
     const h = harness({
       responses: [response(200, { body: CTX_HTML }), response(200, { body: CTX_HTML })],
       intervalMs: 1000,
@@ -118,7 +116,7 @@ describe("pacing", () => {
     await h.http.get(LIST_URL, { kind: "html" });
     await h.http.get(LIST_URL, { kind: "html" });
 
-    expect(h.calls[1]!.at - h.calls[0]!.at).toBe(1200);
+    expect(h.calls[1]!.at - h.calls[0]!.at).toBe(1000);
   });
 
   test("never runs two requests at the same time", async () => {

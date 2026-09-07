@@ -1,12 +1,12 @@
 import type { Database } from "bun:sqlite";
-import { normalizeTitle, type MergedProduct } from "../meli/merge.js";
-import { groupPurchases } from "../meli/parser/list.js";
+import { normalizeTitle, type MergedProduct } from "../mercadolivre/merge.js";
+import { groupPurchases } from "../mercadolivre/parser/list.js";
 import type {
   DetailPage,
   InvoiceOverview,
   InvoiceXml,
   PurchaseListItem,
-} from "../meli/types.js";
+} from "../mercadolivre/types.js";
 import { createQueries, ftsQuery, type Queries } from "./queries.js";
 
 // Repository over the cache (AR-6, AR-8). Purchases are keyed by purchase id

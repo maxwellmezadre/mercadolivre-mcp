@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { ParseError } from "../src/core/errors.js";
-import { parseInvoiceOverview, parseInvoiceXml } from "../src/meli/parser/invoice.js";
+import { parseInvoiceOverview, parseInvoiceXml } from "../src/mercadolivre/parser/invoice.js";
 
 // Shapes from spec §4.4 (overview JSON) and §4.5 (NF-e 4.00 XML).
 

@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { runSync } from "../sync/sync.js";
+import { runSync } from "../cache/sync.js";
 import { defineTool } from "./define.js";
 
 // F-14: the only tool that talks to Mercado Livre in volume. Every query
@@ -9,23 +9,24 @@ import { defineTool } from "./define.js";
 export const sync = defineTool({
   name: "sync",
   description:
-    "Synchronizes the local cache with the Mercado Livre purchase history (the account is only read). " +
-    "mode=incremental (default) refreshes the newest pages and non-final purchases; mode=full walks every page " +
-    "and category (do it once; a full sync of ~70 purchases takes about 3 minutes at one request per second); " +
-    "mode=reparse re-runs the parsers on cached pages with no network. Returns a report with counts, warnings and errors.",
+    "Sincroniza o cache local com o histórico de compras do Mercado Livre (a conta é só lida). " +
+    "mode=incremental (default) atualiza as páginas mais novas e as compras não finais; mode=full percorre " +
+    "todas as páginas e categorias (faça uma vez; ~70 compras levam cerca de 3 minutos, a uma requisição " +
+    "por segundo); mode=reparse reprocessa as páginas em cache sem rede. Devolve um relatório com contagens, " +
+    "avisos e erros. Não chame em paralelo com outras tools de rede.",
   readOnly: false,
   input: Type.Object({
     mode: Type.Optional(
       Type.Union([Type.Literal("incremental"), Type.Literal("full"), Type.Literal("reparse")], {
-        description: "incremental (default), full or reparse",
+        description: "incremental (default), full ou reparse",
       }),
     ),
     maxPages: Type.Optional(
-      Type.Integer({ minimum: 1, maximum: 100, description: "Safety cap on list pages per walk (default 10)" }),
+      Type.Integer({ minimum: 1, maximum: 100, description: "Teto de páginas da lista por passada (default 10)" }),
     ),
-    withDetails: Type.Optional(Type.Boolean({ description: "Fetch purchase details (default true)" })),
-    withInvoices: Type.Optional(Type.Boolean({ description: "Fetch NF-e overviews and XML values (default true)" })),
-    withCategories: Type.Optional(Type.Boolean({ description: "Run the category pass (default true)" })),
+    withDetails: Type.Optional(Type.Boolean({ description: "Busca o detalhe de cada compra (default true)" })),
+    withInvoices: Type.Optional(Type.Boolean({ description: "Busca o overview e o XML das NF-e (default true)" })),
+    withCategories: Type.Optional(Type.Boolean({ description: "Roda a passada por categoria (default true)" })),
   }),
   run: (args, ctx) => runSync({ ...ctx, store: ctx.store() }, args),
 });

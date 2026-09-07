@@ -1,7 +1,7 @@
 {
   "name": "@maxwellmezadre/mercadolivre-mcp",
   "version": "0.1.0",
-  "description": "CLI + MCP server for your Mercado Livre purchase history (buyer side): purchases, products, payments, installments, sellers and NF-e invoices",
+  "description": "CLI + servidor MCP para o histórico de compras do Mercado Livre (compras, produtos, preços, parcelamento, vendedores e notas fiscais) sobre um núcleo compartilhado",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -9,38 +9,35 @@
     "url": "git+https://github.com/maxwellmezadre/mercadolivre-mcp.git"
   },
   "homepage": "https://github.com/maxwellmezadre/mercadolivre-mcp#readme",
-  "keywords": ["mercadolivre", "mercadolibre", "mcp", "cli", "purchases", "nfe", "claude"],
+  "keywords": ["mercadolivre", "mercadolibre", "cli", "mcp", "purchases", "orders", "nfe", "invoices", "claude"],
   "bin": {
-    "mercadolivre": "./dist/bin.js",
-    "mercadolivre-mcp": "./dist/mcp-bin.js"
+    "mercadolivre": "dist/bin.js",
+    "mercadolivre-mcp": "dist/mcp-bin.js"
   },
-  "files": ["dist", "SKILL.md", "README.md", "LICENSE"],
+  "files": ["dist", "SKILL.md", "docs/TOOLS.md", "README.md", "LICENSE"],
   "exports": "./dist/bin.js",
-  "engines": {
-    "bun": ">=1.2"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "publishConfig": { "access": "public" },
+  "engines": { "bun": ">=1.3" },
   "scripts": {
     "start": "bun run src/bin.ts",
+    "login": "bun run src/bin.ts login",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --outdir dist --external playwright-core",
-    "build:binary": "bun build --compile src/bin.ts --outfile mercadolivre --external playwright-core",
+    "verify": "bun run scripts/verify.ts",
+    "docs:tools": "bun run scripts/gen-tools-doc.ts",
+    "build:dist": "bun build src/bin.ts src/mcp-bin.ts --target=bun --packages external --outdir dist",
+    "build:binary": "bun build --compile --external chromium-bidi src/bin.ts --outfile mercadolivre",
     "prepublishOnly": "bun run build:dist",
-    "setup": "bun run scripts/setup.ts"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
+    "setup": "bun run scripts/install.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@sinclair/typebox": "^0.34.52",
-    "commander": "^15.0.0"
+    "commander": "^15.0.0",
+    "playwright-core": "^1.63.0"
   },
-  "optionalDependencies": {
-    "playwright-core": "^1.62.1"
+  "devDependencies": {
+    "@types/bun": "^1.4.1",
+    "typescript": "^5"
   }
 }

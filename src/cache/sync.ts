@@ -1,10 +1,10 @@
 import type { Logger } from "../core/logger.js";
-import type { InvoicesApi } from "../meli/api/invoices.js";
-import type { PurchasesApi } from "../meli/api/purchases.js";
-import { mergeProducts } from "../meli/merge.js";
-import { parseDetailPage } from "../meli/parser/detail.js";
-import type { BrickStack, DetailPage, ListPage, PurchaseListItem } from "../meli/types.js";
-import type { ProductRow, Store } from "../store/repo.js";
+import type { InvoicesApi } from "../mercadolivre/api/invoices.js";
+import type { PurchasesApi } from "../mercadolivre/api/purchases.js";
+import { mergeProducts } from "../mercadolivre/merge.js";
+import { parseDetailPage } from "../mercadolivre/parser/detail.js";
+import type { BrickStack, DetailPage, ListPage, PurchaseListItem } from "../mercadolivre/types.js";
+import type { ProductRow, Store } from "../cache/repo.js";
 
 // Synchronization (F-14, spec §10.3). The site is walked at one request per
 // second, so every step is explicit about cost: list pages, one detail per
@@ -106,7 +106,7 @@ function applyDetail(
   });
   store.applyDetail(purchaseId, detail, products, rawDetail, fetchedAt);
   report.unmatchedDetailRows += unmatchedRows.length;
-  for (const warning of detail.warnings) report.warnings.push(`purchase ${purchaseId}: ${warning}`);
+  for (const warning of detail.warnings) report.warnings.push(`compra ${purchaseId}: ${warning}`);
 }
 
 function reparseAll(ctx: SyncCtx, report: SyncReport): void {
@@ -171,7 +171,7 @@ async function syncDetails(ctx: SyncCtx, report: SyncReport): Promise<string[]> 
   const detailed: string[] = [];
   for (const row of ctx.store.purchasesNeedingDetail({ refreshNonFinalBefore: cutoff })) {
     if (!row.pack_id || !row.order_id) {
-      report.errors.push(`detail ${row.purchase_id}: no pack/order pair cached`);
+      report.errors.push(`detalhe ${row.purchase_id}: sem par pacote/pedido no cache`);
       continue;
     }
     try {
@@ -192,8 +192,8 @@ async function syncDetails(ctx: SyncCtx, report: SyncReport): Promise<string[]> 
       report.detailsFetched += 1;
       detailed.push(row.purchase_id);
     } catch (error) {
-      report.errors.push(`detail ${row.purchase_id}: ${message(error)}`);
-      ctx.log.warn(`sync: detail ${row.purchase_id} failed: ${message(error)}`);
+      report.errors.push(`detalhe ${row.purchase_id}: ${message(error)}`);
+      ctx.log.warn(`sync: o detalhe da compra ${row.purchase_id} falhou: ${message(error)}`);
     }
   }
   return detailed;
@@ -227,7 +227,7 @@ async function syncInvoices(
         report.invoicesFetched += 1;
       }
     } catch (error) {
-      report.errors.push(`invoices overview: ${message(error)}`);
+      report.errors.push(`overview das NF-e: ${message(error)}`);
     }
   }
 
@@ -240,7 +240,7 @@ async function syncInvoices(
       ctx.store.applyInvoiceXml(product.order_id, parsed);
       report.xmlFetched += 1;
     } catch (error) {
-      report.errors.push(`invoice xml ${product.order_id}: ${message(error)}`);
+      report.errors.push(`XML da NF-e ${product.order_id}: ${message(error)}`);
     }
   }
 }
@@ -263,7 +263,7 @@ async function syncCategories(
           pairs.push([purchaseId, category]);
         }
       } catch (error) {
-        report.errors.push(`category ${category} page ${page}: ${message(error)}`);
+        report.errors.push(`categoria ${category} página ${page}: ${message(error)}`);
         break;
       }
     }
@@ -306,7 +306,7 @@ export async function runSync(ctx: SyncCtx, options: SyncOptions = {}): Promise<
     const reachedEnd = report.pagesFetched >= totalPages;
     if (walkAll && !reachedEnd) {
       report.warnings.push(
-        `Stopped at page ${report.pagesFetched} of ${totalPages} (maxPages=${maxPages}); the full sync is not complete yet.`,
+        `Parou na página ${report.pagesFetched} de ${totalPages} (maxPages=${maxPages}); o sync completo ainda não terminou.`,
       );
     }
     if (firstPage) {
@@ -331,8 +331,8 @@ export async function runSync(ctx: SyncCtx, options: SyncOptions = {}): Promise<
   ctx.store.setState(STATE_KEYS.parserVersion, String(PARSER_VERSION));
   report.durationMs = Date.now() - started;
   ctx.log.info(
-    `sync ${mode}: ${report.pagesFetched} pages, ${report.purchasesNew} new, ${report.detailsFetched} details, ` +
-      `${report.invoicesFetched} invoices, ${report.xmlFetched} xml, ${report.errors.length} errors`,
+    `sync ${mode}: ${report.pagesFetched} páginas, ${report.purchasesNew} novas, ${report.detailsFetched} detalhes, ` +
+      `${report.invoicesFetched} notas, ${report.xmlFetched} xml, ${report.errors.length} erros`,
   );
   return report;
 }

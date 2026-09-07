@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Browser } from "../src/auth/browser.js";
-import { interactiveLogin, type PlaywrightLike } from "../src/auth/login.js";
-import { createSessionStore, type SessionCookie } from "../src/auth/session.js";
 import { loadConfig } from "../src/config.js";
 import { LIST_PAGE_URL } from "../src/core/http.js";
 import { createLogger } from "../src/core/logger.js";
+import type { Browser } from "../src/session/browser.js";
+import { interactiveLogin, type PlaywrightLike } from "../src/session/login.js";
+import { createSessionStore, type SessionCookie } from "../src/session/store.js";
 
 const dirs: string[] = [];
 afterEach(() => {
@@ -57,35 +57,47 @@ function fakePlaywright(opts: { failLaunch?: boolean } = {}) {
 function harness(env: Record<string, string> = {}) {
   const home = mkdtempSync(join(tmpdir(), "ml-login-"));
   dirs.push(home);
-  const config = loadConfig({ MERCADOLIVRE_HOME: home, ...env });
-  const session = createSessionStore({ sessionFile: config.sessionFile });
+  const config = loadConfig({ MERCADOLIVRE_CONFIG_DIR: home, ...env }, () => {});
+  const session = createSessionStore({ sessionPath: config.sessionPath, keyPath: config.keyPath });
   const lines: string[] = [];
   const log = createLogger({ sink: (line) => lines.push(line) });
   return { config, session, log, lines };
 }
 
+const resolveChrome = () => ({ browser: CHROME, warnings: [] });
+
 describe("interactiveLogin", () => {
-  test("opens the resolved browser headed on the purchases page and stores only the Mercado Livre cookies", async () => {
+  test("opens the resolved browser headed on the purchases page and stores only the Mercado Livre cookies, encrypted", async () => {
     const ctx = harness();
     const { playwright, calls } = fakePlaywright();
 
-    const result = await interactiveLogin(ctx, {
-      importPlaywright: async () => playwright,
-      resolveBrowser: () => ({ browser: CHROME, warnings: [] }),
-    });
+    const result = await interactiveLogin(ctx, {}, { importPlaywright: async () => playwright, resolveBrowser: resolveChrome });
 
-    expect(calls.launch[0]?.dir).toBe(ctx.config.profileDir);
+    expect(calls.launch[0]?.dir).toBe(ctx.config.browserProfileDir);
     expect(calls.launch[0]?.options).toMatchObject({ headless: false, executablePath: CHROME.executablePath });
     expect(calls.launch[0]?.options.channel).toBeUndefined();
     expect(calls.goto).toEqual([LIST_PAGE_URL]);
     expect(calls.waited).toEqual(["[id^=list_item_]"]);
     expect(calls.closed).toBe(1);
 
-    const saved = JSON.parse(readFileSync(ctx.config.sessionFile, "utf8")) as { cookies: SessionCookie[]; meta: { userAgent: string } };
-    expect(saved.cookies.map((cookie) => cookie.name)).toEqual(["ssid"]);
-    expect(saved.meta.userAgent).toBe("UA/fake");
-    expect(result).toEqual({ browser: "Google Chrome", cookieCount: 1, userAgent: "UA/fake", sessionFile: ctx.config.sessionFile });
-    expect(ctx.lines.join("")).toContain("Opening Google Chrome");
+    const reloaded = createSessionStore({ sessionPath: ctx.config.sessionPath, keyPath: ctx.config.keyPath });
+    expect(reloaded.cookies().map((cookie) => cookie.name)).toEqual(["ssid"]);
+    expect(reloaded.userAgent()).toBe("UA/fake");
+    expect(existsSync(ctx.config.keyPath)).toBe(true);
+    expect(result).toEqual({ browser: "Google Chrome", cookieCount: 1, userAgent: "UA/fake", sessionFile: ctx.config.sessionPath });
+    expect(ctx.lines.join("")).toContain("Abrindo Google Chrome");
+  });
+
+  test("fresh wipes the automation profile before launching", async () => {
+    const ctx = harness();
+    mkdirSync(ctx.config.browserProfileDir, { recursive: true });
+    writeFileSync(join(ctx.config.browserProfileDir, "stale"), "x");
+    const { playwright } = fakePlaywright();
+
+    await interactiveLogin(ctx, { fresh: true }, { importPlaywright: async () => playwright, resolveBrowser: resolveChrome });
+
+    expect(existsSync(join(ctx.config.browserProfileDir, "stale"))).toBe(false);
+    expect(existsSync(ctx.config.browserProfileDir)).toBe(true);
   });
 
   test("passes the MERCADOLIVRE_LOGIN_BROWSER override to the resolver and logs its warnings", async () => {
@@ -93,11 +105,11 @@ describe("interactiveLogin", () => {
     const { playwright } = fakePlaywright();
     const overrides: Array<string | undefined> = [];
 
-    await interactiveLogin(ctx, {
+    await interactiveLogin(ctx, {}, {
       importPlaywright: async () => playwright,
-      resolveBrowser: (override) => {
+      resolveBrowser: (override: string | undefined) => {
         overrides.push(override);
-        return { browser: CHROME, warnings: ["Your default browser (Safari) is not compatible with the login. Using Google Chrome instead."] };
+        return { browser: CHROME, warnings: ["Seu navegador padrão (Safari) não é compatível com o login. Usando Google Chrome no lugar."] };
       },
     });
 
@@ -110,8 +122,8 @@ describe("interactiveLogin", () => {
     const { playwright } = fakePlaywright({ failLaunch: true });
 
     await expect(
-      interactiveLogin(ctx, { importPlaywright: async () => playwright, resolveBrowser: () => ({ browser: CHROME, warnings: [] }) }),
-    ).rejects.toThrow(/Could not start Google Chrome[\s\S]*Google Chrome/);
+      interactiveLogin(ctx, {}, { importPlaywright: async () => playwright, resolveBrowser: resolveChrome }),
+    ).rejects.toThrow(/Não consegui abrir Google Chrome[\s\S]*Google Chrome/);
   });
 
   test("surfaces the browser resolution error untouched", async () => {
@@ -119,24 +131,24 @@ describe("interactiveLogin", () => {
     const { playwright } = fakePlaywright();
 
     await expect(
-      interactiveLogin(ctx, {
+      interactiveLogin(ctx, {}, {
         importPlaywright: async () => playwright,
         resolveBrowser: () => {
-          throw new Error("Your default browser (Safari) is not compatible with the login. Install Google Chrome.");
+          throw new Error("Seu navegador padrão (Safari) não é compatível com o login. Instale o Google Chrome.");
         },
       }),
-    ).rejects.toThrow(/Safari.*not compatible/);
+    ).rejects.toThrow(/Safari.*não é compatível/);
   });
 
-  test("explains how to get playwright-core when it cannot be imported", async () => {
+  test("explains the alternatives when playwright-core cannot be imported", async () => {
     const ctx = harness();
 
     await expect(
-      interactiveLogin(ctx, {
+      interactiveLogin(ctx, {}, {
         importPlaywright: async () => {
           throw new Error("Cannot find module 'playwright-core'");
         },
       }),
-    ).rejects.toThrow(/playwright-core.*MERCADOLIVRE_COOKIE/s);
+    ).rejects.toThrow(/playwright-core[\s\S]*from-browser[\s\S]*MERCADOLIVRE_COOKIE/);
   });
 });

@@ -47,8 +47,8 @@ describe("raw_get", () => {
     await runTool(rawGet, { url: "/my_purchases/list?page=2" }, ctx);
     expect(calls[0]?.url).toBe("https://myaccount.mercadolivre.com.br/my_purchases/list?page=2");
 
-    await expect(runTool(rawGet, { url: "https://evil.example.com/x" }, ctx)).rejects.toThrow(/not allowed/i);
-    await expect(runTool(rawGet, { url: "https://mercadolivre.com.br.evil.com/x" }, ctx)).rejects.toThrow(/not allowed/i);
+    await expect(runTool(rawGet, { url: "https://evil.example.com/x" }, ctx)).rejects.toThrow(/não permitido/i);
+    await expect(runTool(rawGet, { url: "https://mercadolivre.com.br.evil.com/x" }, ctx)).rejects.toThrow(/não permitido/i);
   });
 
   test("as json fetches with the json kind and parses the body", async () => {

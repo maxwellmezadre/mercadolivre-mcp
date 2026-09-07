@@ -6,17 +6,19 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import type { Ctx } from "../context.js";
 import { runTool } from "../tools/define.js";
-import { allTools } from "../tools/registry.js";
+import { activeTools } from "../tools/registry.js";
 
 // MCP transport adapter (AR-2): every use of the SDK is confined here. The
-// LOW-LEVEL Server is deliberate — `registerTool` expects Zod/Standard
+// LOW-LEVEL Server is deliberate: `registerTool` expects Zod/Standard
 // schemas, while we advertise the TypeBox JSON Schema directly as
 // `inputSchema` (AR-3, ADR-0004).
 
+export const SERVER_NAME = "mercadolivre-mcp";
+
 export async function startMcpServer(ctx: Ctx, version: string): Promise<void> {
-  const tools = allTools;
+  const tools = activeTools(ctx.config);
   const server = new Server(
-    { name: "mercadolivre-mcp", version },
+    { name: SERVER_NAME, version },
     { capabilities: { tools: {} } },
   );
 
@@ -27,6 +29,7 @@ export async function startMcpServer(ctx: Ctx, version: string): Promise<void> {
       // The TypeBox object IS a valid JSON Schema object.
       inputSchema: tool.input as { type: "object" },
       annotations: {
+        // The account is never written to; `readOnly` is about local state.
         readOnlyHint: tool.readOnly,
         destructiveHint: false,
         idempotentHint: tool.readOnly,
@@ -37,7 +40,7 @@ export async function startMcpServer(ctx: Ctx, version: string): Promise<void> {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const tool = tools.find((candidate) => candidate.name === request.params.name);
-    if (!tool) return toolError(`Unknown tool: ${request.params.name}`);
+    if (!tool) return toolError(`Tool desconhecida: ${request.params.name}`);
 
     // Validation and execution failures become tool errors, never a crash (NFR-6).
     try {
@@ -52,7 +55,7 @@ export async function startMcpServer(ctx: Ctx, version: string): Promise<void> {
 
   await server.connect(new StdioServerTransport());
   // stderr only: stdout stays 100% JSON-RPC (NFR-3).
-  ctx.log.info(`mercadolivre-mcp ready (${tools.length} tools)`);
+  ctx.log.info(`${SERVER_NAME} pronto (${tools.length} tools)`);
 }
 
 function toolError(message: string) {

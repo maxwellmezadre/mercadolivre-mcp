@@ -2,7 +2,7 @@ import type { Static, TObject } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import type { Ctx } from "../context.js";
 
-// AR-3: one TypeBox schema per tool is the single source of truth — it yields
+// AR-3: one TypeBox schema per tool is the single source of truth: it yields
 // the static types (Static<S>), the runtime validation (Value.Check) and the
 // JSON Schema advertised to the MCP client (the `input` object itself).
 export type ToolDef<S extends TObject = TObject> = {
@@ -22,14 +22,14 @@ export function defineTool<S extends TObject>(tool: ToolDef<S>): ToolDef {
   return tool as unknown as ToolDef;
 }
 
-/** Structured argument validation error — becomes a tool error, not a crash. */
+/** Structured argument validation error: becomes a tool error, not a crash. */
 export class ToolInputError extends Error {
   constructor(
     public readonly tool: string,
     public readonly problems: string[],
   ) {
     super(
-      `Invalid arguments for ${tool}:\n${problems
+      `Argumentos inválidos para ${tool}:\n${problems
         .map((problem) => `  - ${problem}`)
         .join("\n")}`,
     );

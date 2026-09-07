@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join } from "node:path";
+import { LoginError } from "../core/errors.js";
 
 // Which browser the login drives (F-2). The user's DEFAULT browser is used
 // when Playwright can drive it through `executablePath`: Google Chrome,
@@ -77,17 +78,17 @@ const DRIVABLE_MAC: Array<{ id: string; name: string }> = [
 const NOT_DRIVABLE_MAC: Record<string, { name: string; reason: string }> = {
   "company.thebrowser.browser": {
     name: "Arc",
-    reason: "Arc is Chromium based but does not expose a DevTools connection, so it cannot be automated",
+    reason: "o Arc é baseado em Chromium, mas não expõe uma conexão DevTools, então não pode ser automatizado",
   },
   "company.thebrowser.dia": {
     name: "Dia",
-    reason: "Dia is Chromium based but does not expose a DevTools connection, so it cannot be automated",
+    reason: "o Dia é baseado em Chromium, mas não expõe uma conexão DevTools, então não pode ser automatizado",
   },
-  "com.apple.safari": { name: "Safari", reason: "Safari is not Chromium based" },
-  "org.mozilla.firefox": { name: "Firefox", reason: "Firefox is not Chromium based" },
-  "org.mozilla.firefoxdeveloperedition": { name: "Firefox Developer Edition", reason: "Firefox is not Chromium based" },
-  "com.duckduckgo.macos.browser": { name: "DuckDuckGo", reason: "DuckDuckGo is not Chromium based" },
-  "com.kagi.kagimacos": { name: "Orion", reason: "Orion is not Chromium based" },
+  "com.apple.safari": { name: "Safari", reason: "o Safari não é baseado em Chromium" },
+  "org.mozilla.firefox": { name: "Firefox", reason: "o Firefox não é baseado em Chromium" },
+  "org.mozilla.firefoxdeveloperedition": { name: "Firefox Developer Edition", reason: "o Firefox não é baseado em Chromium" },
+  "com.duckduckgo.macos.browser": { name: "DuckDuckGo", reason: "o DuckDuckGo não é baseado em Chromium" },
+  "com.kagi.kagimacos": { name: "Orion", reason: "o Orion não é baseado em Chromium" },
 };
 
 const DRIVABLE_LINUX: Array<{ desktop: RegExp; bins: string[]; name: string }> = [
@@ -111,10 +112,10 @@ const DRIVABLE_WINDOWS: Array<{ name: string; paths: string[] }> = [
 ];
 
 export const INSTALL_HINT =
-  "The login drives your default browser, which must be Google Chrome or another Chromium-based browser " +
-  "that exposes DevTools (Brave, Microsoft Edge, Vivaldi, Chromium). Install one — https://www.google.com/chrome " +
-  "— and make it the default, or point MERCADOLIVRE_LOGIN_BROWSER at its .app or executable. " +
-  "Without any browser, set MERCADOLIVRE_COOKIE instead.";
+  "O login abre o seu navegador padrão, que precisa ser o Google Chrome ou outro navegador baseado em Chromium " +
+  "que exponha o DevTools (Brave, Microsoft Edge, Vivaldi, Chromium). Instale um deles (https://www.google.com/chrome) " +
+  "e defina como padrão, ou aponte MERCADOLIVRE_LOGIN_BROWSER para o .app ou o executável. " +
+  "Sem navegador nenhum, use `mercadolivre login --from-browser chrome` ou MERCADOLIVRE_COOKIE.";
 
 // ------------------------------------------------------------------- macOS
 
@@ -185,14 +186,14 @@ function macDefault(probe: Probe): DefaultBrowser {
     const browser = appPath ? macBrowser(appPath, probe, drivable) : undefined;
     return browser
       ? { ...browser, compatible: true }
-      : { name: drivable.name, id, compatible: false, reason: `${drivable.name} is the default browser but its application could not be found` };
+      : { name: drivable.name, id, compatible: false, reason: `${drivable.name} é o navegador padrão, mas o aplicativo não foi encontrado` };
   }
   const known = NOT_DRIVABLE_MAC[id];
   if (known) return { name: known.name, id, compatible: false, reason: known.reason };
   const appPath = macFindApp(id, probe);
   const info = appPath ? macAppInfo(appPath, probe) : {};
   const name = info.name ?? id;
-  return { name, id, appPath, compatible: false, reason: `${name} is not known to be a Chromium-based browser that exposes DevTools` };
+  return { name, id, appPath, compatible: false, reason: `${name} não é um navegador baseado em Chromium com DevTools conhecido` };
 }
 
 function macFallback(probe: Probe): Browser | undefined {
@@ -220,12 +221,12 @@ function linuxDefault(probe: Probe): DefaultBrowser | undefined {
   const name = desktop.replace(/\.desktop$/, "");
   const entry = DRIVABLE_LINUX.find((candidate) => candidate.desktop.test(desktop));
   if (!entry) {
-    return { name, compatible: false, reason: `${name} is not a Chromium-based browser that exposes DevTools` };
+    return { name, compatible: false, reason: `${name} não é um navegador baseado em Chromium que exponha o DevTools` };
   }
   const executablePath = linuxBin(entry.bins, probe);
   return executablePath
     ? { name: entry.name, executablePath, compatible: true }
-    : { name: entry.name, compatible: false, reason: `${entry.name} is the default browser but its executable is not on PATH` };
+    : { name: entry.name, compatible: false, reason: `${entry.name} é o navegador padrão, mas o executável não está no PATH` };
 }
 
 function linuxFallback(probe: Probe): Browser | undefined {
@@ -265,12 +266,12 @@ function installedFallback(probe: Probe): Browser | undefined {
 /** MERCADOLIVRE_LOGIN_BROWSER: an .app bundle, an executable, or a bundle id. */
 function resolveOverride(value: string, probe: Probe): Browser {
   const fail = (reason: string) =>
-    new Error(`MERCADOLIVRE_LOGIN_BROWSER points to ${value}, ${reason}. ${INSTALL_HINT}`);
+    new LoginError(`MERCADOLIVRE_LOGIN_BROWSER aponta para ${value}, ${reason}. ${INSTALL_HINT}`);
   if (/\.app\/?$/i.test(value)) {
     const appPath = value.replace(/\/+$/, "");
-    if (!probe.exists(appPath)) throw fail("which does not exist");
+    if (!probe.exists(appPath)) throw fail("que não existe");
     const browser = macBrowser(appPath, probe);
-    if (!browser) throw fail("whose Info.plist has no executable");
+    if (!browser) throw fail("cujo Info.plist não tem executável");
     return browser;
   }
   if (probe.exists(value)) return { name: basename(value), executablePath: value };
@@ -278,9 +279,9 @@ function resolveOverride(value: string, probe: Probe): Browser {
     const appPath = macFindApp(value, probe);
     const browser = appPath ? macBrowser(appPath, probe, { id: value }) : undefined;
     if (browser) return browser;
-    throw fail("a bundle id no installed application answers to");
+    throw fail("um bundle id que nenhum aplicativo instalado responde");
   }
-  throw fail("which does not exist");
+  throw fail("que não existe");
 }
 
 /**
@@ -302,15 +303,15 @@ export function resolveLoginBrowser(
 
   const reason =
     found === undefined
-      ? `Could not detect the default browser on ${probe.platform}.`
-      : `Your default browser (${found.name}) is not compatible with the login: ${found.reason}.`;
+      ? `Não consegui detectar o navegador padrão em ${probe.platform}.`
+      : `Seu navegador padrão (${found.name}) não é compatível com o login: ${found.reason}.`;
 
   const fallback = installedFallback(probe);
   if (fallback) {
     return {
       browser: fallback,
-      warnings: [`${reason} Using ${fallback.name} (${fallback.appPath ?? fallback.executablePath}) instead.`],
+      warnings: [`${reason} Usando ${fallback.name} (${fallback.appPath ?? fallback.executablePath}) no lugar.`],
     };
   }
-  throw new Error(`${reason} ${INSTALL_HINT}`);
+  throw new LoginError(`${reason} ${INSTALL_HINT}`);
 }

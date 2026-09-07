@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import type { Ctx } from "../src/context.js";
-import type { InvoicesApi } from "../src/meli/api/invoices.js";
-import type { PurchasesApi } from "../src/meli/api/purchases.js";
-import type { DetailPage, InvoiceOverview, ListPage, PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase } from "../src/store/db.js";
-import { createStore } from "../src/store/repo.js";
+import type { InvoicesApi } from "../src/mercadolivre/api/invoices.js";
+import type { PurchasesApi } from "../src/mercadolivre/api/purchases.js";
+import type { DetailPage, InvoiceOverview, ListPage, PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase } from "../src/cache/db.js";
+import { createStore } from "../src/cache/repo.js";
 import { runTool } from "../src/tools/define.js";
 import { getInvoice, getPurchase, listCategories, listPurchases } from "../src/tools/purchases.js";
 
@@ -124,7 +124,7 @@ describe("get_purchase (live)", () => {
   test("gives up with a clear message when the purchase is not found", async () => {
     const { ctx } = fakeCtx({ pages: [page([item("900", "9")], 1, 1)] });
 
-    await expect(runTool(getPurchase, { purchaseId: "404" }, ctx)).rejects.toThrow(/not found.*404/);
+    await expect(runTool(getPurchase, { purchaseId: "404" }, ctx)).rejects.toThrow(/não encontrada.*404/);
   });
 });
 

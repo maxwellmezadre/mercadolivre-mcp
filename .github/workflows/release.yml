@@ -5,24 +5,25 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write # create the Release and attach binaries
-  id-token: write # npm provenance
+  contents: write # create the Release and attach the binaries
+  id-token: write # npm provenance (trusted publishing)
 
 jobs:
-  test:
+  verify:
+    name: Type-check, test & invariants
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
-      - run: bunx tsc --noEmit
-      - run: bun test
+      - run: bun run verify
 
   npm:
-    needs: test
+    name: Publish to npm
+    needs: verify
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - uses: actions/setup-node@v6
         with:
@@ -32,12 +33,29 @@ jobs:
           package-manager-cache: false
       - run: bun install --frozen-lockfile
       - run: bun run build:dist
-      # No NODE_AUTH_TOKEN: the credential is a short-lived OIDC token minted at
-      # publish time; provenance is automatic.
-      - run: npm publish --access public
+      # The first version of a new package cannot go out through OIDC: npm
+      # requires the package to exist before a trusted publisher can be
+      # configured, and requires the trusted publisher to publish
+      # (npm/cli#8544). That version is published by hand, and this step then
+      # skips the matching tag instead of failing.
+      - id: published
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "$NAME@$VERSION já está no npm; nada a publicar."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      # No NODE_AUTH_TOKEN: the credential is a short-lived OIDC token minted
+      # at publish time, and provenance comes for free.
+      - if: steps.published.outputs.skip == 'false'
+        run: npm publish --access public
 
   binaries:
-    needs: test
+    name: Build ${{ matrix.asset }}
+    needs: verify
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,12 +70,13 @@ jobs:
             target: bun-windows-x64
             asset: mercadolivre-windows-x64.exe
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
-      # playwright-core stays external: `login` needs it resolvable at runtime,
-      # every other command runs from the binary alone.
-      - run: bun build --compile --target=${{ matrix.target }} src/bin.ts --outfile ${{ matrix.asset }} --external playwright-core
+      # chromium-bidi stays external: it is a dynamic require inside
+      # playwright-core that the compiler cannot resolve, and the code path
+      # that uses it (the BiDi transport) is not ours. Chrome speaks CDP.
+      - run: bun build --compile --target=${{ matrix.target }} --external chromium-bidi src/bin.ts --outfile ${{ matrix.asset }}
       - uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.asset }}

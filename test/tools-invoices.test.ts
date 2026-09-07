@@ -4,11 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadConfig } from "../src/config.js";
 import type { Ctx } from "../src/context.js";
-import type { InvoicesApi } from "../src/meli/api/invoices.js";
+import type { InvoicesApi } from "../src/mercadolivre/api/invoices.js";
 import { UpstreamError } from "../src/core/errors.js";
-import type { PurchaseListItem } from "../src/meli/types.js";
-import { openDatabase } from "../src/store/db.js";
-import { createStore, type Store } from "../src/store/repo.js";
+import type { PurchaseListItem } from "../src/mercadolivre/types.js";
+import { openDatabase } from "../src/cache/db.js";
+import { createStore, type Store } from "../src/cache/repo.js";
 import { runTool } from "../src/tools/define.js";
 import { downloadInvoice, exportInvoices } from "../src/tools/invoices.js";
 
@@ -38,7 +38,7 @@ function harness(opts: { store?: Store; fail?: string } = {}) {
   const home = mkdtempSync(join(tmpdir(), "ml-inv-"));
   dirs.push(home);
   const downloadDir = join(home, "nfe");
-  const config = loadConfig({ MERCADOLIVRE_HOME: home, MERCADOLIVRE_DOWNLOAD_DIR: downloadDir });
+  const config = loadConfig({ MERCADOLIVRE_CONFIG_DIR: home, MERCADOLIVRE_EXPORT_DIR: downloadDir }, () => {});
   const calls: string[] = [];
   const invoices: InvoicesApi = {
     overview: async () => [],
@@ -75,8 +75,8 @@ describe("download_invoice", () => {
     const named = (await runTool(downloadInvoice, { orderId: "1", format: "pdf", fileName: "minha-nota.pdf" }, ctx)) as { path: string };
     expect(named.path).toBe(join(downloadDir, "minha-nota.pdf"));
 
-    await expect(runTool(downloadInvoice, { orderId: "1", format: "pdf", fileName: "../fora.pdf" }, ctx)).rejects.toThrow(/file name/i);
-    await expect(runTool(downloadInvoice, { orderId: "1", format: "pdf", fileName: "sub/dentro.pdf" }, ctx)).rejects.toThrow(/file name/i);
+    await expect(runTool(downloadInvoice, { orderId: "1", format: "pdf", fileName: "../fora.pdf" }, ctx)).rejects.toThrow(/nome de arquivo/i);
+    await expect(runTool(downloadInvoice, { orderId: "1", format: "pdf", fileName: "sub/dentro.pdf" }, ctx)).rejects.toThrow(/nome de arquivo/i);
     expect(existsSync(join(downloadDir, "..", "fora.pdf"))).toBe(false);
   });
 });

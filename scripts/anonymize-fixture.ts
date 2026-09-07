@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { collect, uiTypeOf } from "../src/meli/parser/bricks.js";
-import { detailBrickStack, extractNordicCtx, listRootBrick } from "../src/meli/parser/nordic.js";
-import { stripAccents } from "../src/meli/parser/rich.js";
-import type { Brick, NordicCtx } from "../src/meli/types.js";
+import { collect, uiTypeOf } from "../src/mercadolivre/parser/bricks.js";
+import { detailBrickStack, extractNordicCtx, listRootBrick } from "../src/mercadolivre/parser/nordic.js";
+import { stripAccents } from "../src/mercadolivre/parser/rich.js";
+import type { Brick, NordicCtx } from "../src/mercadolivre/types.js";
 
 // Turns raw captures (task/captures, private) into fixtures fit for a public
 // repository (NFR-8). Deterministic: the same salt maps the same id or word to

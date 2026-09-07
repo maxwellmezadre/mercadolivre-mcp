@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { Type } from "@sinclair/typebox";
 import type { Ctx } from "../src/context.js";
 import { defineTool, runTool, ToolInputError } from "../src/tools/define.js";
-import { allTools, toolByName } from "../src/tools/registry.js";
+import { activeTools, allTools, toolByName } from "../src/tools/registry.js";
 
 const echo = defineTool({
   name: "echo",
@@ -43,8 +43,20 @@ describe("registry", () => {
     for (const tool of allTools) {
       const schema = JSON.parse(JSON.stringify(tool.input)) as { type?: string };
       expect(schema.type).toBe("object");
-      expect(tool.description.length).toBeGreaterThan(10);
+      expect(tool.description.length).toBeGreaterThan(40);
     }
+  });
+
+  test("read-only mode drops exactly the tools that persist something", () => {
+    const names = activeTools({ readOnly: true }).map((tool) => tool.name);
+    expect(names).not.toContain("login");
+    expect(names).not.toContain("sync");
+    expect(names).not.toContain("export");
+    expect(names).not.toContain("download_invoice");
+    expect(names).not.toContain("export_invoices");
+    expect(names).toContain("auth_status");
+    expect(names).toContain("list_purchases");
+    expect(activeTools({ readOnly: false })).toBe(allTools);
   });
 
   test("toolByName finds registered tools only", () => {

@@ -1,6 +1,6 @@
 import type { Database } from "bun:sqlite";
-import type { DateFilterValue } from "../meli/api/purchases.js";
-import { normalizeTitle } from "../meli/merge.js";
+import type { DateFilterValue } from "../mercadolivre/api/purchases.js";
+import { normalizeTitle } from "../mercadolivre/merge.js";
 import type { InvoiceRow, ProductRow, PurchaseRow } from "./repo.js";
 
 // Read side of the cache (AR-6): the filters every query tool needs, in SQL.

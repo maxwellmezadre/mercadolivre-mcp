@@ -1,8 +1,8 @@
 import { Type } from "@sinclair/typebox";
-import { DATE_FILTERS, type DateFilterValue, type DetailIds, type ListFilters } from "../meli/api/purchases.js";
-import { mergeProducts, type MergedProduct } from "../meli/merge.js";
-import { groupPurchases } from "../meli/parser/list.js";
-import { centsToNumber } from "../meli/parser/rich.js";
+import { DATE_FILTERS, type DateFilterValue, type DetailIds, type ListFilters } from "../mercadolivre/api/purchases.js";
+import { mergeProducts, type MergedProduct } from "../mercadolivre/merge.js";
+import { groupPurchases } from "../mercadolivre/parser/list.js";
+import { centsToNumber } from "../mercadolivre/parser/rich.js";
 import type {
   DetailProduct,
   InvoiceOverview,
@@ -10,9 +10,9 @@ import type {
   MoneyBreakdown,
   Payment,
   PurchaseListItem,
-} from "../meli/types.js";
-import { dateFilterRange } from "../store/queries.js";
-import type { ProductRow, PurchaseRow, Store } from "../store/repo.js";
+} from "../mercadolivre/types.js";
+import { dateFilterRange } from "../cache/queries.js";
+import type { ProductRow, PurchaseRow, Store } from "../cache/repo.js";
 import { compactObject, defineTool } from "./define.js";
 
 // Purchase tools (F-3, F-4, F-5, F-6, F-12). The cache is the default query
@@ -26,7 +26,7 @@ export const dateFilterField = Type.Optional(
     DATE_FILTERS.map((value) => Type.Literal(value)),
     {
       description:
-        "Time window: ALL (default), 30D, 3M, 6M, Y (current year) or 1Y..4Y (calendar years: 1Y = last year)",
+        "Janela de tempo: ALL (default), 30D, 3M, 6M, Y (ano corrente) ou 1Y..4Y (anos-calendário: 1Y = ano passado)",
     },
   ),
 );
@@ -164,23 +164,24 @@ async function livePages(
 export const listPurchases = defineTool({
   name: "list_purchases",
   description:
-    "Lists Mercado Livre purchases grouped by purchase (one purchase = one checkout; one product per order inside " +
-    "it), newest first. Reads the local cache by default (run sync first; falls back to the site while the cache is " +
-    "empty; fromCache=false forces the site). Filters: time window (dateFilter) or explicit from/to dates, exact " +
-    "category (see list_categories) and free-text search. Returns money in BRL and the detailRef needed by get_purchase.",
+    "Lista as compras do Mercado Livre agrupadas por compra (uma compra = um checkout; dentro dela, um produto por " +
+    "pedido), da mais recente para a mais antiga. Lê o cache local por padrão (rode sync antes; enquanto o cache " +
+    "estiver vazio consulta o site, 1 requisição por página; fromCache=false força o site). Filtros: janela de tempo " +
+    "(dateFilter) ou datas from/to, categoria exata (veja list_categories) e busca por texto. Valores em reais e o " +
+    "detailRef que get_purchase precisa.",
   readOnly: true,
   input: Type.Object({
-    fromCache: Type.Optional(Type.Boolean({ description: "Read the local cache (default true)" })),
+    fromCache: Type.Optional(Type.Boolean({ description: "Lê o cache local (default true)" })),
     dateFilter: dateFilterField,
-    from: Type.Optional(Type.String({ description: "Cache only: purchase date >= YYYY-MM-DD" })),
-    to: Type.Optional(Type.String({ description: "Cache only: purchase date <= YYYY-MM-DD" })),
-    category: Type.Optional(Type.String({ minLength: 1, description: "Exact category name from list_categories" })),
-    search: Type.Optional(Type.String({ minLength: 1, description: "Free text: product title or brand" })),
-    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, description: "Cache only: maximum purchases (default 50)" })),
-    offset: Type.Optional(Type.Integer({ minimum: 0, description: "Cache only: purchases to skip (default 0)" })),
-    page: Type.Optional(Type.Integer({ minimum: 1, description: "Site only: first page to read (default 1)" })),
+    from: Type.Optional(Type.String({ description: "Só no cache: data da compra >= YYYY-MM-DD" })),
+    to: Type.Optional(Type.String({ description: "Só no cache: data da compra <= YYYY-MM-DD" })),
+    category: Type.Optional(Type.String({ minLength: 1, description: "Nome exato da categoria, de list_categories" })),
+    search: Type.Optional(Type.String({ minLength: 1, description: "Texto livre: título ou marca do produto" })),
+    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, description: "Só no cache: máximo de compras (default 50)" })),
+    offset: Type.Optional(Type.Integer({ minimum: 0, description: "Só no cache: compras a pular (default 0)" })),
+    page: Type.Optional(Type.Integer({ minimum: 1, description: "Só no site: primeira página a ler (default 1)" })),
     maxPages: Type.Optional(
-      Type.Integer({ minimum: 1, maximum: 50, description: "Site only: consecutive pages to read (default 1)" }),
+      Type.Integer({ minimum: 1, maximum: 50, description: "Só no site: páginas consecutivas a ler (default 1)" }),
     ),
   }),
   run: async (args, ctx) => {
@@ -218,7 +219,7 @@ export const listPurchases = defineTool({
     const first = pages[0] as ListPage;
     return compactObject({
       source: "live",
-      note: useCache ? "The cache is empty; showing live results. Run sync to fill the cache." : undefined,
+      note: useCache ? "O cache está vazio; mostrando o resultado do site. Rode sync para preencher o cache." : undefined,
       totalLabel: first.totalLabel,
       page,
       totalPages: first.totalPages,
@@ -231,16 +232,16 @@ export const listPurchases = defineTool({
 export const searchPurchases = defineTool({
   name: "search_purchases",
   description:
-    "Searches the purchase history by product title, brand or variation. scope=cache (default) is a full-text " +
-    "search over the local cache and names the matching products per purchase; scope=live asks the site (first " +
-    "page of results only).",
+    "Busca no histórico de compras por título, marca ou variação do produto. scope=cache (default) é uma busca " +
+    "textual no cache local, sem rede, e diz quais produtos casaram em cada compra; scope=live pergunta ao site " +
+    "(1 requisição, só a primeira página de resultados).",
   readOnly: true,
   input: Type.Object({
-    query: Type.String({ minLength: 1, description: "Words to look for" }),
+    query: Type.String({ minLength: 1, description: "Palavras a procurar" }),
     scope: Type.Optional(
-      Type.Union([Type.Literal("cache"), Type.Literal("live")], { description: "cache (default) or live" }),
+      Type.Union([Type.Literal("cache"), Type.Literal("live")], { description: "cache (default) ou live" }),
     ),
-    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, description: "Cache only: maximum products (default 100)" })),
+    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 500, description: "Só no cache: máximo de produtos (default 100)" })),
   }),
   run: async (args, ctx) => {
     if (args.scope === "live") {
@@ -280,26 +281,27 @@ async function findInList(
     if (items.length > 0) return { items, pagesScanned };
   }
   throw new Error(
-    `Purchase not found: ${purchaseId} is not in the first ${pagesScanned} list page(s). ` +
-      "Pass packId and orderId (from list_purchases) or raise maxLookupPages.",
+    `Compra não encontrada: ${purchaseId} não está nas primeiras ${pagesScanned} página(s) da lista. ` +
+      "Informe packId e orderId (de list_purchases) ou aumente maxLookupPages.",
   );
 }
 
 export const getPurchase = defineTool({
   name: "get_purchase",
   description:
-    "Full detail of one purchase: money breakdown (products, discount, coupons, shipping, total), installments and " +
-    "card, delivery address, seller, every product with list/paid/unit price and variations, and the NF-e invoice " +
-    "metadata. packId and orderId must come from the same list item (list_purchases gives a valid detailRef); " +
-    "without them the tool looks the purchase up in the cache, then scans the purchase list (one request per page).",
+    "Detalhe completo de uma compra: breakdown financeiro (produtos, desconto, cupons, frete, total), parcelas e " +
+    "cartão, endereço de entrega, vendedor, cada produto com preço cheio, pago e unitário e variações, e os " +
+    "metadados da NF-e. Busca a página de detalhe no site (1 requisição, mais 1 para a NF-e). packId e orderId " +
+    "precisam vir do mesmo item da lista (list_purchases devolve um detailRef válido); sem eles a tool procura no " +
+    "cache e depois varre a lista (1 requisição por página).",
   readOnly: true,
   input: Type.Object({
-    purchaseId: Type.String({ minLength: 1, description: "Purchase id ('Compra número N')" }),
-    packId: Type.Optional(Type.String({ minLength: 1, description: "Pack id paired with orderId" })),
-    orderId: Type.Optional(Type.String({ minLength: 1, description: "Order id paired with packId" })),
-    includeInvoice: Type.Optional(Type.Boolean({ description: "Fetch NF-e metadata too (default true)" })),
+    purchaseId: Type.String({ minLength: 1, description: "Id da compra ('Compra número N')" }),
+    packId: Type.Optional(Type.String({ minLength: 1, description: "Id do pacote, par de orderId" })),
+    orderId: Type.Optional(Type.String({ minLength: 1, description: "Id do pedido, par de packId" })),
+    includeInvoice: Type.Optional(Type.Boolean({ description: "Busca também os metadados da NF-e (default true)" })),
     maxLookupPages: Type.Optional(
-      Type.Integer({ minimum: 1, maximum: 50, description: "Pages to scan when the pair is missing (default 10)" }),
+      Type.Integer({ minimum: 1, maximum: 50, description: "Páginas a varrer quando o par não é informado (default 10)" }),
     ),
   }),
   run: async (args, ctx) => {
@@ -386,8 +388,9 @@ function cachedRowToListItem(row: ProductRow): PurchaseListItem {
 export const listCategories = defineTool({
   name: "list_categories",
   description:
-    "Lists the category names accepted by list_purchases (category) and the available time windows. Uses the " +
-    "categories saved by the last sync, or the site when the cache is empty.",
+    "Lista os nomes de categoria aceitos por list_purchases (category) e as janelas de tempo disponíveis. Usa as " +
+    "categorias salvas pelo último sync, ou o site (1 requisição) quando o cache está vazio. Pode vir vazio: o " +
+    "site não oferece o filtro de categoria para toda conta.",
   readOnly: true,
   input: Type.Object({}),
   run: async (_args, ctx) => {
@@ -403,11 +406,11 @@ export const listCategories = defineTool({
 export const getInvoice = defineTool({
   name: "get_invoice",
   description:
-    "NF-e invoice metadata of one order (invoice date, items, PDF and XML links). Orders are one product each; " +
-    "get_purchase lists them under invoiceOrderIds.",
+    "Metadados da NF-e de um pedido (data da nota, itens, links de PDF e XML), com 1 requisição. Cada pedido é um " +
+    "produto; get_purchase os lista em invoiceOrderIds. Os links expiram: para salvar o arquivo use download_invoice.",
   readOnly: true,
   input: Type.Object({
-    orderId: Type.String({ minLength: 1, description: "Order id (one product)" }),
+    orderId: Type.String({ minLength: 1, description: "Id do pedido (um produto)" }),
   }),
   run: async (args, ctx) => {
     const invoices = await ctx.meli.invoices.overview([args.orderId]);
