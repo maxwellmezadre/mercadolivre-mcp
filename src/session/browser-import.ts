@@ -11,7 +11,7 @@ import type { LoginResult } from "./login.js";
 import { isMercadoLivre, SESSION_DOMAIN, type SessionCookie, type SessionStore } from "./store.js";
 
 // Alternative to the headed login: reuse the session of a Chromium-based
-// browser the user is ALREADY logged in with (Arc, Chrome, Brave, Edge,
+// browser the user is ALREADY logged in with (Dia, Arc, Chrome, Brave, Edge,
 // Chromium). Chromium on macOS encrypts cookie values with AES-128-CBC using
 // a key derived from a per-browser password kept in the Keychain ("<Browser>
 // Safe Storage"); the user grants access once through the macOS dialog.
