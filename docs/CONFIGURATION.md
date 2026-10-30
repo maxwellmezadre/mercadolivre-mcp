@@ -13,7 +13,7 @@ que fazer.
 | `MERCADOLIVRE_SESSION_KEY` | — | Chave AES em base64 de 32 bytes (`openssl rand -base64 32`). Sem ela, uma é gerada em `session.key` |
 | `MERCADOLIVRE_EXPORT_DIR` | `~/Downloads/mercadolivre-export` | Único diretório em que `export`, `download_invoice` e `export_invoices` podem escrever |
 | `MERCADOLIVRE_READ_ONLY` | `0` | Não registra `login`, `sync`, `download_invoice`, `export_invoices` e `export` |
-| `MERCADOLIVRE_IMPORT_BROWSER` | — | `arc`, `chrome`, `chromium`, `brave` ou `edge`: o `login` importa daí em vez de abrir uma janela |
+| `MERCADOLIVRE_IMPORT_BROWSER` | — | `dia`, `arc`, `chrome`, `chromium`, `brave` ou `edge`: o `login` importa daí em vez de abrir uma janela |
 | `MERCADOLIVRE_LOGIN_BROWSER` | navegador padrão | Navegador da janela de login: caminho do `.app` (macOS), executável ou bundle id. Precisa expor DevTools |
 | `MERCADOLIVRE_COOKIE` | — | Header `Cookie` completo do site. Vence a sessão salva e nunca é gravado |
 | `MERCADOLIVRE_USER_AGENT` | o salvo no login | User-Agent enviado ao site |

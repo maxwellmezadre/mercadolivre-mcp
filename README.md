@@ -156,7 +156,7 @@ Todas opcionais. A tabela completa está em
 | `MERCADOLIVRE_SESSION_KEY` | gerada em `session.key` | Chave AES em base64 de 32 bytes |
 | `MERCADOLIVRE_EXPORT_DIR` | `~/Downloads/mercadolivre-export` | O único diretório onde `export`, `download_invoice` e `export_invoices` escrevem |
 | `MERCADOLIVRE_READ_ONLY` | `0` | Não registra as tools que escrevem em disco |
-| `MERCADOLIVRE_IMPORT_BROWSER` | — | `arc` \| `chrome` \| `chromium` \| `brave` \| `edge`: o `login` importa daí |
+| `MERCADOLIVRE_IMPORT_BROWSER` | — | `dia` \| `arc` \| `chrome` \| `chromium` \| `brave` \| `edge`: o `login` importa daí |
 | `MERCADOLIVRE_LOGIN_BROWSER` | navegador padrão | Navegador da janela de login: `.app`, executável ou bundle id |
 | `MERCADOLIVRE_COOKIE` | — | Header `Cookie` completo; vence a sessão salva e nunca é gravado |
 | `MERCADOLIVRE_MIN_INTERVAL_MS` | `1200` | Intervalo mínimo entre requisições |

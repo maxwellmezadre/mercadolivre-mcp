@@ -77,7 +77,7 @@ export async function runCli(argv: string[], version: string): Promise<void> {
   command("login")
     .description("Abre o navegador para você entrar na conta e salva a sessão cifrada")
     .option("--fresh", "apaga o perfil do navegador de automação antes")
-    .option("--from-browser <navegador>", "importa a sessão de um navegador já logado (macOS): arc|chrome|chromium|brave|edge")
+    .option("--from-browser <navegador>", "importa a sessão de um navegador já logado (macOS): dia|arc|chrome|chromium|brave|edge")
     .action((options) =>
       invoke("login", { fresh: options.fresh, from_browser: options.fromBrowser }, options.json ?? false),
     );

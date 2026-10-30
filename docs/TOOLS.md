@@ -44,7 +44,7 @@ Abre o navegador padrão para o usuário entrar na conta do Mercado Livre e guar
 | Parâmetro | Tipo | Obrigatório | Descrição |
 | --- | --- | --- | --- |
 | `fresh` | boolean | não | Apaga o perfil do navegador de automação antes (login do zero) |
-| `from_browser` | `arc` \| `chrome` \| `chromium` \| `brave` \| `edge` | não | Importa os cookies de um navegador já logado (só macOS) em vez de abrir uma janela |
+| `from_browser` | `dia` \| `arc` \| `chrome` \| `chromium` \| `brave` \| `edge` | não | Importa os cookies de um navegador já logado (só macOS) em vez de abrir uma janela |
 
 ## `doctor`
 

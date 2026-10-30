@@ -35,7 +35,7 @@ mercadolivre login
 ## Importando de um navegador já logado (macOS)
 
 ```sh
-mercadolivre login --from-browser chrome    # arc | chrome | chromium | brave | edge
+mercadolivre login --from-browser chrome    # dia | arc | chrome | chromium | brave | edge
 ```
 
 O Chromium no macOS cifra os cookies com uma chave guardada no Keychain

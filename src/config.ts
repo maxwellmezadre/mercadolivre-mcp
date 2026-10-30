@@ -10,7 +10,7 @@ import { Value } from "@sinclair/typebox/value";
 // tools fail with an actionable SessionError at call time, not at boot (NFR-9).
 
 /** Chromium-based browsers whose cookie store can be imported (macOS). */
-export const IMPORT_BROWSERS = ["arc", "chrome", "chromium", "brave", "edge"] as const;
+export const IMPORT_BROWSERS = ["dia", "arc", "chrome", "chromium", "brave", "edge"] as const;
 export type ImportBrowser = (typeof IMPORT_BROWSERS)[number];
 
 export const SESSION_KEY_BYTES = 32;
