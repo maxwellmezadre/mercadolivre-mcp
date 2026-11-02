@@ -33,9 +33,14 @@ export type Brick = {
   /** `{ui_type}_{hex}`; the hex suffix changes on every render. */
   id?: string;
   ui_type?: string;
+  /** The same, on pages redesigned in 2026-11. */
+  uiType?: string;
   data?: Record<string, unknown>;
   /** Children (the key is `bricks`, not `children`). */
   bricks?: Brick[];
+  /** In a stack of the redesigned pages: the ids of the children and of the parent. */
+  childrenBricks?: string[];
+  parentBrick?: string;
 };
 
 /** Detail pages ship a flat `id -> brick` map instead of a tree. */
@@ -49,6 +54,13 @@ export type PageProps = {
     data?: { brick?: Brick; events?: Array<{ data?: { brick?: Brick } }> };
   };
   floxPreloadedState?: Record<string, { brickStack?: BrickStack }>;
+  /** Pages redesigned in 2026-11 keep the state one level down, in a React element. */
+  children?: {
+    props?: {
+      middleendData?: { floxResponse?: PageProps["floxResponse"] };
+      floxContext?: { floxPreloadedState?: PageProps["floxPreloadedState"] };
+    };
+  };
 };
 
 export type NordicCtx = { appProps?: { pageProps?: PageProps } };
@@ -89,6 +101,8 @@ export type PurchaseListItem = PurchaseIds & {
   /** Raw product label from the list (title + quantity + attributes prose). */
   productTitle: string;
   quantity: number;
+  /** Value paid for the line, when the list shows it. */
+  paidCents?: number;
   /** "MLB2086446083" */
   itemId?: string;
   itemUrl?: string;

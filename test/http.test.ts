@@ -10,7 +10,7 @@ import { createLogger } from "../src/core/logger.js";
 // Deterministic harness: fake clock (sleep advances time), fake fetch that
 // records every call, real session store on a tmp file.
 
-const LIST_URL = "https://myaccount.mercadolivre.com.br/my_purchases/list";
+const LIST_URL = "https://myaccount.mercadolivre.com.br/post-purchase/my-purchases/list";
 const CTX_HTML =
   '<html><script id="__NORDIC_RENDERING_CTX__" nonce="n">_n.ctx.r={}</script></html>';
 
@@ -167,7 +167,7 @@ describe("redirects and cookies", () => {
   test("follows same-domain redirects manually and merges each hop's cookies", async () => {
     const h = harness({
       responses: [
-        response(302, { location: "/my_purchases/list?page=2", setCookie: ["hop=1; Path=/"] }),
+        response(302, { location: "/post-purchase/my-purchases/list?page=2", setCookie: ["hop=1; Path=/"] }),
         response(200, { body: CTX_HTML, setCookie: ["ssid=rotated-cookie-value; Domain=.mercadolivre.com.br; Path=/"] }),
       ],
     });

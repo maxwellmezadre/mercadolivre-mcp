@@ -14,7 +14,7 @@ import type { ProductRow, Store } from "../cache/repo.js";
 // network at all; it also runs automatically when PARSER_VERSION changes.
 
 /** Bump when a parser changes what it extracts; cached pages get reparsed. */
-export const PARSER_VERSION = 2;
+export const PARSER_VERSION = 3;
 
 export type SyncMode = "incremental" | "full" | "reparse";
 
@@ -82,6 +82,8 @@ function rowToListItem(row: ProductRow): PurchaseListItem {
     isFull: row.is_full === 1,
     productTitle: row.title,
     quantity: row.quantity,
+    // An NF-e price stays one: the detail merge must not take it as its own.
+    paidCents: row.price_source === "invoice" ? undefined : (row.paid_cents ?? undefined),
     itemId: row.item_id ?? undefined,
     imageUrl: row.image_url ?? undefined,
     itemUrl: row.item_url ?? undefined,
@@ -103,7 +105,7 @@ function applyDetail(
   const { products, unmatchedRows } = mergeProducts(listItems, detail.products, {
     orderId: queriedOrderId,
     title: detail.queriedProductTitle,
-  });
+  }, detail.money);
   store.applyDetail(purchaseId, detail, products, rawDetail, fetchedAt);
   report.unmatchedDetailRows += unmatchedRows.length;
   for (const warning of detail.warnings) report.warnings.push(`compra ${purchaseId}: ${warning}`);

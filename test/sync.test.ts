@@ -194,6 +194,30 @@ describe("incremental sync", () => {
   });
 });
 
+describe("what the list no longer shows", () => {
+  test("the units come from the ticket and reach the product row", async () => {
+    const { ctx, store } = harness(SITE);
+    await runSync(ctx, { mode: "full", withDetails: false, withInvoices: false, withCategories: false });
+    const first = (SITE.pages[0] as PurchaseListItem[])[0] as PurchaseListItem;
+    const detail = SITE.details[first.purchaseId] as DetailPage;
+    store.applyDetail(first.purchaseId, detail, [{ orderId: first.orderId, title: first.productTitle, quantity: 4, paidCents: 400, unitCents: 100, priceSource: "detail", variations: {} }], "{}", "2026-09-05T00:00:00Z");
+    expect(store.productsOf(first.purchaseId).find((row) => row.order_id === first.orderId)?.quantity).toBe(4);
+  });
+
+  test("a row without quantity, status or delivery does not erase what the cache knows, nor a known paid value or date", async () => {
+    const { ctx, store } = harness(SITE);
+    await runSync(ctx, { mode: "full", withDetails: false, withInvoices: false, withCategories: false });
+    const first = (SITE.pages[0] as PurchaseListItem[])[0] as PurchaseListItem;
+    store.upsertListItems([{ ...first, quantity: 3, status: "Entregue", deliveryHeadline: "Chegou", deliveredAt: "2026-08-29", isFull: true, shipmentId: "s9", paidCents: 900, purchaseDate: "2026-08-20" }], "2026-09-04T00:00:00Z");
+    const before = store.getPurchase(first.purchaseId)?.purchase_date;
+    store.upsertListItems([{ ...first, quantity: 1, status: undefined, deliveryHeadline: undefined, deliveredAt: undefined, isFull: false, shipmentId: undefined, paidCents: 1200, purchaseDate: "2026-08-19" }], "2026-09-05T00:00:00Z");
+    expect(store.productsOf(first.purchaseId).find((row) => row.order_id === first.orderId)).toMatchObject({
+      quantity: 3, status: "Entregue", delivery_headline: "Chegou", delivered_at: "2026-08-29", is_full: 1, shipment_id: "s9", paid_cents: 900,
+    });
+    expect(store.getPurchase(first.purchaseId)?.purchase_date).toBe(before);
+  });
+});
+
 describe("reparse", () => {
   test("re-runs the detail parser from raw_detail without touching the network", async () => {
     const { ctx, store } = harness(SITE);

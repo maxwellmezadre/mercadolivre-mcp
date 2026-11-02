@@ -3,7 +3,18 @@
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/);
 versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
+
 ## [Unreleased]
+
+### Fixed
+
+- O Mercado Livre redesenhou a lista e o detalhe das compras (`/post-purchase/my-purchases`) e o `sync` parou com "floxResponse.data.brick não encontrado". A lista agora vem da página nova e da API dela, página a página até uma vazia, e o detalhe tem parser próprio. O parser antigo continua para as páginas já em cache.
+
+### Changed
+
+- Compras novas: o valor pago por produto parte do valor da lista (antes do cupom) e é acertado ao total da compra.
+- Compras novas não trazem mais o texto e a data de entrega nem o `shipmentId`, que a lista deixou de mostrar. O vendedor pode vir sem nome quando a página mostra só o assistente de mensagens.
+- Uma passada de lista não apaga mais a quantidade, a situação, a entrega, o preço ou a data que o cache já sabia.
 
 ## [0.2.0] - 2026-09-07
 

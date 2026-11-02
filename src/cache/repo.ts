@@ -151,23 +151,32 @@ export function createStore(db: Database): Store {
     (db.query(sql).get(...(params as never[])) as T | null) ?? undefined;
   const transaction = <T>(fn: () => T): T => db.transaction(fn)() as T;
 
+  function insertCategories(pairs: Array<[purchaseId: string, category: string]>): void {
+    for (const [purchaseId, category] of pairs) {
+      run("INSERT OR IGNORE INTO purchase_categories (purchase_id, category) VALUES (?, ?)", purchaseId, category);
+    }
+  }
+
   function upsertProduct(item: PurchaseListItem): void {
     run(
       `INSERT INTO products (order_id, purchase_id, pack_id, shipment_id, item_id, title, title_norm, quantity,
-         status, delivery_headline, delivered_at, is_full, image_url, item_url, detail_url)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         status, delivery_headline, delivered_at, is_full, image_url, item_url, detail_url, paid_cents)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(order_id) DO UPDATE SET
-         purchase_id = excluded.purchase_id, pack_id = excluded.pack_id, shipment_id = excluded.shipment_id,
-         item_id = COALESCE(excluded.item_id, products.item_id), quantity = excluded.quantity,
-         status = excluded.status, delivery_headline = excluded.delivery_headline,
-         delivered_at = excluded.delivered_at, is_full = excluded.is_full,
+         purchase_id = excluded.purchase_id, pack_id = excluded.pack_id,
+         shipment_id = COALESCE(excluded.shipment_id, products.shipment_id),
+         item_id = COALESCE(excluded.item_id, products.item_id), quantity = MAX(excluded.quantity, products.quantity),
+         status = COALESCE(excluded.status, products.status),
+         delivery_headline = COALESCE(excluded.delivery_headline, products.delivery_headline),
+         delivered_at = COALESCE(excluded.delivered_at, products.delivered_at), is_full = MAX(excluded.is_full, products.is_full),
+         paid_cents = COALESCE(products.paid_cents, excluded.paid_cents),
          image_url = COALESCE(excluded.image_url, products.image_url),
          item_url = COALESCE(excluded.item_url, products.item_url),
          detail_url = COALESCE(excluded.detail_url, products.detail_url)`,
       item.orderId, item.purchaseId, item.packId, orNull(item.shipmentId), orNull(item.itemId),
       item.productTitle, normalizeTitle(item.productTitle), item.quantity,
       orNull(item.status), orNull(item.deliveryHeadline), orNull(item.deliveredAt), flag(item.isFull),
-      orNull(item.imageUrl), orNull(item.itemUrl), orNull(item.detailUrl),
+      orNull(item.imageUrl), orNull(item.itemUrl), orNull(item.detailUrl), orNull(item.paidCents),
     );
   }
 
@@ -187,11 +196,11 @@ export function createStore(db: Database): Store {
                date_label, status, is_full, list_seen_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(purchase_id) DO UPDATE SET
-               pack_id = excluded.pack_id, order_id = excluded.order_id, shipment_id = excluded.shipment_id,
+               pack_id = excluded.pack_id, order_id = excluded.order_id, shipment_id = COALESCE(excluded.shipment_id, purchases.shipment_id),
                vertical_id = COALESCE(excluded.vertical_id, purchases.vertical_id),
-               purchase_date = COALESCE(excluded.purchase_date, purchases.purchase_date),
-               date_label = COALESCE(excluded.date_label, purchases.date_label),
-               status = excluded.status, is_full = excluded.is_full, list_seen_at = excluded.list_seen_at`,
+               purchase_date = COALESCE(purchases.purchase_date, excluded.purchase_date),
+               date_label = COALESCE(purchases.date_label, excluded.date_label),
+               status = COALESCE(excluded.status, purchases.status), is_full = MAX(excluded.is_full, purchases.is_full), list_seen_at = excluded.list_seen_at`,
             group.purchaseId, group.detailRef.packId, group.detailRef.orderId, orNull(first.shipmentId),
             orNull(first.verticalId), orNull(group.purchaseDate), group.purchaseDateLabel,
             orNull(group.status), flag(group.products.some((product) => product.isFull)), seenAt,
@@ -230,12 +239,12 @@ export function createStore(db: Database): Store {
         for (const product of products) {
           if (!product.orderId || product.priceSource !== "detail") continue;
           run(
-            `UPDATE products SET title = ?, title_norm = ?, list_cents = ?, paid_cents = ?, unit_cents = ?,
+            `UPDATE products SET title = ?, title_norm = ?, quantity = ?, list_cents = ?, paid_cents = ?, unit_cents = ?,
                price_source = 'detail', variations = ?,
                image_url = COALESCE(?, image_url), item_url = COALESCE(?, item_url),
                item_id = COALESCE(?, item_id)
              WHERE order_id = ?`,
-            product.title, normalizeTitle(product.title), orNull(product.listCents), orNull(product.paidCents),
+            product.title, normalizeTitle(product.title), product.quantity, orNull(product.listCents), orNull(product.paidCents),
             orNull(product.unitCents), json(product.variations), orNull(product.imageUrl),
             orNull(product.itemUrl), orNull(product.itemId), product.orderId,
           );
@@ -293,12 +302,7 @@ export function createStore(db: Database): Store {
     replaceCategories(pairs) {
       transaction(() => {
         run("DELETE FROM purchase_categories");
-        for (const [purchaseId, category] of pairs) {
-          run(
-            "INSERT OR IGNORE INTO purchase_categories (purchase_id, category) VALUES (?, ?)",
-            purchaseId, category,
-          );
-        }
+        insertCategories(pairs);
       });
     },
 

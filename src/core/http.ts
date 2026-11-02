@@ -58,7 +58,7 @@ export type MeliHttp = {
 };
 
 export const LIST_PAGE_URL =
-  "https://myaccount.mercadolivre.com.br/my_purchases/list";
+  "https://myaccount.mercadolivre.com.br/post-purchase/my-purchases/list";
 
 /** Fallback when the session carries no User-Agent (spec §3.6). */
 export const DEFAULT_USER_AGENT =

@@ -8,6 +8,7 @@ const ID_SUFFIX = /_[0-9a-f]{6,}$/;
 
 export function uiTypeOf(brick: Brick): string | undefined {
   if (brick.ui_type) return brick.ui_type;
+  if (brick.uiType) return brick.uiType;
   return brick.id ? brick.id.replace(ID_SUFFIX, "") : undefined;
 }
 

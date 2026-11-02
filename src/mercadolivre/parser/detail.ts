@@ -11,6 +11,7 @@ import type {
   ShippingAddress,
 } from "../types.js";
 import { collectFromStack } from "./bricks.js";
+import { parsePostPurchaseDetail } from "./post-purchase-detail.js";
 import { parsePaymentInfo, parsePtBrDate } from "./dates.js";
 import {
   labelCount,
@@ -38,7 +39,7 @@ const PURCHASE_NUMBER = /compra numero\s+(\d+)/;
 const MESSAGES_URL = /\/compras\/novo\/mensagens\/(\d+)\/(\d+)/;
 const ITEM_ID = /MLB-?(\d+)/;
 const ROW_ORDER = /\/my_purchases\/\d+\/status\?packId=(\d+)&orderId=(\d+)/;
-const CARD = /^(.+?)\s+\*{2,}\s*(\d{3,4})$/;
+export const CARD = /^(.+?)\s+\*{2,}\s*(\d{3,4})$/;
 const INSTALLMENTS_RICH = /(\d+)\s*x\b/i;
 const INSTALLMENTS_PROSE = /(\d+|uma|um)\s+parcelas?\s+de\s+/;
 
@@ -67,6 +68,11 @@ const ACCUMULATED: Set<MoneyField> = new Set(["discountCents", "couponsCents", "
 
 /** Ticket rows that repeat the payment (per card, n x installment): skipped. */
 const PAYMENT_LABELS = new Set(["pagamento", "pagamentos", ""]);
+
+/** The redesigned ticket says "Total pago", "Frete grátis", "Desconto especial": the first word decides. */
+export function moneyFieldOf(key: string): MoneyField | undefined {
+  return LABELS[key] ?? LABELS[key.split(" ")[0] as string];
+}
 
 type TextLike = string | RichText | undefined;
 
@@ -157,7 +163,7 @@ function parseMoney(rows: Brick[]): { money: MoneyBreakdown; installments?: numb
 }
 
 /** products + discount + coupons + shipping must equal total (AR-7); extras are informational. */
-function checkMoney(money: MoneyBreakdown, installments: number): string[] {
+export function checkMoney(money: MoneyBreakdown, installments: number): string[] {
   if (money.productsCents === undefined || money.totalCents === undefined) return [];
   const parts = {
     products: money.productsCents,
@@ -285,6 +291,7 @@ function parseShipping(row: Brick | undefined): ShippingAddress {
 }
 
 export function parseDetailPage(stack: BrickStack, now: Date): DetailPage {
+  if (Object.values(stack).some((brick) => brick?.uiType)) return parsePostPurchaseDetail(stack, now);
   const ticket = collectFromStack(stack, "ticket")[0]?.data as { subtitle?: RichText } | undefined;
   const subtitle = prose(ticket?.subtitle);
   const purchaseId = subtitle

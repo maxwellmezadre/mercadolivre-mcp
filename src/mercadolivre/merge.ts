@@ -1,5 +1,5 @@
 import { stripAccents } from "./parser/rich.js";
-import type { DetailProduct, PurchaseListItem } from "./types.js";
+import type { DetailProduct, MoneyBreakdown, PurchaseListItem } from "./types.js";
 
 // Joins the two product sources of a purchase (spec §6.6): the list is the
 // complete inventory (one item per order, with quantity), the detail rows
@@ -40,8 +40,9 @@ export function normalizeTitle(title: string): string {
 }
 
 function build(item: PurchaseListItem | undefined, row: DetailProduct | undefined): MergedProduct {
-  const quantity = item?.quantity ?? row?.quantity ?? 1;
-  const paidCents = row?.paidCents;
+  // The redesigned list shows no quantity (always 1) and the ticket no paid value: each brings its half.
+  const quantity = Math.max(item?.quantity ?? 0, row?.quantity ?? 0, 1);
+  const paidCents = row?.paidCents ?? item?.paidCents;
   return {
     orderId: item?.orderId,
     packId: item?.packId,
@@ -63,10 +64,28 @@ function build(item: PurchaseListItem | undefined, row: DetailProduct | undefine
   };
 }
 
+/**
+ * The redesigned list shows each line before coupons (and no page shows it after them): the lines are settled to what
+ * the purchase paid for its products, spreading the difference. A value an older page read per line is left alone.
+ */
+function settlePaid(products: MergedProduct[], rows: DetailProduct[], money: MoneyBreakdown | undefined): MergedProduct[] {
+  if (money?.totalCents === undefined || rows.some((row) => row.paidCents !== undefined)) return products;
+  const goal = money.totalCents - (money.shippingCents ?? 0) - (money.interestCents ?? 0);
+  const sum = products.reduce((total, product) => total + (product.paidCents ?? 0), 0);
+  if (sum <= 0 || sum === goal || products.some((product) => product.paidCents === undefined)) return products;
+  let spent = 0;
+  return products.map((product, index) => {
+    const paidCents = index === products.length - 1 ? goal - spent : Math.round(((product.paidCents as number) * goal) / sum);
+    spent += paidCents;
+    return { ...product, paidCents, unitCents: Math.round(paidCents / product.quantity) };
+  });
+}
+
 export function mergeProducts(
   listItems: PurchaseListItem[],
   rows: DetailProduct[],
   anchor?: { orderId: string; title?: string },
+  money?: MoneyBreakdown,
 ): { products: MergedProduct[]; unmatchedRows: DetailProduct[] } {
   if (listItems.length === 0) {
     return { products: rows.map((row) => build(undefined, row)), unmatchedRows: [] };
@@ -112,7 +131,7 @@ export function mergeProducts(
   }
 
   return {
-    products: listItems.map((item, index) => build(item, matches.get(index))),
+    products: settlePaid(listItems.map((item, index) => build(item, matches.get(index))), rows, money),
     unmatchedRows,
   };
 }

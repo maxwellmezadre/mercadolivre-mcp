@@ -8,6 +8,7 @@ import type {
 } from "../types.js";
 import { collect, uiTypeOf, walk } from "./bricks.js";
 import { parsePtBrDate } from "./dates.js";
+import { parsePostPurchaseList } from "./post-purchase-list.js";
 import { parseQuantity } from "./rich.js";
 
 // Purchase list page -> canonical items (spec §6.2). Pure function over the
@@ -108,7 +109,8 @@ function dropdownOptions(root: Brick, uiType: string, keyName: string): Array<{ 
   return (options ?? []).map((option) => option.data ?? {});
 }
 
-export function parseListPage(root: Brick, now: Date): ListPage {
+export function parseListPage(root: Brick, now: Date, page = 1): ListPage {
+  if (root.uiType) return parsePostPurchaseList(root, now, page);
   const items: PurchaseListItem[] = [];
   let currentGroup = "";
   (function visit(brick: Brick): void {

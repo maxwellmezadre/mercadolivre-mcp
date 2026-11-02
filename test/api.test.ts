@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { UpstreamError } from "../src/core/errors.js";
 import type { GetOptions, HttpResult, MeliHttp } from "../src/core/http.js";
 import { createInvoicesApi, OVERVIEW_BATCH } from "../src/mercadolivre/api/invoices.js";
-import { createPurchasesApi, detailUrl, listItemsUrl, listPageUrl } from "../src/mercadolivre/api/purchases.js";
-import type { Brick, BrickStack } from "../src/mercadolivre/types.js";
+import { createPurchasesApi, detailUrl } from "../src/mercadolivre/api/purchases.js";
+import type { BrickStack } from "../src/mercadolivre/types.js";
 
 // The api layer only glues urls, the http funnel and the parsers together;
 // these tests pin the urls (spec §4) and the response routing.
@@ -14,25 +14,9 @@ const NOW = new Date("2026-09-04T12:00:00Z");
 
 const text = (value: string) => ({ rich: [{ type: "text", value: { text: value } }], accessibility: value });
 
-function listRoot(): Brick {
-  return {
-    id: "main_1",
-    ui_type: "main",
-    bricks: [
-      { ui_type: "list_item_grouper", data: { text: text("27 de agosto") } },
-      {
-        id: "list_item_1",
-        ui_type: "list_item",
-        data: { intro: text("Entregue"), info: text("Cafe 1 unidade"), context: { purchase_id: "1", pack_id: "2", order_id: "3" } },
-      },
-      { ui_type: "paginator", data: { total_pages: 4, current: 2 } },
-    ],
-  };
-}
 
 const wrap = (ctx: unknown) =>
   `<html><script id="__NORDIC_RENDERING_CTX__" nonce="n">_n.ctx.r=${JSON.stringify(ctx)};</script></html>`;
-const listHtml = () => wrap({ appProps: { pageProps: { floxResponse: { data: { brick: listRoot() } } } } });
 const detailHtml = (stack: BrickStack) =>
   wrap({ appProps: { pageProps: { floxPreloadedState: { "@meli/web/flox/FLOX_STATE": { brickStack: stack } } } } });
 const errorHtml = () => wrap({ appProps: { pageProps: { errorType: "error", httpStatus: 500, title: "Ocorreu um erro" } } });
@@ -53,45 +37,13 @@ function fakeHttp(respond: (url: string, options: GetOptions) => Partial<HttpRes
 }
 
 describe("urls", () => {
-  test("list page and json endpoint carry the same filters; only the page differs", () => {
-    expect(listPageUrl(2, { dateFilter: "3M", category: "Pet Shop", search: "cafe" })).toBe(
-      `${MYACCOUNT}/my_purchases/list?filterDate=3M&filterCategory=Pet+Shop&searchValue=cafe&page=2`,
-    );
-    expect(listPageUrl(1, {})).toBe(`${MYACCOUNT}/my_purchases/list?filterDate=ALL&page=1`);
-    expect(listItemsUrl({ search: "cafe" })).toBe(`${MYACCOUNT}/my_purchases/api/web/list_items?filterDate=ALL&searchValue=cafe`);
-  });
-
   test("detail url needs the full triple", () => {
-    expect(detailUrl({ purchaseId: "10", packId: "20", orderId: "30" })).toBe(`${MYACCOUNT}/my_purchases/10/status?packId=20&orderId=30`);
+    expect(detailUrl({ purchaseId: "10", packId: "20", orderId: "30" })).toBe(`${MYACCOUNT}/post-purchase/my-purchases/10/status?packId=20&orderId=30`);
     expect(() => detailUrl({ purchaseId: "10", packId: "", orderId: "30" })).toThrow(/packId/);
   });
 });
 
 describe("purchases api", () => {
-  test("listPage fetches the ssr page as html and parses it", async () => {
-    const { http, calls } = fakeHttp(() => listHtml());
-    const api = createPurchasesApi({ http, now: () => NOW });
-
-    const page = await api.listPage(2, { dateFilter: "3M" });
-
-    expect(calls[0]?.url).toBe(`${MYACCOUNT}/my_purchases/list?filterDate=3M&page=2`);
-    expect(calls[0]?.options.kind).toBe("html");
-    expect(page.page).toBe(2);
-    expect(page.totalPages).toBe(4);
-    expect(page.items[0]).toMatchObject({ purchaseId: "1", packId: "2", orderId: "3", purchaseDate: "2026-08-27" });
-  });
-
-  test("listFiltered uses the json endpoint and parses the envelope", async () => {
-    const { http, calls } = fakeHttp(() => JSON.stringify({ type: "register_and_render", data: { brick: listRoot() } }));
-    const api = createPurchasesApi({ http, now: () => NOW });
-
-    const page = await api.listFiltered({ search: "cafe" });
-
-    expect(calls[0]?.url).toBe(`${MYACCOUNT}/my_purchases/api/web/list_items?filterDate=ALL&searchValue=cafe`);
-    expect(calls[0]?.options.kind).toBe("json");
-    expect(page.items).toHaveLength(1);
-  });
-
   test("getDetail returns the parsed page and the raw brick stack", async () => {
     const stack: BrickStack = {
       ticket_1: { id: "ticket_1", ui_type: "ticket", data: { subtitle: text("27 de agosto. Compra número 10") } },
@@ -101,7 +53,7 @@ describe("purchases api", () => {
 
     const result = await api.getDetail({ purchaseId: "10", packId: "20", orderId: "30" });
 
-    expect(calls[0]?.url).toBe(`${MYACCOUNT}/my_purchases/10/status?packId=20&orderId=30`);
+    expect(calls[0]?.url).toBe(`${MYACCOUNT}/post-purchase/my-purchases/10/status?packId=20&orderId=30`);
     expect(result.detail.purchaseId).toBe("10");
     expect(Object.keys(result.brickStack)).toEqual(["ticket_1"]);
   });

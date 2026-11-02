@@ -58,6 +58,11 @@ export function extractNordicCtx(html: string): NordicCtx {
     );
   }
   const pageProps = ctx.appProps?.pageProps;
+  const inner = pageProps?.children?.props;
+  if (pageProps && inner) {
+    pageProps.floxResponse ??= inner.middleendData?.floxResponse;
+    pageProps.floxPreloadedState ??= inner.floxContext?.floxPreloadedState;
+  }
   const status = pageProps?.httpStatus;
   if (pageProps?.errorType || (status !== undefined && status >= 400)) {
     throw new UpstreamError(
@@ -85,6 +90,20 @@ export function detailBrickStack(ctx: NordicCtx): BrickStack {
     throw new ParseError("O layout do detalhe mudou: FLOX_STATE.brickStack não encontrado.");
   }
   return stack;
+}
+
+/** The list api answers a list of events carrying bricks: they become the children of one root. */
+export function floxEventsRootBrick(body: string): Brick {
+  let events: unknown;
+  try {
+    events = JSON.parse(body);
+  } catch {
+    throw new ParseError("A lista de compras não devolveu JSON.");
+  }
+  if (!Array.isArray(events)) {
+    throw new ParseError(`A resposta da lista mudou: esperava eventos, veio ${(events as { type?: string } | null)?.type ?? "outro formato"}.`);
+  }
+  return { id: "events", uiType: "events", bricks: (events as Array<{ bricks?: Brick[] }>).flatMap((event) => event.bricks ?? []) };
 }
 
 /** Root brick of the `/api/web/list_items` JSON envelope (spec §4.2). */

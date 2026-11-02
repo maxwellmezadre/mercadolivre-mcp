@@ -8,7 +8,7 @@ const MONTHS = [
   "janeiro", "fevereiro", "marco", "abril", "maio", "junho",
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
-const DATE = /(\d{1,2})[º°]?\s+de\s+([a-z]+)(?:\s+de\s+(\d{4}))?/;
+const DATE = /(\d{1,2})[º°]?\s+de\s+([a-z]+)\.?(?:\s+de\s+(\d{4}))?/;
 const PAYMENT_ID = /pagamento numero\s+(\d+)/;
 
 function iso(year: number, month: number, day: number): string {
@@ -32,7 +32,8 @@ export function parsePtBrDate(label: string, now: Date): string | undefined {
   const match = DATE.exec(text);
   if (!match) return undefined;
   const parsedDay = Number(match[1]);
-  const parsedMonth = MONTHS.indexOf(match[2] as string) + 1;
+  // The redesigned pages abbreviate: "20 de set.".
+  const parsedMonth = MONTHS.findIndex((name) => (match[2] as string).length >= 3 && name.startsWith(match[2] as string)) + 1;
   if (parsedMonth === 0 || parsedDay < 1 || parsedDay > 31) return undefined;
 
   let parsedYear = match[3] ? Number(match[3]) : year;

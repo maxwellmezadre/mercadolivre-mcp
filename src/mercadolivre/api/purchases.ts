@@ -5,7 +5,7 @@ import { parseListPage } from "../parser/list.js";
 import {
   detailBrickStack,
   extractNordicCtx,
-  floxJsonRootBrick,
+  floxEventsRootBrick,
   listRootBrick,
 } from "../parser/nordic.js";
 import type { BrickStack, DetailPage, ListPage } from "../types.js";
@@ -31,23 +31,15 @@ export type ListFilters = {
 
 export type DetailIds = { purchaseId: string; packId: string; orderId: string };
 
-function filterParams(filters: ListFilters): URLSearchParams {
-  const params = new URLSearchParams({ filterDate: filters.dateFilter ?? "ALL" });
-  if (filters.category) params.set("filterCategory", filters.category);
-  if (filters.search) params.set("searchValue", filters.search);
-  return params;
-}
-
-/** SSR list page (paginates, 10 purchases per page). */
+/** The list api: about 20 orders a page, the whole history without a period, an empty page at the end. */
 export function listPageUrl(page: number, filters: ListFilters): string {
-  const params = filterParams(filters);
-  params.set("page", String(page));
-  return `${MYACCOUNT_URL}/my_purchases/list?${params}`;
-}
-
-/** JSON list endpoint (same filters, always the first page). */
-export function listItemsUrl(filters: ListFilters): string {
-  return `${MYACCOUNT_URL}/my_purchases/api/web/list_items?${filterParams(filters)}`;
+  const params = new URLSearchParams();
+  if (filters.dateFilter && filters.dateFilter !== "ALL") params.set("filter_date", filters.dateFilter);
+  if (filters.category) params.set("filter_category", filters.category);
+  if (filters.search) params.set("search", filters.search);
+  if (page > 1) params.set("infinite-scroll", String(page));
+  const query = params.toString();
+  return `${MYACCOUNT_URL}/post-purchase/my-purchases/api/list${query ? `?${query}` : ""}`;
 }
 
 /** Detail page. All three ids are required and must come from one list item (AR-10). */
@@ -55,7 +47,7 @@ export function detailUrl(ids: DetailIds): string {
   for (const key of ["purchaseId", "packId", "orderId"] as const) {
     if (!ids[key]) throw new Error(`A página de detalhe precisa de ${key}: purchaseId, packId e orderId vêm juntos de um item da lista`);
   }
-  return `${MYACCOUNT_URL}/my_purchases/${ids.purchaseId}/status?packId=${ids.packId}&orderId=${ids.orderId}`;
+  return `${MYACCOUNT_URL}/post-purchase/my-purchases/${ids.purchaseId}/status?packId=${ids.packId}&orderId=${ids.orderId}`;
 }
 
 export type PurchasesApi = {
@@ -65,16 +57,21 @@ export type PurchasesApi = {
 };
 
 export function createPurchasesApi(ctx: { http: MeliHttp; now: () => Date }): PurchasesApi {
-  return {
-    async listPage(page, filters = {}) {
-      const result = await ctx.http.get(listPageUrl(page, filters), { kind: "html" });
-      return parseListPage(listRootBrick(extractNordicCtx(result.body)), ctx.now());
-    },
+  async function list(page: number, filters: ListFilters = {}): Promise<ListPage> {
+    // Only the full page brings the filter options (the category names); the api leaves them out.
+    const plain = !filters.category && !filters.search && (!filters.dateFilter || filters.dateFilter === "ALL");
+    if (page === 1 && plain) {
+      const full = await ctx.http.get(LIST_PAGE_URL, { kind: "html" });
+      return parseListPage(listRootBrick(extractNordicCtx(full.body)), ctx.now());
+    }
+    const result = await ctx.http.get(listPageUrl(page, filters), { kind: "json" });
+    return parseListPage(floxEventsRootBrick(result.body), ctx.now(), page);
+  }
 
-    async listFiltered(filters) {
-      const result = await ctx.http.get(listItemsUrl(filters), { kind: "json" });
-      return parseListPage(floxJsonRootBrick(result.body), ctx.now());
-    },
+  return {
+    listPage: list,
+
+    listFiltered: (filters) => list(1, filters),
 
     async getDetail(ids) {
       const result = await ctx.http.get(detailUrl(ids), { kind: "html", referer: LIST_PAGE_URL });

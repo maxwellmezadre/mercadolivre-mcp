@@ -54,6 +54,16 @@ const QUANTITY_WORDS: Record<string, number> = {
 };
 const QUANTITY = /(\d+|[a-z]+)\s+(?:unidades?|un\b\.?)/gi;
 
+const BRL = /(-)?\s*(?:(\d+)\s*x\s*)?R\$\s*(\d[\d.]*)(?:,(\d{1,2}))?/;
+
+/** "- R$ 6,90", "5x R$ 12,42", "R$ 1.200": signed value of one installment and how many. */
+export function parseBrl(text: string): { unitCents: number; installments: number } | undefined {
+  const match = BRL.exec(text);
+  if (!match) return undefined;
+  const cents = Number((match[3] as string).replace(/\./g, "")) * 100 + Number((match[4] ?? "0").padEnd(2, "0"));
+  return { unitCents: match[1] ? -cents : cents, installments: Number(match[2] ?? 1) };
+}
+
 export function stripAccents(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
